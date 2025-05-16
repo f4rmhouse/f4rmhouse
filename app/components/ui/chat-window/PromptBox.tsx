@@ -1,0 +1,243 @@
+"use client"
+import { useChat } from "ai/react";
+
+import { useEffect, useRef, useState } from "react";
+import type { FormEvent } from "react";
+import { useTheme } from "../../../context/ThemeContext";
+import F4Session from "../../types/F4Session";
+import ProductType from "../../types/ProductType";
+import ChatAIMessage from "../chat-messages/ChatAIMessage";
+import ChatToolMessage from "../chat-messages/ChatToolMessage";
+import ChatInitToolCallMessage from "../chat-messages/ChatInitToolCallMessage";
+import ChatMessageType from "../../types/ChatMessageType";
+import ChatUserMessage from "../chat-messages/ChatUserMessage";
+import ChatErrorMessage from "../chat-messages/ChatErrorMessage";
+import { ArrowLeftToLine, ArrowRightToLine, RotateCcw } from "lucide-react";
+import Link from "next/link";
+import Modal from "../modal/Modal";
+import Timer from "../misc/Timer";
+import UserInput from "./UserInput";
+import ModelSelector from "./ModelSelector";
+import AgentSelector from "./AgentSelector";
+import config from "../../../../f4.config";
+import Canvas from "./Canvas";
+import ChatSession from "./utils/ChatSession";
+import { PostDataType } from "./utils/types";
+import StreamProcessor from "./utils/StreamProcessor";
+
+/**
+ * PromptBox is the text input box at the bottom of the screen on /f4rmers/details page
+ * when the send button is pressed a request is sent to the /llm endpoint which 
+ * will return a response from the f4rmer that is currently selected
+ * 
+ * @param toolbox -- the set of tools that the f4rmer can use
+ * @param description -- system prompt created when the f4rmer was created
+ * @param session -- current f4 user session
+ * 
+ * @returns 
+ */
+export default function PromptBox({uti, toolbox, description, session, state, setState}: {uti: string, toolbox: ProductType[], description: string, session: F4Session, state: "canvas" | "chat" | "preview", setState: (state: "canvas" | "chat" | "preview") => void}) {
+  const { theme } = useTheme();
+  const messageContainerRef = useRef<HTMLDivElement | null>(null);
+  // Neede for streaming tokens not messages
+  // const bufferRef = useRef<string>('');
+
+  const [promptForUserLogin, setPromptForUserLogin] = useState<boolean>(false)
+  const [selectedModel, setSelectedModel] = useState<any>(config.models[Object.keys(config.models)[0]][0]);
+  const [selectedAgent, setSelectedAgent] = useState<any>({ id: 'seo-agent', name: 'SEO Agent' });
+
+  const [chatSession, setChatSession] = useState<ChatSession>(new ChatSession())
+
+  const transport:"MCP"|"REST" = "REST"
+
+  /** Absolutely needed */
+  const [currentSession, setCurrentSession] = useState<ChatMessageType[]>([]) 
+  const { messages, input, setInput, handleInputChange, setMessages } = useChat({});
+  const [loading, setLoading] = useState<boolean>(false)
+  const [latestMessage, setLatestMessage] = useState<string>("")
+
+  useEffect(() => {
+    setMessages(chatSession.messages)
+  }, [chatSession.messages])
+
+  useEffect(() => {
+    setMessages(chatSession.messages)
+  }, [latestMessage])
+
+  useEffect(() => {
+    if(loading) {
+      chatSession.streaming = false
+    }
+    else {
+      chatSession.streaming = false
+    }
+    setChatSession(chatSession)
+  }, [loading])
+
+  /**
+   * processStream processes the incoming stream of messages from the LLM.
+   * Reads chunks of data from the stream, decodes them, and passes them to the StreamProcessor
+   * for handling agent messages and tool responses.
+   * 
+   * @param id - Message ID counter
+   * @param reader - ReadableStream reader for the response
+   * @param MSStart - Timestamp when the stream processing started
+   */
+  async function processStream(id:number, reader:ReadableStreamDefaultReader<Uint8Array>, MSStart: number) {
+    try {
+      while (true) {
+        id++
+        const { done, value } = await reader.read();
+  
+        if (done) break;
+
+        const chunk = new TextDecoder().decode(value);
+        StreamProcessor.processTokenChunk(chunk, chatSession, MSStart, setLatestMessage, loading)
+      }
+    } catch (err) {
+      console.error(err)
+      chatSession.push("error", "system", "Connection error. Either the connection to the server has been broken or your connection is not stable. Please come back later and try again.")
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  /**
+   * sendMessage handles the submission of user messages to the LLM.
+   * - Checks if user needs to login after every 4 messages
+   * - Validates input and prevents empty submissions
+   * - Adds the user message to the chat session
+   * - Initiates the LLM response stream
+   * 
+   * @param e - Form submission event
+   */
+  async function sendMessage(e: FormEvent<HTMLFormElement>) {
+    if(chatSession.getMessages().length % 4 == 0 && chatSession.getMessages().length != 0 && session.access_token == "undefined") {
+      setPromptForUserLogin(true)
+    }
+
+    e.preventDefault()
+    if (input.length == 0) {
+      return
+    }
+    // TODO: make it so that I need to type nextjsrole and f4role
+    chatSession.push("user", "user", input)
+    setInput("")
+
+    // Add session to the components chat message storage
+    setCurrentSession(chatSession.getMessages())
+
+    // Hopefully we can remove messages in the future
+    setMessages(chatSession.toNextJSMessage("user"))
+
+    // show loading animation
+    let MSStart = new Date().getTime()
+    setLoading(true)
+
+    if(selectedModel == null){
+      alert("Please select a model to use.")
+      return
+    }
+
+    let postData: PostDataType = {
+      messages: chatSession.getNextJSMessages(), 
+      description: description,
+      show_intermediate_steps: false,
+      email: session.user.email,
+      provider: session.provider,
+      token: session.access_token,
+      f4rmer: uti,
+      model: selectedModel
+    }
+
+    // Send message
+    const stream = await chatSession.send(postData)
+    if(!stream) {
+      alert("There was a server error while sending your request. This is completely our, fault we will do better in the future.")
+      return
+    }
+
+    await processStream(chatSession.getMessages().length, stream, MSStart) 
+  }
+
+  return (
+    <div className="sm:flex overflow-hidden w-[100vw]">
+      <div className={`flex transition-all ${state === "chat" ? "m-auto" : "m-0"}`}>
+    <div className={`relative m-auto pt-0 md:pt-0 w-[100vw] h-[100vh] sm:h-[93vh] overflow-hidden ${state === "chat" ? "sm:w-[16cm]" : "sm:w-[10cm]"} ${theme.chatWindowStyle ? theme.chatWindowStyle : ""}`}>
+      <div className={`w-full w-[100%] ${theme.textColorSecondary} p-2`}>
+        <AgentSelector onAgentSelect={(e:any) => {setSelectedAgent(e)}} selectedAgent={selectedAgent}/> 
+      </div>
+      <div className="no-scrollbar flex flex-col w-full transition-all duration-500 overflow-y-auto flex-grow h-full">
+        <div
+          className={`p-2 no-scrollbar flex flex-col-reverse w-full gap-5 transition-all duration-500 overflow-y-scroll scrollb ${currentSession.length > 0 ? 'opacity-100' : 'opacity-0 h-0'}`}
+          ref={messageContainerRef}
+        >
+          {loading ? 
+            <div className="flex gap-2 ml-2"><img className="h-[30px] rounded-full" src="https://pbs.twimg.com/media/CrghjJoUMAEBcO_.jpg"/> <div className={`p-2 ${theme.textColorSecondary}`}><p><span className="">🤔</span> thinking...</p><div className="text-xs"><Timer /></div></div></div>
+            :
+            <></>
+          }
+          {chatSession.messages.length > 0 ? (
+            [...chatSession.messagesTypes]
+              .reverse()
+              .map((m, i) => {
+                switch (m.role) {
+                  case "user":
+                    return (<ChatUserMessage key={i} content={m.content} timestamp={m.timestamp}/>)
+                  case "tool_init":
+                    return (<ChatInitToolCallMessage key={i} message={m.content} debug={chatSession.getDebug(m.id) ?? {message: "no extra information"}}/>)
+                  case "system":
+                    return (<ChatAIMessage key={i} message={m.content} openCanvas={() => setState("canvas")}/>)
+                  case "tool_response":
+                    return (<ChatToolMessage key={i} message={m.content} debug={chatSession.getDebug(m.id) ?? {message: "no extra information"}}/>)
+                  case "error":
+                    return (<ChatErrorMessage key={i} content={m.content}/>)
+                }
+              })
+          ) : (
+            ""
+          )}
+        </div>
+        <div className={`mt-auto sticky transition-all ${state === "canvas" ? "w-[98%]" : "w-[99%]"} ml-1 mr-2 ${chatSession.getMessages().length > 0 ? "bottom-[10%] sm:bottom-12 pb-1" : "bottom-[calc(50vh)]"}`}>
+            <div className={`${chatSession.getMessages().length === 0 ? "opacity-100" : "opacity-0"} pb-5`}>
+              <h1 className={`text-2xl ${theme.textColorPrimary ? theme.textColorPrimary : "text-white"}`}>{config.welcomeText.replace("{{username}}", session.user.name === "undefined" ? "anon" : session.user.name.split(" ")[0])}</h1>
+            </div>
+          <UserInput onSubmit={sendMessage} onChange={handleInputChange} value={input}>
+            <div className="flex p-0">
+              <ModelSelector onModelSelect={(e:any) => {setSelectedModel(e)}} selectedModel={selectedModel}/>
+              <button onClick={() => setState(state === "canvas" ? "chat" : "canvas")} className={`transition-all p-2 ${theme.textColorSecondary ? theme.textColorSecondary : "text-neutral-300"} hover:${theme.secondaryHoverColor ? theme.secondaryHoverColor : ""}`}>
+                {state === "canvas" ? <ArrowRightToLine size={15}/> : <ArrowLeftToLine size={15}/>}
+              </button>
+            </div>
+          </UserInput>
+        </div>
+      </div>
+    </div>
+    <div className="absolute bg-transparent sm:static ml-2 right-2 top-[40%]">
+      <div className={`flex flex-col gap-2 ${chatSession.getMessages().length == 0 ? "opacity-0" : "opacity-100"}`}>
+        <button onClick={() => {chatSession.clear();setCurrentSession([])}} className={`transition-all hover:rotate-[-90deg] rounded-md p-2 ${theme.textColorPrimary ? theme.textColorPrimary : "text-white"}`}><RotateCcw size={15}/></button>
+      </div> 
+    </div>
+    {promptForUserLogin ? 
+      <div onClick={() => setPromptForUserLogin(false)} className={`${promptForUserLogin ? "" : "hidden"} transition-all absolute top-0 left-0 w-full h-full bg-black bg-opacity-50`}>
+        <Modal open={promptForUserLogin} title="🙏">
+          <div className="p-5">
+            <p className="text-2xl font-bold">Appreciate you for using f4rmhouse.</p>
+            <p className="text-neutral-400">Sign in and add actions to your LLM to automate your digital work!</p>
+            <div className="w-full flex">
+              <Link href="/login" className="transition-all hover:bg-neutral-400 bg-neutral-200 mt-5 pt-2 pb-2 w-full rounded-full text-black text-center">Sign in</Link>
+            </div>
+            <button onClick={() => {setPromptForUserLogin(false)}} className="z-99 text-sm text-center text-neutral-300 pt-2 w-full underline">not yet!</button>
+          </div>
+        </Modal>
+      </div>
+      :
+      <></>
+    }
+    </div>
+    <div className={`flex transition-all ease-in-out text-white rounded-md w-full bg-white ${state === "chat" ? "opacity-0 hidden" : "opacity-100"}`}>
+      <Canvas />
+    </div>
+    </div>
+  )
+}

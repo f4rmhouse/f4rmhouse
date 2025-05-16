@@ -1,0 +1,111 @@
+import ChatMessageType from "@/app/components/types/ChatMessageType";
+import { Message } from "ai/react";
+import { PostDataType } from "./types";
+
+export default class ChatSession {
+    public messages: Message[];
+    private langchainDebugMessages: Map<string, Object>;
+    public messagesTypes: ChatMessageType[];
+    public streaming: boolean;
+  
+    constructor() {
+        this.messages = [];
+        this.messagesTypes = [];
+        this.langchainDebugMessages = new Map()
+        this.streaming = false
+    } 
+  
+    push = (f4role: "user" | "system" | "tool_response" | "tool_init" | "error", nextjsrole: "user" | "assistant" | "system" | "tool", message:string, debug?: Object) => {
+      let id = this.messagesTypes.length.toString()
+      this.messagesTypes.push({
+        id: id, 
+        role: f4role, 
+        content: message,
+        tool_calls: [],
+        timestamp: new Date().getTime()
+      })
+  
+      this.messages.push(
+        { 
+          id: this.messages.length.toString(), 
+          content: message, 
+          role: nextjsrole 
+        }
+      );
+
+      if(debug) {
+        this.langchainDebugMessages.set(String(id), debug)
+      }
+  
+      return this
+    } 
+  
+    clear = () => {
+      this.messages = [];
+      this.messagesTypes = [];
+    }
+    
+    send = async (data: PostDataType) => {
+      try {
+        const response = await fetch('/api/llm', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+  
+        if(!response.ok){
+          return null
+        }
+  
+        const stream = response.body;
+        if(stream) {
+          return stream.getReader()
+        }
+        return null
+      } 
+      catch(err) {
+        console.error("An error occured when fetching the stream reader: ", err)
+        let chatErrMsg = { 
+          id: this.messages.length.toString(), 
+          content: "[ERROR] Connection error. Either the connection to the server has been broken or your connection is not stable. Please come back later and try again.", 
+          role: "error" as const, 
+          tool_calls: [], 
+          timestamp: new Date().getTime()
+        }
+  
+        this.messagesTypes.push(chatErrMsg)
+  
+      } 
+    }
+  
+    getMessages = () => {
+      return this.messagesTypes
+    }
+  
+    toNextJSMessage = (role: "user" | "assistant" | "system" | "tool") => {
+      return this.messagesTypes.map((m) => {
+        return {
+          id: m.id,
+          role: role,
+          content: m.content,
+          tool_calls: m.tool_calls,
+          timestamp: m.timestamp
+        }
+      })   
+    }
+  
+    getNextJSMessages = () => {
+      return this.messages
+    }
+
+    getDebug = (id:string) => {
+      return this.langchainDebugMessages.get(id)
+    }
+
+    pushToken = (token: string) => {
+      this.messages[this.messages.length - 1].content += token
+      this.messagesTypes[this.messagesTypes.length - 1].content += token
+    }
+  }

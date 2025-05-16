@@ -1,0 +1,217 @@
+{
+    "banner": {
+      "type": "banner",
+      "header": "", 
+      "content": [
+        {"uti": "", "link": "", "id": "0", "price": "0.0", "disclaimer": "", "type": "simple", "title": "Make the impossible possible", "description": "Run these free apps that feel like magic", "decorator": "https://media.licdn.com/dms/image/D5612AQFsxjC67OTtwg/article-cover_image-shrink_720_1280/0/1678313143886?e=2147483647&v=beta&t=z4H1BPpb1EpjBwnpwTWb02d7U3Z83IF6e2P9npWCJ2s", "style": "bg-white"},
+        {"uti": "", "link": "", "id": "1", "price": "0.0", "disclaimer": "", "type": "full", "title": "RIP tomagotchi?", "description": "Wrappers your new employee? Your new therapist? Boss?? idk lol", "decorator": "https://preview.redd.it/y2k-computer-wallpaper-pictures-used-from-3840-x-2160-v0-1btthmfnwnob1.png?width=1080&crop=smart&auto=webp&s=50a60952708d37c56a38a0d5db02c869dad2cb70", "style": "font-rocket text-blue-900 ml-[150px]"},
+        {"uti": "", "link": "", "id": "2", "price": "0.0", "disclaimer": "", "type": "simple", "title": "Delightful and creative", "description": "A curated list of amazing wrapper applications we discovered", "decorator": "https://static.vecteezy.com/system/resources/previews/032/714/330/non_2x/pc-retro-y2k-desktop-lofi-wallpaper-nostalgic-computer-interface-2d-scene-cartoon-flat-illustration-upload-files-sunshine-peony-hearts-chill-art-lo-fi-aesthetic-colorful-background-vector.jpg", "style": " font-sunflower bg-yellow-200"},
+        {"uti": "", "link": "", "id": "3", "price": "0.0", "disclaimer": "", "type": "central-text", "title": "You wouldn't download an intelligence", "description": "Find out how f4rmers deploy apps and how you can integrate them into your workflow.", "decorator": "https://cdn.prod.website-files.com/5a9ee6416e90d20001b20038/6289efcc9a52f65ff46e8400_white-gradient.png", "style": "font-warning"},
+        {"uti": "", "link": "", "id": "4", "price": "0.0", "disclaimer": "", "type": "simple", "title": "AI changes by the second not by the quarter", "description": "", "decorator": "https://media.licdn.com/dms/image/D5612AQFsxjC67OTtwg/article-cover_image-shrink_720_1280/0/1678313143886?e=2147483647&v=beta&t=z4H1BPpb1EpjBwnpwTWb02d7U3Z83IF6e2P9npWCJ2s", "style": ""},
+        {"uti": "", "link": "", "id": "5", "price": "0.0", "disclaimer": "", "type": "simple", "title": "AI changes by the second not by the quarter", "description": "", "decorator": "https://media.licdn.com/dms/image/D5612AQFsxjC67OTtwg/article-cover_image-shrink_720_1280/0/1678313143886?e=2147483647&v=beta&t=z4H1BPpb1EpjBwnpwTWb02d7U3Z83IF6e2P9npWCJ2s", "style": "font-cats"}
+      ]
+    },
+    "info": {
+      "type": "info_cards",
+      "header": "",
+      "content": [
+        {
+          "uti": "",
+          "id": "1",
+          "decorator": "https://img.freepik.com/free-vector/cute-robot-holding-phone-with-laptop-cartoon-vector-icon-illustration-science-technology-isolated_138676-4870.jpg",
+          "title": "New to f4rmhouse?",
+          "description": "Create any agents you need or use one created by our cool (😎) community!",
+          "price": "",
+          "disclaimer": "",
+          "style": "",
+          "link": "/article/how_to_tools"
+        },
+        {
+          "uti": "",
+          "id": "2",
+          "decorator": "https://www.shutterstock.com/image-vector/set-retro-computer-ui-nostalgic-600nw-2185374701.jpg",
+          "title": "File conversion. Done right.",
+          "description": "PDF to Word? HTML to PDF? Excel to Word? We got it all!",
+          "price": "",
+          "disclaimer": "",
+          "style": "",
+          "link": "/article/file_converter"
+        }, 
+        {
+          "uti": "",
+          "id": "3",
+          "decorator": "",
+          "title": "'I want to watch a movie but don't know which!'",
+          "description": "The future is NOW. f4rmers can help to solve first world problems!",
+          "price": "",
+          "disclaimer": "",
+          "style": "",
+          "link": ""
+        }, 
+        {
+          "uti": "",
+          "id": "4",
+          "decorator": "",
+          "title": "Stay ahead of the competition",
+          "description": "qrd can aggregate millions of news articles in minutes.",
+          "price": "",
+          "disclaimer": "",
+          "style": "",
+          "link": ""
+        }, 
+        {
+          "uti": "",
+          "id": "5",
+          "decorator": "",
+          "title": "Low risk high reward actions",
+          "description": "qrd can aggregate millions of news articles in minutes.",
+          "price": "",
+          "disclaimer": "",
+          "style": "",
+          "link": ""
+        }, 
+        {
+          "uti": "",
+          "id": "6",
+          "decorator": "",
+          "title": "Forecasting. Done right.",
+          "description": "qrd can aggregate millions of news articles in minutes.",
+          "price": "",
+          "disclaimer": "",
+          "style": "",
+          "link": ""
+        },
+        {
+          "uti": "",
+          "id": "7",
+          "decorator": "",
+          "title": "Actions can do your work for you!",
+          "description": "qrd can aggregate millions of news articles in minutes.",
+          "price": "",
+          "disclaimer": "",
+          "style": "",
+          "link": ""
+        }, 
+        {
+          "uti": "",
+          "id": "8",
+          "decorator": "",
+          "title": "Forecasting. Done right.",
+          "description": "qrd can aggregate millions of news articles in minutes.",
+          "price": "",
+          "disclaimer": "",
+          "style": "",
+          "link": ""
+        },
+        {
+          "uti": "",
+          "id": "9",
+          "decorator": "",
+          "title": "Forecasting. Done right.",
+          "description": "qrd can aggregate millions of news articles in minutes.",
+          "price": "",
+          "disclaimer": "",
+          "style": "",
+          "link": ""
+        }, 
+        {
+          "uti": "",
+          "id": "10",
+          "decorator": "",
+          "title": "Forecasting. Done right.",
+          "description": "qrd can aggregate millions of news articles in minutes.",
+          "price": "",
+          "disclaimer": "",
+          "style": "",
+          "link": ""
+        },
+        {
+          "uti": "",
+          "id": "11",
+          "decorator": "",
+          "title": "Forecasting. Done right.",
+          "description": "qrd can aggregate millions of news articles in minutes.",
+          "price": "",
+          "disclaimer": "",
+          "style": "",
+          "link": ""
+        }, 
+        {
+          "uti": "",
+          "id": "12",
+          "decorator": "",
+          "title": "Forecasting. Done right.",
+          "description": "qrd can aggregate millions of news articles in minutes.",
+          "price": "",
+          "disclaimer": "",
+          "style": "",
+          "link": ""
+        },
+        {
+          "uti": "",
+          "id": "13",
+          "decorator": "",
+          "title": "Forecasting. Done right.",
+          "description": "qrd can aggregate millions of news articles in minutes.",
+          "price": "",
+          "disclaimer": "",
+          "style": "",
+          "link": ""
+        }, 
+        {
+          "uti": "",
+          "id": "14",
+          "decorator": "",
+          "title": "Forecasting. Done right.",
+          "description": "qrd can aggregate millions of news articles in minutes.",
+          "price": "",
+          "disclaimer": "",
+          "style": "",
+          "link": ""
+        }
+      ]
+    },
+    "bApps": {
+      "type": "small_cards",
+      "header": "Apps to streamline your business",
+      "content": "trending"
+    },
+    "articles": {
+      "type": "medium_cards",
+      "header": "Welcome to f4rmhouse",
+      "content": [
+        {
+          "uti": "",
+          "id": "1",
+          "decorator": "https://f4-public.s3.eu-central-1.amazonaws.com/public/assets/blog-header-1.jpeg",
+          "title": "A proposition for an agentic web",
+          "description": "",
+          "price": "5.49",
+          "disclaimer": "Subscription-based service with a free version available.",
+          "style": "",
+          "link": "/article/agentic_web"
+        },
+        {
+          "uti": "",
+          "id": "2",
+          "decorator": "https://f4-public.s3.eu-central-1.amazonaws.com/public/assets/blog-header-2.png",
+          "title": "f4rmhouses dedication to revolutionize security in the AI space",
+          "description": "(this image was AI generated)",
+          "price": "24.99",
+          "disclaimer": "",
+          "style": "",
+          "link": "/article/security"
+        },
+        {
+          "uti": "",
+          "id": "3",
+          "decorator": "https://f4-public.s3.eu-central-1.amazonaws.com/public/assets/blog-header-3.jpeg",
+          "title": "What can a F4RMER even do?",
+          "description": "",
+          "price": "3.99",
+          "disclaimer": "",
+          "style": "",
+          "link": "/article/use_cases"
+        }
+      ]}
+}

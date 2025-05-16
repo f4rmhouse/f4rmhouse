@@ -1,0 +1,52 @@
+import type { Metadata } from "next";
+import "./globals.css";
+import Link from "next/link";
+import NavButtonGroup from "./components/ui/navbar/NavButtonGroup"
+import { SessionProvider } from 'next-auth/react'
+import { PHProvider } from './providers'
+import { ThemeProvider } from "./context/ThemeContext";
+import { ArtifactProvider } from "./context/ArtifactContext";
+import config from "../f4.config"
+
+export const metadata: Metadata = {
+  title: "f4rmhouse",
+  description: "The MCP tool hub.",
+};
+
+export default function RootLayout({children,}: Readonly<{children: React.ReactNode}>) {
+
+  return (
+    <html lang="en">
+      <head>
+        <link rel="icon" href="/public/icon.ico" sizes="any" />
+      </head>
+      <PHProvider>
+      <SessionProvider>
+        <ThemeProvider>
+          <body>
+            <ArtifactProvider>
+              <div className="min-h-screen">
+                {
+                <nav className="fixed z-10 w-[100vw] border-b border-neutral-700 bg-black">
+                  <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto">
+                    <div>
+                      <Link href="/" className="text-xs sm:text-sm">{config.name}</Link>
+                    </div>
+                    <div>
+                      <NavButtonGroup />
+                    </div>
+                  </div>
+                </nav>
+                }
+                <div>
+                  {children}
+                </div>
+              </div>
+            </ArtifactProvider>
+          </body>
+        </ThemeProvider>
+        </SessionProvider>
+        </PHProvider>
+    </html>
+  );
+}
