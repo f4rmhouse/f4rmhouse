@@ -1,8 +1,9 @@
 # 🏡 f4rmhouse
 
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/f4rmhouse/f4-client)
-[![Commits/Month](https://img.shields.io/github/commit-activity/m/f4rmhouse/f4-client)](https://github.com/f4rmhouse/f4-client/commits/main)
-[![Issues Closed](https://img.shields.io/github/issues-closed/f4rmhouse/f4-client)](https://github.com/f4rmhouse/f4-client/issues?q=is%3Aissue+is%3Aclosed)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/f4rmhouse/f4rmhouse)
+[![Commits/Month](https://img.shields.io/github/commit-activity/m/f4rmhouse/f4rmhouse)](https://github.com/f4rmhouse/f4rmhouse/commits/main)
+[![Issues Closed](https://img.shields.io/github/issues-closed/f4rmhouse/f4rmhouse)](https://github.com/f4rmhouse/f4rmhouse/issues?q=is%3Aissue+is%3Aclosed)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/f4rmhouse/f4rmhouse/pulls)
 ## What is f4rmhouse?
 
 F4rmhouse is an all-in-one, open source platform for building useful agents. It provides every tool you need to create a modern agent with all its bells and MCP whistles. 
