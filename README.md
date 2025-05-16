@@ -50,8 +50,9 @@ Now just follow the instructions on the screen.
 ## Roadmap
 ## Contributing
 ## License
+
+This repo is available under the MIT expat license, except for the ee directory if applicable.
+
 ## Stay Connected
 
     🏡 Built with love for agents, by humans.
-
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
