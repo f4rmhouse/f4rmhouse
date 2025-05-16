@@ -58,7 +58,7 @@ SESSION_AUTH_TOKEN=""
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-Now just follow the instructions on the screen.
+Now you should see a chat window on your screen.
 
 ## Contributing
 
