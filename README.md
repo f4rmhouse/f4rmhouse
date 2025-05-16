@@ -5,6 +5,15 @@ F4rmhouse is an all-in-one, open source platform for building useful agents. It 
 
 If you're non-technical you can use the official [website](https://f4rmhouse.com) which contains some paid features but has a very generous free tier. If you're not interested in that you can install a f4rmhouse client on your local system. 
 
+[f4rmhouse](https://f4rmhouse.com) provides every tool you need to create useful agents:
+
+* [on-prem deployments](https://f4rmhouse.com):
+* [shareable agents](https://f4rmhouse.com):
+* [MCP plug-ang-play](https://f4rmhouse.com):
+* [Model selection](https://f4rmhouse.com):
+* [Extensible artifacts](https://f4rmhouse.com):
+* [Agent swarms](https://f4rmhouse.com):
+
 ## Prerequisites
 
 * (optional) A running f4rmhouse API (we use the public one by default but you can run your own)
