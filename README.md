@@ -13,20 +13,13 @@ F4rmhouse is an all-in-one, open source platform for building useful agents. It 
 
 This is all mostly free to use on our official [website](https://f4rmhouse.com) which has a very generous free tier. If you're not interested in that you can install a f4rmhouse client on your local system. 
 
-## Prerequisites
-
-* (optional) A running f4rmhouse API (we use the public one by default but you can run your own)
-* Docker
-* node
-* f4cli -- the f4rmhouse cli tool that let's you publish tools to the public or a private tool repository
-
 ## Getting Started
 
 ### Using Docker
 
 ```
 docker build -t f4rmhouse .
-docker run -p 8000:8000 f4rmhouse
+docker run -p 3000:3000 f4rmhouse
 ```
 
 ### Using npm
@@ -46,8 +39,6 @@ bun dev
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 Now just follow the instructions on the screen.
-
-## Roadmap
 
 ## Contributing
 
