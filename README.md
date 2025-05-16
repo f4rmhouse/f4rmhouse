@@ -7,7 +7,7 @@ F4rmhouse is an all-in-one, open source platform for building useful agents. It 
 * [shareable agents](https://f4rmhouse.com): We are the leaders of the Create Once Run Anywhere (CORA) movement in tech, we don't want agents to live in a single application but rather integrate into the apps you already use.
 * [MCP plug-and-play](https://f4rmhouse.com): Users often complain about the complexity associated with attaching MCPs to a chat. f4rmhouse makes this a breeze with our "action store" you can add MCPs to your chat with one single click. 
 * [Model selection](https://f4rmhouse.com): different models have different capabilities. The model selector lets you choose the model you want to use to accomplish a specific task, use a public model through an API key or use a local one with ollama.
-* [Extensible artifacts](https://f4rmhouse.com):
+* [Extensible artifacts](https://f4rmhouse.com): LLMs are mostly used to generate text. But give them the right tools and they can generate far more than that, artifacts allow your agents to render web pages, csv files, 3D scenes and much more. You can add artifacts that suit your specific needs.
 * [Agent swarms](https://f4rmhouse.com):
 * [Deep customizability](https://f4rmhouse.com)
 
