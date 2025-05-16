@@ -11,7 +11,7 @@ F4rmhouse is an all-in-one, open source platform for building useful agents. It 
 * [Agent swarms](https://f4rmhouse.com):
 * [Deep customizability](https://f4rmhouse.com)
 
-If you're non-technical you can use the official [website](https://f4rmhouse.com) which contains some paid features but has a very generous free tier. If you're not interested in that you can install a f4rmhouse client on your local system. 
+This is all mostly free to use on our official [website](https://f4rmhouse.com) which has a very generous free tier. If you're not interested in that you can install a f4rmhouse client on your local system. 
 
 ## Prerequisites
 
