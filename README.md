@@ -1,4 +1,6 @@
 # 🏡 f4rmhouse
+
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/f4rmhouse/f4-client)
 ## What is f4rmhouse?
 
 F4rmhouse is an all-in-one, open source platform for building useful agents. It provides every tool you need to create a modern agent with all its bells and MCP whistles. 

@@ -39,7 +39,7 @@ interface Config {
 
 const config: Config = {
     "name": "f4rmhouse",
-    "version": "0.1.0",
+    "version": "1.0.0",
     "welcomeText": "{{username}} returns!",
     "models": {
         "openai": [

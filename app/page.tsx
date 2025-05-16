@@ -13,7 +13,7 @@ import { CircleHelp, Github } from "lucide-react";
 import FPSCounter from './components/ui/FPSCounter';
 import { ThemeProvider } from "./context/ThemeContext";
 import ThemeToggleButton from "./components/ui/ThemeToggleButton";
-
+import config from "../f4.config";
 
 async function Dashboard({ params }: { params: { username: string, uid: string } }) {
 
@@ -68,6 +68,7 @@ async function Dashboard({ params }: { params: { username: string, uid: string }
             Help
           </button>
           <FPSCounter />
+          <p className="text-neutral-500 text-xs">version: {config.version}</p>
         </div>
         {error && (
             <div className="bg-black p-4 rounded absolute bottom-10 right-24">
