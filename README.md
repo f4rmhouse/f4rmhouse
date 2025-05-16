@@ -13,6 +13,7 @@ If you're non-technical you can use the official [website](https://f4rmhouse.com
 * [Model selection](https://f4rmhouse.com):
 * [Extensible artifacts](https://f4rmhouse.com):
 * [Agent swarms](https://f4rmhouse.com):
+* [Deep customizability](https://f4rmhouse.com)
 
 ## Prerequisites
 
