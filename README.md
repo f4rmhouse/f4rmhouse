@@ -36,6 +36,23 @@ pnpm dev
 bun dev
 ```
 
+### Adding secrets
+```
+AUTH_SECRET="" # Added by `npx auth`. Read more: https://cli.authjs.dev
+AUTH_GOOGLE_ID="" # if you want Google OAuth
+AUTH_GOOGLE_SECRET="" # if you want Google OAuth
+AUTH_GITHUB_ID="" # if you want GitHub OAuth
+AUTH_GITHUB_SECRET="" # if you want Github OAuth
+  
+SECRET_KEY= 
+AWS_ACCESS_KEY_ID= # (optional) If you want to use AWS 
+AWS_SECRET_ACCESS_KEY= # (optional) If you want to use AQS
+OPENAI_SECRET= 
+ANTHROPIC_SECRET=""
+WHATSAPP_ACCESS_TOKEN=''
+SESSION_AUTH_TOKEN=""
+```
+
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 Now just follow the instructions on the screen.
