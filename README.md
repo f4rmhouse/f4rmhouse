@@ -37,6 +37,9 @@ bun dev
 ```
 
 ### Adding secrets
+
+Copy this into your `.env.local` file
+
 ```
 AUTH_SECRET="" # Added by `npx auth`. Read more: https://cli.authjs.dev
 AUTH_GOOGLE_ID="" # if you want Google OAuth
