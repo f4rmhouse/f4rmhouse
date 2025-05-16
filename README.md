@@ -24,6 +24,11 @@ This is all mostly free to use on our official [website](https://f4rmhouse.com) 
 
 ### Using Docker
 
+```
+docker build -t f4rmhouse .
+docker run -p 8000:8000 f4rmhouse
+```
+
 ### Using npm
 
 First, run the development server:
