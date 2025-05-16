@@ -9,7 +9,7 @@ F4rmhouse is an all-in-one, open source platform for building useful agents. It 
 * [Model selection](https://f4rmhouse.com): different models have different capabilities. The model selector lets you choose the model you want to use to accomplish a specific task, use a public model through an API key or use a local one with ollama.
 * [Extensible artifacts](https://f4rmhouse.com): LLMs are mostly used to generate text. But give them the right tools and they can generate far more than that, artifacts allow your agents to render web pages, csv files, 3D scenes and much more. You can add artifacts that suit your specific needs.
 * [Agent swarms](https://f4rmhouse.com):
-* [Deep customizability](https://f4rmhouse.com): people spend more and more time in front of AI chat windows. f4rmhouse lets you change every aspect of the design using the f4.config file, f4rmhouse also support custom keyboard bindings so that you can work much faster.
+* [Deep customizability](https://f4rmhouse.com): people spend more and more time in front of AI chat windows. f4rmhouse gives you the customizability you wish you had on other platforms. You change every aspect of the design using the f4.config file, f4rmhouse also support custom keyboard bindings so that you can work much faster.
 
 This is all mostly free to use on our official [website](https://f4rmhouse.com) which has a very generous free tier. If you're not interested in that you can install a f4rmhouse client on your local system. 
 
