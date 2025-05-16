@@ -54,7 +54,7 @@ async function Dashboard({ params }: { params: { username: string, uid: string }
         
         <div className="absolute bottom-0 flex right-24">
           <a 
-            href="https://github.com/fizlip/f4rmhouse-frontend" 
+            href="https://github.com/f4rmhouse/f4rmhouse" 
             target="_blank" 
             rel="noopener noreferrer" 
             className="text-neutral-500 flex hover:text-white px-1 underline text-xs"
