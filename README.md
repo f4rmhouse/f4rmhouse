@@ -51,17 +51,16 @@ Now just follow the instructions on the screen.
 
 ## Contributing
 
-We love your input! We want to make contributing to this project as easy and transparent as possible, whether it's:
+We <3 your input! We want to make contributing to this project as easy and transparent as possible, whether it's:
 
-- Reporting a bug
+- Reporting a bug or submitting a fix
 - Discussing the current state of the code
-- Submitting a fix
 - Proposing new features
 - Becoming a maintainer
 
 ### Development Process
 
-We use GitHub to host code, to track issues and feature requests, as well as accept pull requests.
+We use GitHub to host code, to track issues and feature requests, as well as accept pull requests. If you want to dicuss the project more generally or meet other community members you can join our Dicsord! 
 
 ### Pull Requests
 
