@@ -8,7 +8,7 @@ F4rmhouse is an all-in-one, open source platform for building useful agents. It 
 * [MCP plug-and-play](https://f4rmhouse.com): Users often complain about the complexity associated with attaching MCPs to a chat. f4rmhouse makes this a breeze with our "action store" you can add MCPs to your chat with one single click. 
 * [Model selection](https://f4rmhouse.com): different models have different capabilities. The model selector lets you choose the model you want to use to accomplish a specific task, use a public model through an API key or use a local one with ollama.
 * [Extensible artifacts](https://f4rmhouse.com): LLMs are mostly used to generate text. But give them the right tools and they can generate far more than that, artifacts allow your agents to render web pages, csv files, 3D scenes and much more. You can add artifacts that suit your specific needs.
-* [Agent swarms](https://f4rmhouse.com):
+* [Agent swarms](https://f4rmhouse.com): (coming soon)
 * [Deep customizability](https://f4rmhouse.com): people spend more and more time in front of AI chat windows. f4rmhouse gives you the customizability you wish you had on other platforms. You change every aspect of the design using the f4.config file, f4rmhouse also support custom keyboard bindings so that you can work much faster.
 
 This is all mostly free to use on our official [website](https://f4rmhouse.com) which has a very generous free tier. If you're not interested in that you can install a f4rmhouse client on your local system. 
@@ -48,7 +48,34 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 Now just follow the instructions on the screen.
 
 ## Roadmap
+
 ## Contributing
+
+We love your input! We want to make contributing to this project as easy and transparent as possible, whether it's:
+
+- Reporting a bug
+- Discussing the current state of the code
+- Submitting a fix
+- Proposing new features
+- Becoming a maintainer
+
+### Development Process
+
+We use GitHub to host code, to track issues and feature requests, as well as accept pull requests.
+
+### Pull Requests
+
+1. Fork the repo and create your branch from `main`.
+2. If you've added code that should be tested, add tests.
+3. If you've changed APIs, update the documentation.
+4. Ensure the test suite passes.
+5. Make sure your code lints.
+6. Issue that pull request!
+
+### Issues
+
+We use GitHub issues to track public bugs. Report a bug by opening a new issue.
+
 ## License
 
 This repo is available under the MIT expat license, except for the ee directory if applicable.
