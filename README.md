@@ -5,7 +5,7 @@ F4rmhouse is an all-in-one, open source platform for building useful agents. It 
 
 * [local/custom deployments](https://f4rmhouse.com): many teams want or need full control over their data and infrastructure. Self-hosting avoids vendor lock-in, ensures data never leaves your environment, and simplifies compliance with HIPAA, GDPR, SOC 2, etc.
 * [shareable agents](https://f4rmhouse.com): We are the leaders of the Create Once Run Anywhere (CORA) movement in tech, we don't want agents to live in a single application but rather integrate into the apps you already use.
-* [MCP plug-ang-play](https://f4rmhouse.com): 
+* [MCP plug-and-play](https://f4rmhouse.com): 
 * [Model selection](https://f4rmhouse.com):
 * [Extensible artifacts](https://f4rmhouse.com):
 * [Agent swarms](https://f4rmhouse.com):
