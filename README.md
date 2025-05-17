@@ -14,7 +14,7 @@ Feature list:
 - [x] [MCP plug-and-play](https://f4rmhouse.com): Users often complain about the complexity associated with attaching MCPs to a chat. f4rmhouse makes this a breeze, using the "action store" you can add MCPs to your chat with one single click. 
 - [x] [Model selection](https://f4rmhouse.com): different models have different capabilities. The model selector lets you choose the model you want to use to accomplish a specific task, use a public model through an API key or use a local one with ollama.
 - [x] [Extensible artifacts](https://f4rmhouse.com): LLMs are mostly used to generate text. But give them the right tools and they can generate far more than that, artifacts allow your agents to render web pages, csv files, 3D scenes and much more. You can add artifacts that suit your specific needs.
-- [] [Agent swarms](https://f4rmhouse.com): (coming soon)
+- [ ] [Agent swarms](https://f4rmhouse.com): (coming soon)
 - [x] [Deep customizability](https://f4rmhouse.com): people spend more and more time in front of AI chat windows. f4rmhouse gives you the customizability you wish you had on other platforms. You change every aspect of the design using the f4.config file, f4rmhouse also support custom keyboard bindings so that you can work much faster.
 
 This is all mostly free to use on our official [website](https://f4rmhouse.com) which has a very generous free tier. If you're not interested in that you can install a f4rmhouse client on your local system. 
