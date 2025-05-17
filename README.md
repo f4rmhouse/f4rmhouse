@@ -17,7 +17,7 @@ Feature list:
 - [ ] [Agent swarms](https://f4rmhouse.com): (coming soon)
 - [x] [Deep customizability](https://f4rmhouse.com): people spend more and more time in front of AI chat windows. f4rmhouse gives you the customizability you wish you had on other platforms. You change every aspect of the design using the f4.config file, f4rmhouse also support custom keyboard bindings so that you can work much faster.
 
-This is all mostly free to use on our official [website](https://f4rmhouse.com) which has a very generous free tier. If you're not interested in that you can install a f4rmhouse client on your local system or your cloud setup. 
+This is all mostly free to use on our official [website](https://f4rmhouse.com) which has a very generous free tier. If you're not interested in that you can install a f4rmhouse client on your local system or your own cloud setup. 
 
 ## Getting Started
 
