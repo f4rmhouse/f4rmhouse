@@ -5,19 +5,21 @@
 [![Issues Closed](https://img.shields.io/github/issues-closed/f4rmhouse/f4rmhouse)](https://github.com/f4rmhouse/f4rmhouse/issues?q=is%3Aissue+is%3Aclosed)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/f4rmhouse/f4rmhouse/pulls)
 [![Bundle Size](https://img.shields.io/bundlephobia/min/next)](https://bundlephobia.com/package/next)
+
 ## What is f4rmhouse?
 
 F4rmhouse is an all-in-one, open source platform for building useful agents. It provides every tool you need to create a modern agent with all its bells and MCP whistles. 
 
-* [local/custom deployments](https://f4rmhouse.com): many teams want or need full control over their data and infrastructure. Self-hosting avoids vendor lock-in, ensures data never leaves your environment, and simplifies compliance with HIPAA, GDPR, SOC 2, etc.
-* [shareable agents](https://f4rmhouse.com): We are the leaders of the Create Once Run Anywhere (CORA) movement in tech, we don't want agents to live in a single application but rather integrate into the apps you already use.
-* [MCP plug-and-play](https://f4rmhouse.com): Users often complain about the complexity associated with attaching MCPs to a chat. f4rmhouse makes this a breeze, using the "action store" you can add MCPs to your chat with one single click. 
-* [Model selection](https://f4rmhouse.com): different models have different capabilities. The model selector lets you choose the model you want to use to accomplish a specific task, use a public model through an API key or use a local one with ollama.
-* [Extensible artifacts](https://f4rmhouse.com): LLMs are mostly used to generate text. But give them the right tools and they can generate far more than that, artifacts allow your agents to render web pages, csv files, 3D scenes and much more. You can add artifacts that suit your specific needs.
-* [Agent swarms](https://f4rmhouse.com): (coming soon)
-* [Deep customizability](https://f4rmhouse.com): people spend more and more time in front of AI chat windows. f4rmhouse gives you the customizability you wish you had on other platforms. You change every aspect of the design using the f4.config file, f4rmhouse also support custom keyboard bindings so that you can work much faster.
+Feature list:
+- [x] [local/custom deployments](https://f4rmhouse.com): many teams want or need full control over their data and infrastructure. Self-hosting avoids vendor lock-in, ensures data never leaves your environment, and simplifies compliance with HIPAA, GDPR, SOC 2, etc.
+- [x] [shareable agents](https://f4rmhouse.com): We are the leaders of the Create Once Run Anywhere (CORA) movement in tech, we don't want agents to live in a single application but rather integrate into the apps you already use.
+- [x] [MCP plug-and-play](https://f4rmhouse.com): Users often complain about the complexity associated with attaching MCPs to a chat. f4rmhouse makes this a breeze, using the "action store" you can add MCPs to your chat with one single click. 
+- [x] [Model selection](https://f4rmhouse.com): different models have different capabilities. The model selector lets you choose the model you want to use to accomplish a specific task, use a public model through an API key or use a local one with ollama.
+- [x] [Extensible artifacts](https://f4rmhouse.com): LLMs are mostly used to generate text. But give them the right tools and they can generate far more than that, artifacts allow your agents to render web pages, csv files, 3D scenes and much more. You can add artifacts that suit your specific needs.
+- [ ] [Agent swarms](https://f4rmhouse.com): (coming soon)
+- [x] [Deep customizability](https://f4rmhouse.com): people spend more and more time in front of AI chat windows. f4rmhouse gives you the customizability you wish you had on other platforms. You change every aspect of the design using the f4.config file, f4rmhouse also support custom keyboard bindings so that you can work much faster.
 
-This is all mostly free to use on our official [website](https://f4rmhouse.com) which has a very generous free tier. If you're not interested in that you can install a f4rmhouse client on your local system. 
+This is all mostly free to use on our official [website](https://f4rmhouse.com) which has a very generous free tier. If you're not interested in that you can install a f4rmhouse client on your local system or your own cloud setup. 
 
 ## Getting Started
 
