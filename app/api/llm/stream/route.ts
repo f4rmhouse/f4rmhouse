@@ -62,7 +62,7 @@ AI:`;
  *
  * https://js.langchain.com/docs/guides/expression_language/cookbook#prompttemplate--llm--outputparser
  */
-export async function POST(req: NextRequest, apiRes: NextApiResponse) {
+export async function POST(req: NextRequest) {
   try {
     const body = await req.json() as RequestBody;
     const { description, messages = [], model: selectedModel, toolbox: initialToolbox, f4rmer } = body;

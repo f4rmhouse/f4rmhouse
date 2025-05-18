@@ -11,7 +11,7 @@ import Boxes from "../components/ui/chat-window/Boxes";
 import Store from "../microstore/Store";
 import Link from "next/link";
 
-async function Dashboard({ params }: { params: { username: string, uid: string } }) {
+async function Dashboard() {
 
   const session = await getSession()
   var error = null

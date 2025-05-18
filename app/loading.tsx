@@ -43,39 +43,7 @@ async function Dashboard() {
   return (
     <ThemeProvider>
       <main className="flex overflow-hidden w-full h-[99vh] relative">
-        <div className="mt-10">
-          <div className="overflow-hidden">
-            <div>
-              <Boxes data={data} session={session}/>
-              <RightSidebar f4rmer={data}/>
-            </div>
-          </div>
-        </div>
-        
-        <div className="absolute bottom-0 flex right-24">
-          <a 
-            href="https://github.com/f4rmhouse/f4rmhouse" 
-            target="_blank" 
-            rel="noopener noreferrer" 
-            className="text-neutral-500 flex hover:text-white px-1 underline text-xs"
-          >
-            <Github className="w-4 h-4" />
-            GitHub 
-          </a>
-          <ThemeToggleButton />
-          <button className="flex text-neutral-500 hover:text-white px-1 underline text-xs">
-            <CircleHelp className="w-4 h-4" />
-            Help
-          </button>
-          <FPSCounter />
-          <p className="text-neutral-500 text-xs">version: {config.version}</p>
-        </div>
-        {error && (
-            <div className="bg-black p-4 rounded absolute bottom-10 right-24">
-              <p className="text-neutral-100 text-xs">👩🏾‍💻 Running in local mode</p>
-              <p className="text-neutral-100 text-xs">Only local MCP tool calling available</p>
-            </div>
-          )}
+        <p>Loading...</p>
       </main>
     </ThemeProvider>
   );

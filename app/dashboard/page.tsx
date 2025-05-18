@@ -18,7 +18,7 @@ const posthog = new PostHog(process.env.NEXT_PUBLIC_POSTHOG_KEY ? process.env.NE
   host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
 })
 
-async function Dashboard({ params }: { params: { username: string, uid: string } }) {
+async function Dashboard() {
 
   const session = await getSession()
   const user = new User(session.user.email, session.provider, session.access_token);

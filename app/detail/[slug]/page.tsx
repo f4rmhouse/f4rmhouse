@@ -6,7 +6,7 @@ import Property from "@/app/components/product/Property";
 import ImageBanner from "@/app/components/banner/PrimitiveImageBanner";
 import ProductType from "@/app/components/types/ProductType";
 import { FaArrowLeft } from "react-icons/fa6";
-import { useEffect, useState } from "react";
+import { useEffect, useState, use } from "react";
 import OCI from "@/app/microstore/OCI";
 
 import Store from "@/app/microstore/Store";
@@ -18,15 +18,18 @@ import { remark } from 'remark';
 import html from 'remark-html';
 import { UsersRound } from "lucide-react";
 
+type Params = Promise<{ slug: string }>
+
 /**
  * DetailPage shows all the information about a product that a user needs to make a decision.
  * @param param0 
  * @returns 
  */
-export default function DetailPage({ params }: { params: { slug: string } }) {
+export default function DetailPage({ params }: { params: Params }) {
     const { data: session, status } = useSession();
     const oci = new OCI();
     const store = new Store();
+    const ps = use(params)
     var sc = [
       "https://cdnp.kittl.com/51d12197-8a4c-47ad-a1ea-96d4b1a329b0_kittl-ai-image-generator-2-dalle-3-black-model-bpoc-galactic-fashion-retro-space-ship-illustration.jpg?auto=compress,format",
       "https://images.ctfassets.net/kftzwdyauwt9/Nw3a33C8bfO7VJMCTNgSz/3633c190fd7309970a9ac85d7c7d3989/avocado-square.jpg?w=3840&q=90&fm=webp",
@@ -52,7 +55,7 @@ export default function DetailPage({ params }: { params: { slug: string } }) {
 
     useEffect(() => {
       try{
-      oci.getByUTI(params.slug).then(e => {
+      oci.getByUTI(ps.slug).then(e => {
         const res = e.Message;
         if(e.Code == 201){
           setNoActionFound(true)
@@ -74,13 +77,13 @@ export default function DetailPage({ params }: { params: { slug: string } }) {
       })
       
       if (session != null && session != undefined && session.user != null && session.user != undefined && session?.user) {
-        store.getReviews(String(session.user.email), params.slug).then(e => {
+        store.getReviews(String(session.user.email), ps.slug).then(e => {
           setReviews(e.Reviews)
         }).catch(err => setServerError(true))
 
       } 
       else {
-        store.getReviews("", params.slug).then(e => {
+        store.getReviews("", ps.slug).then(e => {
           setReviews(e.Reviews)
         }).catch(err => setServerError(true))
       }

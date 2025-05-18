@@ -12,7 +12,7 @@ import { FaArrowLeft } from "react-icons/fa6";
  * @param param0 
  * @returns 
  */
-export default async function F4rmers({ params }: { params: { product_id: string } }) {
+export default async function F4rmers() {
   const session = await getSession()
   const user = new User(session.user.email, session.provider, session.access_token);
 

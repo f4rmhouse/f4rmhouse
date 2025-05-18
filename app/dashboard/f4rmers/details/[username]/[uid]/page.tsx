@@ -5,14 +5,18 @@ import RightSidebar from "@/app/components/ui/sidebar/RightSidebar";
 import getSession from "@/app/context/getSession";
 import User from "@/app/microstore/User";
 
+type Params = Promise<{ slug: string[] }>
+
 /**
  * F4rmerDetailsPage is the UI page of the f4rmer. User can chat with the f4rmer that they have
  * created and add/remove tools from it.
  * @param param0 
  * @returns 
  */
-export default async function F4rmerDetailsPage({ params }: { params: { username: string, uid: string } }) {
+export default async function F4rmerDetailsPage({ params }: { params: Params }) {
   const session = await getSession()
+  const { slug } = await params;
+
   const user = new User(session.user.email, session.provider, session.access_token);
 
   let error:ErrorType|null = null
@@ -26,7 +30,7 @@ export default async function F4rmerDetailsPage({ params }: { params: { username
     }
 
   try {
-    data = await user.getF4rmer(params.username, params.uid);
+    data = await user.getF4rmer(slug[0], slug[1]);
   }
   catch(err) {
     console.error("Could not get user usage")
