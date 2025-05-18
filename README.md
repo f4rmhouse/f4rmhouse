@@ -4,7 +4,7 @@
 [![Commits/Month](https://img.shields.io/github/commit-activity/m/f4rmhouse/f4rmhouse)](https://github.com/f4rmhouse/f4rmhouse/commits/main)
 [![Issues Closed](https://img.shields.io/github/issues-closed/f4rmhouse/f4rmhouse)](https://github.com/f4rmhouse/f4rmhouse/issues?q=is%3Aissue+is%3Aclosed)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/f4rmhouse/f4rmhouse/pulls)
-[![Bundle Size](https://img.shields.io/bundlephobia/min/next)](https://bundlephobia.com/package/next)
+
 ## What is f4rmhouse?
 
 F4rmhouse is an all-in-one, open source platform for building useful agents. It provides every tool you need to create a modern agent with all its bells and MCP whistles. 
