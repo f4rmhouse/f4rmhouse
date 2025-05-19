@@ -42,7 +42,6 @@ export default function AgentSelector({ onAgentSelect, selectedAgent }: { onAgen
       
       // Option+number (Alt+number) to select agent by index
       if (event.ctrlKey) {
-        console.log(event.key)
         const numKey = parseInt(event.key);
         if (!isNaN(numKey) && numKey >= 1 && numKey <= availableAgents.length) {
           event.preventDefault();

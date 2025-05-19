@@ -18,7 +18,7 @@ export default function HelpModal() {
     { keys: 'Cmd/Ctrl+O', description: 'Open canvas' },
     { keys: 'Cmd/Ctrl+X', description: 'Clear chat' },
     { keys: 'Cmd/Ctrl+<number>', description: 'Select agent by number' },
-    { keys: 'Cmd/Ctrl+Backspace', description: 'Deselect everything on screen' }
+    { keys: 'Cmd/Ctrl', description: 'Clear command' }
   ]
   
   // General help topics
