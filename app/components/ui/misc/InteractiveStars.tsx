@@ -6,9 +6,8 @@
  */
 "use client"
 
+import { Star } from "lucide-react";
 import { useState } from "react";
-import { FaRegStar } from "react-icons/fa";
-import { FaStar } from "react-icons/fa";
 
 /**
  * 
@@ -23,10 +22,10 @@ export default function InteractiveStars({setStars}: {setStars: (n:number) => vo
     <div className="flex">
       {[0,1,2,3,4].map((e:number) => {
         if(currentHover+1 <= e) {
-          return <FaRegStar key={e} className="text-yellow-500" onMouseEnter={() => {setCurrentHover(e); setStars(e)}} />
+          return <Star key={e} className="text-yellow-500 bg-yellow-500" onMouseEnter={() => {setCurrentHover(e); setStars(e)}} />
         }
         else {
-          return <FaStar key={e} className="text-yellow-500" onMouseEnter={() => {setCurrentHover(e); setStars(e)}} />
+          return <Star key={e} className="text-yellow-500" onMouseEnter={() => {setCurrentHover(e); setStars(e)}} />
         }
       })}
       <p className="text-xs m-auto ml-2">{helpers[currentHover]}</p>

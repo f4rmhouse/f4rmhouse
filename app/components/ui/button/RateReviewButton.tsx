@@ -1,7 +1,7 @@
-import { AiOutlineLike } from "react-icons/ai"
 import { useSession } from "next-auth/react";
 import User from "@/app/microstore/User"
 import { useEffect, useState } from "react"
+import { Heart } from "lucide-react";
 
 /**
  * RateReviewButton is a thumbs up button that will increment a counter if it has not been 
@@ -42,7 +42,7 @@ export default function RateReviewButton({rid, uid, rating, rated}:{rid:string, 
 
   return (
     <button onClick={() => rate()} className={currentRated ? "transition-all flex text-white hover:text-neutral-400":"flex text-neutral-400 hover:text-white"}>
-      <AiOutlineLike />
+      <Heart />
       <p className="m-auto text-xs">{r}</p>
     </button>
   )

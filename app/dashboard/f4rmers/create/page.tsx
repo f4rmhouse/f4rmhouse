@@ -5,14 +5,11 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import User from "@/app/microstore/User";
 import F4rmerType from "@/app/components/types/F4rmerType";
-import { FaArrowLeft } from "react-icons/fa6";
 import Link from "next/link";
 import config from "@/f4.config";
 import { LineNumberedTextarea } from "@/app/components/ui/LineNumberedTextarea";
 import ModelSelector from "@/app/components/ui/chat-window/ModelSelector";
 import { Sparkles } from "lucide-react";
-import PromptBox from "@/app/components/ui/chat-window/PromptBox";
-import Boxes from "@/app/components/ui/chat-window/Boxes";
 import PromptBoxSimple from "@/app/components/ui/chat-window/PromptBoxSimple";
 
 const SYS_PROMPT = `**System Prompt for AI Agent**
@@ -146,7 +143,6 @@ export default function CreateF4rmerForm() {
       <div className="w-full">
       <div className="flex items-center gap-2 mt-10">
         <Link href="/" className="hover:opacity-80 transition-all">
-          <FaArrowLeft size={20} className="text-neutral-400" />
         </Link>
         <h1 className="text-2xl font-semibold text-neutral-100">Add Agent</h1>
       </div>

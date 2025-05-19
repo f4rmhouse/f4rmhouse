@@ -6,7 +6,7 @@ import { ReactElement, JSXElementConstructor, ReactNode, ReactPortal, AwaitedRea
 import DashboardLayout from "./layout";
 import Article from "../components/docs/Article";
 import Link from "next/link";
-import { FaArrowLeft } from "react-icons/fa6";
+import { ArrowLeft } from "lucide-react";
 
 async function Dashboard() {
   // Different tutorials to help user get accustomed with the platform
@@ -14,7 +14,7 @@ async function Dashboard() {
     <main>
       <div className="w-[100%]">
           <div className="">
-            <Link href="/" className="mb-2"><FaArrowLeft size={30} className="transition-all hover:opacity-100 bg-neutral-500 p-2 rounded-full opacity-50" /></Link>
+            <Link href="/" className="mb-2"><ArrowLeft size={30} className="transition-all hover:opacity-100 bg-neutral-500 p-2 rounded-full opacity-50" /></Link>
             <Article fname={'https://f4-public.s3.eu-central-1.amazonaws.com/public/docs/main.md'}/>
           </div>
       </div>

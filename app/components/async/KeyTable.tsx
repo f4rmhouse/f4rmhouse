@@ -5,10 +5,10 @@
 import { useEffect, useState, useRef } from "react";
 import ErrorType from "../types/ErrorType";
 import APIKeyType from "../types/APIKeyType";
-import { MdOutlineDelete } from "react-icons/md";
 import F4Session from "../types/F4Session";
 import Vendor from "@/app/microstore/Vendor";
 import ConfirmModal from "../ui/modal/ConfirmModal";
+import { Trash2 } from "lucide-react";
 
 /**
  * KeyTable displays all API keys that are available to a user
@@ -56,7 +56,7 @@ export default function KeyTable({ks, session}:{ks:APIKeyType[], error: ErrorTyp
                     <p className="m-auto ml-0 mr-0 font-mono">{e.Partial}</p>
                   </td>
                   <td className="text-sm mt-auto mb-auto"><p>{(new Date(e.Created).toISOString().replace("T"," ").replace("Z", " ").slice(0,-5))}</p></td>
-                  <td className="text-red-500  mt-auto mb-auto"><button onClick={() => {setKeyToDelete(e.Partial);setShowModal(true)}} className="transition-all hover:bg-red-800 cursor-pointer rounded-full"><MdOutlineDelete /></button></td>
+                  <td className="text-red-500  mt-auto mb-auto"><button onClick={() => {setKeyToDelete(e.Partial);setShowModal(true)}} className="transition-all hover:bg-red-800 cursor-pointer rounded-full"><Trash2 /></button></td>
                 </tr>
               )
             })}

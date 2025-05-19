@@ -8,10 +8,9 @@
 import React, { useEffect, useState } from "react";
 import AppCardType from "../types/AppCardType";
 
-import { FaAngleRight } from "react-icons/fa6";
-import { FaAngleLeft } from "react-icons/fa6";
 import Image from 'next/image'
 import { usePostHog } from "posthog-js/react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 // SimpleBannerItem shows an image and a message to the left side of it
 function SimpleBannerItem({item}: {item: AppCardType}) {
@@ -154,7 +153,7 @@ export default function Banner() {
   return (
     <div>
       <div className="flex w-full">
-        <button onClick={() => previousPage()} className="transition-all text-neutral-600 hover:text-sky-500 h-[50vh] rounded-md bg-transparent hidden md:block" id="previous image" aria-label="previous image"><FaAngleLeft size="40" /></button>
+        <button onClick={() => previousPage()} className="transition-all text-neutral-600 hover:text-sky-500 h-[50vh] rounded-md bg-transparent hidden md:block" id="previous image" aria-label="previous image"><ChevronLeft size="40" /></button>
         <div className="overflow-hidden h-[35vh] md:h-[50vh] md:min-h-[320px] bg-white sm:bg-white text-black flex w-full rounded-md border border-black">
           <div className="transition-all w-full h-full duration-[300ms] ease-in-out" style={{ transform: `translate3d(${-currentPage* 100}%, 0, 0)` }}>
           <div className="whitespace-nowrap">
@@ -170,11 +169,11 @@ export default function Banner() {
             </div>
           </div>
         </div>
-        <button onClick={() => nextPage()} className="transition-all hover:text-sky-500 text-neutral-600 h-[50vh] rounded-md bg-transparent hidden md:block" id="next image" aria-label="next image"><FaAngleRight size="40" /></button>
+        <button onClick={() => nextPage()} className="transition-all hover:text-sky-500 text-neutral-600 h-[50vh] rounded-md bg-transparent hidden md:block" id="next image" aria-label="next image"><ChevronRight size="40" /></button>
       </div>
       <div className="flex w-full mt-2">
         <div className="flex m-auto">
-        <button onClick={() => previousPage()} className="transition-all mr-5 text-neutral-500 hover:text-white flex text-xs" id="previous image" aria-label="previous image"><FaAngleLeft size="15" /></button>
+        <button onClick={() => previousPage()} className="transition-all mr-5 text-neutral-500 hover:text-white flex text-xs" id="previous image" aria-label="previous image"><ChevronLeft size="15" /></button>
         <div className="flex m-auto">
           {
             pages.map((e,i) => {
@@ -185,7 +184,7 @@ export default function Banner() {
             })
           }
         </div>
-        <button onClick={() => nextPage()} className="transition-all ml-5 text-neutral-500 hover:text-white" id="next image" aria-label="next image"><FaAngleRight size="15" /></button>
+        <button onClick={() => nextPage()} className="transition-all ml-5 text-neutral-500 hover:text-white" id="next image" aria-label="next image"><ChevronRight size="15" /></button>
         </div>
       </div>
     </div>

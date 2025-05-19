@@ -6,9 +6,7 @@
 import { useState } from "react"
 import { useRouter } from 'next/navigation'
 import Link from "next/link";
-import { CiSearch } from "react-icons/ci";
-import { IoMdClose } from "react-icons/io";
-import { IoMdCloseCircle } from "react-icons/io";
+import { CircleX, Search, X } from "lucide-react";
 
 export default function SearchBar() {
   const router = useRouter()
@@ -53,7 +51,7 @@ export default function SearchBar() {
     <form action={handleSearch}>
       <div className="relative">
         <div className="flex rounded-md ">
-          <CiSearch size={20} className="m-auto mr-2 ml-2"/>
+          <Search size={20} className="m-auto mr-2 ml-2"/>
           <input 
             placeholder="Search for tools, agents or software" 
             className="outline-none w-[60vw] border-none text-white rounded-md text-black text-md p-1 bg-transparent bg-neutral-900" type="text"
@@ -64,7 +62,7 @@ export default function SearchBar() {
           />
           {
             searchIsFocused ?
-            <button onClick={() => setQuery("")} className="m-auto mr-2 hover:bg-neutral-600 transition-all p-1 rounded-full"><IoMdCloseCircle /></button>
+            <button onClick={() => setQuery("")} className="m-auto mr-2 hover:bg-neutral-600 transition-all p-1 rounded-full"><CircleX /></button>
             :
             <></>
           }
@@ -77,7 +75,7 @@ export default function SearchBar() {
               return(
                 <div key={i} className="flex group">
                   <Link onClick={() => setSearchIsFocused(false)} className={`${i+1 == selectedIndex ? "bg-gray-200": ""} w-full p-2 flex hover:bg-neutral-200 cursor-pointer`} href={`/search?query=${s}`}>{s}</Link>
-                  <button className={`${i+1==selectedIndex?"bg-gray-200":""} group-hover:bg-neutral-200 m-auto hover:bg-neutral-200 p-3 pr-2`}><IoMdClose /></button>
+                  <button className={`${i+1==selectedIndex?"bg-gray-200":""} group-hover:bg-neutral-200 m-auto hover:bg-neutral-200 p-3 pr-2`}><X /></button>
                 </div>)
             })}
           </ul>

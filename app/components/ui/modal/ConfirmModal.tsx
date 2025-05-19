@@ -2,7 +2,6 @@
  * ConfirmModal is a yes/no confirmation shown to the user
  */
 import Modal from "./Modal"
-import { FiAlertTriangle } from "react-icons/fi";
 
 export default function ConfirmModal(
     {content,open,setIsOpen, title, action}: 

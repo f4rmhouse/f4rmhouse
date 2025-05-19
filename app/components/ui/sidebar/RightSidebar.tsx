@@ -8,12 +8,11 @@ import axios from 'axios';
 import F4rmerType from '../../types/F4rmerType';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { FaDeleteLeft } from "react-icons/fa6";
 import { useSession } from "next-auth/react";
 import User from '@/app/microstore/User';
 import ProductType from '../../types/ProductType';
-import { GoTriangleRight, GoTriangleDown } from "react-icons/go";
-import { PanelLeftClose, PanelRightClose, Repeat2, Wrench } from 'lucide-react';
+import { ChevronDown, ChevronRight } from "lucide-react";
+import { Delete, PanelLeftClose, PanelRightClose, Repeat2, Wrench } from 'lucide-react';
 import Store from '@/app/microstore/Store';
 import config from "../../../../f4.config"
 import { useTheme } from "../../../context/ThemeContext";
@@ -112,12 +111,12 @@ export default function RightSidebar({f4rmer}:{f4rmer:F4rmerType}) {
                 :
                 <div onClick={() => getToolSummary(tool.uti, i)} className={`flex w-full border-t ${theme.secondaryColor} ${i % 2 == 0 ? "bg-neutral-900" : ""} hover:bg-neutral-700`}>
                   {openList[i] && openList[i][0] ?
-                    <GoTriangleDown className='cursor-pointer transition-all m-auto'/>
+                    <ChevronDown className='cursor-pointer transition-all m-auto'/>
                     :
-                    <GoTriangleRight className='cursor-pointer transition-all m-auto'/>
+                    <ChevronRight className='cursor-pointer transition-all m-auto'/>
                   }
                   <p className={`text-sm hover:cursor-pointer ${theme.textColorPrimary} w-[90%]`}>{tool.title}</p>
-                  <FaDeleteLeft onClick={() => removeTool(tool.uti)} className='cursor-pointer transition-all hover:text-red-400 text-red-500 mr-2 m-auto'/>
+                  <Delete onClick={() => removeTool(tool.uti)} className='cursor-pointer transition-all hover:text-red-400 text-red-500 mr-2 m-auto'/>
                 </div>
                 }
                 <div>

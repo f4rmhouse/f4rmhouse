@@ -1,4 +1,4 @@
-import { FaStar } from "react-icons/fa6";
+import { Star } from "lucide-react";
 
 /**
  * ReviewProgress is a progress bar showing the percentage of stars
@@ -9,7 +9,7 @@ import { FaStar } from "react-icons/fa6";
 export default function ReviewProgress({value, percentage}: {value:string, percentage:string}) {
   return (
     <div className="flex">
-      <FaStar size={10} className="mt-auto mb-auto opacity-80"/> 
+      <Star size={10} className="mt-auto mb-auto opacity-80"/> 
       <p className="text-xs">{value}</p>
       <div className="w-full m-auto bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
       <div className="bg-neutral-400 h-2.5 rounded-full" style={{"width": `${percentage}`}}></div>

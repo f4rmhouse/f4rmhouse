@@ -1,4 +1,4 @@
-import { FaArrowLeft } from "react-icons/fa6";
+import { ArrowLeft } from "lucide-react";
 import { signIn } from "../auth"
 import Link from "next/link";
 import OAuthLoginButton from "../components/ui/button/OAuthLoginButton";
@@ -13,7 +13,7 @@ export default function Login() {
       <div className='relative flex h-full'>
         <div className='m-auto rounded-md w-[100%] md:w-[75%] lg:w-[25%] p-2'>
           <div className="flex relative mb-10">
-            <Link href="/" className="absolute mt-auto mb-auto m-2"><FaArrowLeft size={30} className="transition-all hover:bg-zinc-600 bg-zinc-700 p-2 rounded-full" /></Link>
+            <Link href="/" className="absolute mt-auto mb-auto m-2"><ArrowLeft size={30} className="transition-all hover:bg-zinc-600 bg-zinc-700 p-2 rounded-full" /></Link>
             <h1 className='text-center text-xl m-auto'>Login</h1>
           </div>
           <div className='flex flex-col'>

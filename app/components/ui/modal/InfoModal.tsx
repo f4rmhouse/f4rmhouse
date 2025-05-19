@@ -1,8 +1,8 @@
 /**
  * InfoModal informs a user about something
  */
+import { CircleAlert } from "lucide-react";
 import Modal from "./Modal"
-import { IoMdInformationCircleOutline } from "react-icons/io";
 
 export default function InfoModal({
   content, open, setIsOpen, title}: 
@@ -12,7 +12,7 @@ export default function InfoModal({
     <Modal open={open} title={title}>
       <div className="flex border-neutral-700">
         <div className="text-sky-500 bg-opacity-50 rounded-full p-2">
-          <IoMdInformationCircleOutline size={60} />
+          <CircleAlert size={60} />
         </div>
         <p className="mt-auto mb-auto ml-5 text-sm">{content}</p>
       </div>

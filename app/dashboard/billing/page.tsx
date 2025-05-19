@@ -1,13 +1,10 @@
 "use client"
-import {Elements} from '@stripe/react-stripe-js';
-import {loadStripe} from '@stripe/stripe-js';
-import {PaymentElement} from '@stripe/react-stripe-js';
+
 
 const SetupForm = () => {
 
   return (
     <form className="w-full">
-      <PaymentElement />
       <button>Submit</button>
     </form>
   );
@@ -19,7 +16,6 @@ const SetupForm = () => {
  * @returns 
  */
 export default function Billing() {
-  const stripePromise = loadStripe('unused');
   const sk = ""
 
   const flat = "flat"
@@ -56,9 +52,6 @@ export default function Billing() {
   return (
     <div className="mt-20 w-[50vw] m-auto">
       <div className="w-full">
-        <Elements stripe={stripePromise} options={options}>
-          <SetupForm />
-        </Elements>
       </div>
     </div>
   );

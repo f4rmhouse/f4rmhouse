@@ -1,5 +1,5 @@
+import { X } from "lucide-react";
 import { useEffect, useState } from "react";
-import { IoMdClose } from "react-icons/io";
 
 /**
  * Modal is the component that all modal windows in f4rmhouse use
@@ -28,7 +28,7 @@ export default function Modal({children,open,title}: Readonly<{children: React.R
             <div className="relative z-50 rounded-lg shadow bg-black bg-opacity-50 backdrop-blur-xl p-2">
               <div className="flex">
                 <p className="font-bold text-xs text-neutral-200">{title.toLocaleUpperCase()}</p>
-                <button onClick={() => setIsOpen(false)} className="transition-all hover:text-red-500 rounded-full cursor-pointer ml-auto p-2 hover:bg-neutral-700"><IoMdClose /></button>
+                <button onClick={() => setIsOpen(false)} className="transition-all hover:text-red-500 rounded-full cursor-pointer ml-auto p-2 hover:bg-neutral-700"><X /></button>
               </div>
               {children}
             </div>

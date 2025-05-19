@@ -3,8 +3,7 @@
 import React, { useState } from "react";
 import AppCardType from "../types/AppCardType";
 import InfoCard from "../card/InfoCard";
-import { FaAngleLeft } from "react-icons/fa6";
-import { FaAngleRight } from "react-icons/fa6";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 /**
  * InfoCardGrid shows InfoCards in a Banner format letting a user view two 
@@ -18,7 +17,7 @@ export default function InfoCardGrid({apps}: {apps: AppCardType[]|string}) {
   return (
     <div className="group/roller hidden sm:flex">
       <div onClick={() => setCurrentPage((p) => (p-2+apps.length)%apps.length)} className="transition-all opacity-0 group-hover/roller:opacity-100 group flex flex-1 cursor-pointer">
-        <button className="flex m-auto transition-all text-neutral-600 group-hover:text-sky-500 rounded-md bg-transparent"><FaAngleLeft size="40" /></button>
+        <button className="flex m-auto transition-all text-neutral-600 group-hover:text-sky-500 rounded-md bg-transparent"><ChevronLeft size="40" /></button>
       </div>
       <div className="w-full overflow-hidden">
         <div className="transition-all h-full duration-[300ms] ease-in-out" style={{ transform: `translate3d(${-currentPage* 50}%, 0, 0)` }}>
@@ -38,7 +37,7 @@ export default function InfoCardGrid({apps}: {apps: AppCardType[]|string}) {
         </div>
       </div>
       <div onClick={() => setCurrentPage((p) => (p+2)%apps.length)} className="transition-all opacity-0 group-hover/roller:opacity-100 group flex flex-1 cursor-pointer">
-        <button className="flex m-auto transition-all text-neutral-600 group-hover:text-sky-500 rounded-md bg-transparent"><FaAngleRight size="40" /></button>
+        <button className="flex m-auto transition-all text-neutral-600 group-hover:text-sky-500 rounded-md bg-transparent"><ChevronRight size="40" /></button>
       </div>
     </div>
   )

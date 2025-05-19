@@ -5,7 +5,6 @@ import Review from "@/app/components/product/Review";
 import Property from "@/app/components/product/Property";
 import ImageBanner from "@/app/components/banner/PrimitiveImageBanner";
 import ProductType from "@/app/components/types/ProductType";
-import { FaArrowLeft } from "react-icons/fa6";
 import { useEffect, useState, use } from "react";
 import OCI from "@/app/microstore/OCI";
 
@@ -16,7 +15,7 @@ import { useSession } from "next-auth/react";
 import axios from "axios";
 import { remark } from 'remark';
 import html from 'remark-html';
-import { UsersRound } from "lucide-react";
+import { ArrowRight, UsersRound } from "lucide-react";
 
 type Params = Promise<{ slug: string }>
 
@@ -156,7 +155,7 @@ export default function DetailPage({ params }: { params: Params }) {
           {product?
           <>
           <div className="flex flex-col sm:flex-row mb-2">
-          <Link href="/store" className="transition-all hover:bg-neutral-700 cursor-pointer text-neutral-500 hover:text-neutral-300 rounded-full mt-auto mb-auto p-2 mr-5"><FaArrowLeft /></Link>
+          <Link href="/store" className="transition-all hover:bg-neutral-700 cursor-pointer text-neutral-500 hover:text-neutral-300 rounded-full mt-auto mb-auto p-2 mr-5"><ArrowRight /></Link>
           <div className="flex">
             <img className="h-10 rounded-full aspect-square object-cover" height={10} src={"https://f4-public.s3.eu-central-1.amazonaws.com/showcases/" + product.uti + "/thumbnail.jpg"}/>
             <div className="pl-5">

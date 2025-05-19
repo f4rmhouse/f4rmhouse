@@ -6,7 +6,7 @@ import { useEffect, useState, useRef } from "react";
 import DataItemType from "../types/DataItemType";
 import UsageType from "../types/UsageType";
 import ErrorType from "../types/ErrorType";
-import { RiErrorWarningFill } from "react-icons/ri";
+import { CircleAlert } from "lucide-react";
 
 /**
  * Usage will handle the parsing and display of user usage statistics on the dashboard.
@@ -83,7 +83,7 @@ export default function Usage({usage, error}:{usage:UsageType[], error: ErrorTyp
         <div className="col-span-12 m-auto">
           <div className="mt-20 text-red">
             <div className="text-4xl text-red-500 flex m-auto align-center items-align-center justify-center">
-              <RiErrorWarningFill />
+              <CircleAlert />
             </div>
             <p className="text-white">{error.message}</p>
             <p className="text-white text-center">{error.link}</p>

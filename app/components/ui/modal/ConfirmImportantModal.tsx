@@ -5,7 +5,7 @@
 "use client"
 import { useState } from "react";
 import Modal from "./Modal"
-import { FiAlertTriangle } from "react-icons/fi";
+import { TriangleAlert } from "lucide-react";
 
 export default function ConfirmImportantModal(
     {content,open,setIsOpen, title, action}: 
@@ -17,7 +17,7 @@ export default function ConfirmImportantModal(
     <Modal open={open} title={title}>
       <div className="flex border-neutral-700">
         <div className="text-yellow-500 bg-opacity-50 rounded-full p-2">
-          <FiAlertTriangle size={60} />
+          <TriangleAlert size={60} />
         </div>
         <p className="mt-auto mb-auto ml-5">{content}</p>
       </div>

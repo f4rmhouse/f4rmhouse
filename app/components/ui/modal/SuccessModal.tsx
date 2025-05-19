@@ -1,5 +1,5 @@
+import { CircleCheck } from "lucide-react";
 import Modal from "./Modal"
-import { GoCheckCircleFill } from "react-icons/go";
 /**
  * SuccessModal is shown on success
  * @param param0 
@@ -11,7 +11,7 @@ export default function SuccessModal({content,open,setIsOpen, title}: Readonly<{
     <Modal open={open} title={title}>
       <div className="flex border-neutral-700">
         <div className="text-green-500 bg-opacity-50 rounded-full p-2">
-          <GoCheckCircleFill size={60} />
+          <CircleCheck size={60} />
         </div>
         <p className="mt-auto mb-auto ml-5">{content}</p>
       </div>
