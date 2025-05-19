@@ -68,7 +68,7 @@ async function Dashboard() {
             Help
           </button>
           <FPSCounter />
-          <p className="text-neutral-500 text-xs">version: {config.version}</p>
+          <p className="text-neutral-500 text-xs">v{config.version}</p>
         </div>
         {error && (
             <div className="bg-black p-4 rounded absolute bottom-10 right-24">

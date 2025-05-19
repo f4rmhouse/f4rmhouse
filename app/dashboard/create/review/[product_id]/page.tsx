@@ -1,7 +1,7 @@
 import { auth } from "@/app/auth";
 import CreateReviewForm from "@/app/components/forms/CreateReviewForm";
 
-type Params = Promise<{ slug: string[] }>
+type Params = Promise<{product_id:{product_id:string}}>
 
 /**
  * WriteReviewPage 
@@ -10,8 +10,7 @@ type Params = Promise<{ slug: string[] }>
  */
 export default async function WriteReviewPage({ params }: {params: Params}) {
   const session = await auth()
-
-  const { slug } = await params;
+  const slug = (await params).product_id;
    
-  return(<CreateReviewForm product_id={slug[0]} username={String(session?.user?.name)}/>)
+  return(<CreateReviewForm product_id={slug.product_id} username={String(session?.user?.name)}/>)
 }

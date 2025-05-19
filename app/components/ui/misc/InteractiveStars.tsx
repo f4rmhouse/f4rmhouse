@@ -16,19 +16,19 @@ import { useState } from "react";
  */
 export default function InteractiveStars({setStars}: {setStars: (n:number) => void}) {
   const [currentHover, setCurrentHover] = useState<number>(0);
-  const helpers = ["Unusable!", "Not good.", "It's OK.", "It's useful.", "I love it!"]
+  const helpers = ["😡 Unusable!", "😟 Not good.", "😐 It's OK.", "👍 It's useful.", "😍 I love it!"]
 
   return (
-    <div className="flex">
+    <div className="flex relative">
       {[0,1,2,3,4].map((e:number) => {
         if(currentHover+1 <= e) {
-          return <Star key={e} className="text-yellow-500 bg-yellow-500" onMouseEnter={() => {setCurrentHover(e); setStars(e)}} />
+          return <Star size={20} key={e} className="text-yellow-500" onMouseEnter={() => {setCurrentHover(e); setStars(e)}} />
         }
         else {
-          return <Star key={e} className="text-yellow-500" onMouseEnter={() => {setCurrentHover(e); setStars(e)}} />
+          return <Star size={20} key={e} className="text-yellow-500" fill="currentColor" onMouseEnter={() => {setCurrentHover(e); setStars(e)}} />
         }
       })}
-      <p className="text-xs m-auto ml-2">{helpers[currentHover]}</p>
+      <p className="text-xs absolute m-auto ml-2 right-0 top-[-20px]">{helpers[currentHover]}</p>
     </div>
   )
 }

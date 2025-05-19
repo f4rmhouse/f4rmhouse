@@ -11,8 +11,10 @@ import getSession from "@/app/context/getSession";
 import User from "@/app/microstore/User";
 import Boxes from "../components/ui/chat-window/Boxes";
 import { PostHog } from 'posthog-node'
-import Link from "next/link";
-import { Plus } from "lucide-react";
+import { CircleHelp, Github } from "lucide-react";
+import ThemeToggleButton from "../components/ui/ThemeToggleButton";
+import FPSCounter from "../components/ui/FPSCounter";
+import config from "@/f4.config";
 
 const posthog = new PostHog(process.env.NEXT_PUBLIC_POSTHOG_KEY ? process.env.NEXT_PUBLIC_POSTHOG_KEY : "", {
   host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
@@ -44,7 +46,6 @@ async function Dashboard() {
       await user.createF4rmer(data)
     }
     else {
-      console.log("F4rmers: ", f4s)
       data = f4s[0]
     }
   }
@@ -57,18 +58,40 @@ async function Dashboard() {
   // Different tutorials to help user get accustomed with the platform
   return (
     <main>
-      <div className="flex">
-        <div className="w-full">
-        <div className="overflow-none">
-          <Link href="/dashboard/f4rmers/create" className="group absolute top-16 left-28 flex rounded-md p-2 pl-4 pr-4 hover:bg-blue-500 hover:border-blue-500 transition-all">
-            <button className="text-center rounded-full group-hover:rotate-90 transition-all"><Plus size={15} /></button>
-            <p className="transition-all text-neutral-300 m-auto text-xs ml-1">New agent</p>
-          </Link>
-          <div className="flex">
-          <Boxes data={data} session={session}/>
-          <RightSidebar f4rmer={data}/>
+      <div>
+        <div>
+        <div className="mt-10">
+          <div className="overflow-hidden">
+            <div>
+              <Boxes data={data} session={session}/>
+              <RightSidebar f4rmer={data}/>
+            </div>
           </div>
         </div>
+        <div className="absolute bottom-2 flex right-24">
+          <a 
+            href="https://github.com/f4rmhouse/f4rmhouse" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="text-neutral-500 flex hover:text-white px-1 underline text-xs"
+          >
+            <Github className="w-4 h-4" />
+            GitHub 
+          </a>
+          <ThemeToggleButton />
+          <button className="flex text-neutral-500 hover:text-white px-1 underline text-xs">
+            <CircleHelp className="w-4 h-4" />
+            Help
+          </button>
+          <FPSCounter />
+          <p className="text-neutral-500 text-xs">v{config.version}</p>
+        </div>
+        {error && (
+            <div className="bg-black p-4 rounded absolute bottom-10 right-24">
+              <p className="text-neutral-100 text-xs">👩🏾‍💻 Running in local mode</p>
+              <p className="text-neutral-100 text-xs">Only local MCP tool calling available</p>
+            </div>
+          )}
         </div>
       </div>
     </main>

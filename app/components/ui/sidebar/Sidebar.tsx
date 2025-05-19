@@ -42,7 +42,7 @@ export default function SearchBar({username, img}:{username:string, img:string})
             <p className="pl-2 text-xs">{username}</p>
             <p className="text-xs text-neutral-400 pl-2">User</p>
           </div>
-          <button className="absolute h-full transition-all rounded hover:bg-zinc-800 text-xs border border-zinc-700 p-2 text-zinc-500 text-white right-0" onClick={() => handleSignOut(session).then(() => signOut())}><LogOut /></button>
+          <button className="absolute h-full transition-all rounded hover:bg-zinc-800 text-xs border border-zinc-700 p-2 text-zinc-500 text-white right-0" onClick={() => handleSignOut(session).then(() => signOut())}><LogOut size={15}/></button>
         </div>
       </div>
       <div onMouseEnter={() => setExpand(true)} className="fixed md:visible w-[50px] h-[100vh] z-0 bg-transparent">
