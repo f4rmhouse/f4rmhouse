@@ -69,7 +69,8 @@ const config: Config = {
         "primaryHoverColor": "bg-zinc-800",
         "secondaryHoverColor": "bg-zinc-800",
         "textColorPrimary": "text-zinc-50",
-        "textColorSecondary": "text-zinc-400"
+        "textColorSecondary": "text-zinc-400",
+        "chatWindowStyle": "bg-zinc-900"
 
     }, 
     "defaultState": "chat",

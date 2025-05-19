@@ -19,7 +19,7 @@ const themePresets: Record<string, Theme> = {
     secondaryHoverColor: "bg-zinc-800",
     textColorPrimary: "text-zinc-50",
     textColorSecondary: "text-zinc-400",
-    chatWindowStyle: "bg-transparent"
+    chatWindowStyle: "bg-zinc-900"
   },
   nostalgic: {
     primaryColor: "bg-[#cbcbcb]",
@@ -44,7 +44,8 @@ const themePresets: Record<string, Theme> = {
     "primaryHoverColor": "bg-gray-100",
     "secondaryHoverColor": "bg-gray-200",
     "textColorPrimary": "text-gray-900",
-    "textColorSecondary": "text-gray-500"
+    "textColorSecondary": "text-gray-500",
+    "chatWindowStyle": "bg-white"
   },
   green: {
     "primaryColor": "bg-emerald-700 shadow-sm",
@@ -56,7 +57,8 @@ const themePresets: Record<string, Theme> = {
     "primaryHoverColor": "bg-emerald-800",
     "secondaryHoverColor": "bg-emerald-700",
     "textColorPrimary": "text-black",
-    "textColorSecondary": "text-emerald-900"
+    "textColorSecondary": "text-emerald-900",
+    "chatWindowStyle": "bg-emerald-50"
   },
   cyberpunk: {
     "primaryColor": "bg-gray-900 shadow-sm",
@@ -68,7 +70,8 @@ const themePresets: Record<string, Theme> = {
     "primaryHoverColor": "bg-gray-800",
     "secondaryHoverColor": "bg-gray-700",
     "textColorPrimary": "text-cyan-300",
-    "textColorSecondary": "text-fuchsia-300"
+    "textColorSecondary": "text-fuchsia-300",
+    "chatWindowStyle": "bg-gray-900"
   },
   gpt: {
     "primaryColor": "bg-[#303030]",
@@ -80,7 +83,8 @@ const themePresets: Record<string, Theme> = {
     "primaryHoverColor": "bg-[#876767]",
     "secondaryHoverColor": "bg-[#876767]",
     "textColorPrimary": "text-white",
-    "textColorSecondary": "text-gray-400"
+    "textColorSecondary": "text-gray-400",
+    "chatWindowStyle": "bg-[#212121]"
   },
   sophie: {
     "primaryColor": "bg-[#30302e]",
@@ -92,7 +96,8 @@ const themePresets: Record<string, Theme> = {
     "primaryHoverColor": "bg-[#876767]",
     "secondaryHoverColor": "bg-[#876767]",
     "textColorPrimary": "text-white",
-    "textColorSecondary": "text-gray-400"
+    "textColorSecondary": "text-gray-400",
+    "chatWindowStyle": "bg-[#262624]"
   },
   shadcn: {
     "primaryColor": "bg-black shadow-sm",
@@ -104,7 +109,8 @@ const themePresets: Record<string, Theme> = {
     "primaryHoverColor": "bg-slate-900",
     "secondaryHoverColor": "bg-slate-800",
     "textColorPrimary": "text-slate-50",
-    "textColorSecondary": "text-slate-400"
+    "textColorSecondary": "text-slate-400",
+    "chatWindowStyle": "bg-black"
   },
   hacker: {
     "primaryColor": "bg-zinc-950 shadow-sm text-sm",
@@ -116,7 +122,8 @@ const themePresets: Record<string, Theme> = {
     "primaryHoverColor": "bg-zinc-900",
     "secondaryHoverColor": "bg-zinc-800",
     "textColorPrimary": "text-emerald-400",
-    "textColorSecondary": "text-emerald-600"
+    "textColorSecondary": "text-emerald-600",
+    "chatWindowStyle": "bg-zinc-950"
   },
   vscode: {
     "primaryColor": "bg-[#1f1f1f] shadow-sm",
@@ -129,7 +136,7 @@ const themePresets: Record<string, Theme> = {
     "secondaryHoverColor": "bg-gray-800",
     "textColorPrimary": "text-gray-100",
     "textColorSecondary": "text-gray-400",
-    "chatWindowStyle": ""
+    "chatWindowStyle": "bg-[#1f1f1f]"
   },
   msn: {
     "primaryColor": "bg-[#d5e0f4]",
@@ -156,7 +163,7 @@ const themePresets: Record<string, Theme> = {
     "secondaryHoverColor": "bg-gray-100",
     "textColorPrimary": "text-black",
     "textColorSecondary": "text-neutral-800",
-    "chatWindowStyle": "",
+    "chatWindowStyle": "bg-white",
     "aiMessageStyle": "bg-white"
   },
   gpt6: {
@@ -170,7 +177,7 @@ const themePresets: Record<string, Theme> = {
     "secondaryHoverColor": "bg-gray-100",
     "textColorPrimary": "text-black",
     "textColorSecondary": "text-neutral-800",
-    "chatWindowStyle": ""
+    "chatWindowStyle": "bg-white"
   },
 };
 

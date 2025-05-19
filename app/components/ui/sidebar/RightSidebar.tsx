@@ -11,10 +11,9 @@ import { useEffect, useState } from 'react';
 import { useSession } from "next-auth/react";
 import User from '@/app/microstore/User';
 import ProductType from '../../types/ProductType';
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight, QrCode, Store as StoreIcon} from "lucide-react";
 import { Delete, PanelLeftClose, PanelRightClose, Repeat2, Wrench } from 'lucide-react';
 import Store from '@/app/microstore/Store';
-import config from "../../../../f4.config"
 import { useTheme } from "../../../context/ThemeContext";
 
 export default function RightSidebar({f4rmer}:{f4rmer:F4rmerType}) {
@@ -63,7 +62,6 @@ export default function RightSidebar({f4rmer}:{f4rmer:F4rmerType}) {
     }
     const store = new Store();
     store.getEndpoint(uti).then((e:any) => {
-      console.log("endpoint: ", e)
       setOpenList(openList.map((item, i) => 
         i === index ? e : item
       ));
@@ -88,40 +86,32 @@ export default function RightSidebar({f4rmer}:{f4rmer:F4rmerType}) {
 
   return (
     <div>
-    <div onMouseEnter={() => setVisible(true)} onMouseLeave={() => setVisible(false)} className={`fixed right-0 w-[50%] sm:w-[16%] h-[100vh] z-10 border top-0 border-${theme.secondaryColor?.replace("bg-", "")} ${theme.primaryColor} transition-transform duration-300 ease-in-out transform ${visible ? 'translate-x-0' : 'translate-x-full'}`}>
-      <div className="block text-sm flex p-2">
-        <button onClick={() => setVisible(p => !p)} className={`visible md:hidden z-10 ml-4 ${theme.textColorPrimary} hover:${theme.textColorPrimary} transition-all`}><PanelRightClose /></button>
-        <p className={`${theme.textColorPrimary} ml-2 text-right ml-auto text-md`}>{f4rmer.title}</p>
-      </div>
+    <div onMouseEnter={() => setVisible(true)} onMouseLeave={() => setVisible(false)} className={`p-2 fixed right-0 w-[50%] sm:w-[16%] h-[100vh] z-10 top-0 border-${theme.secondaryColor?.replace("bg-", "")} ${theme.chatWindowStyle} transition-transform duration-300 ease-in-out transform ${visible ? 'translate-x-0' : 'translate-x-full'}`}>
       <div className='h-[95%] flex flex-col'>
-        <div className={`text-right ml-auto flex ${theme.textColorPrimary}`}>
-          <p className='text-right text-sm'>Tools</p>
-          <Wrench size={15} className='mt-auto mb-auto ml-2'/>
-        </div>
         {f4rmer.toolbox ?
-        <div className={`${theme.primaryColor}`}>
+        <div className={`rounded-md`}>
           {f4rmer.toolbox.map((tool:any, i:number) => {
             return(
               <div key={i}> 
                 {toolHasBeenDisabledByCreator.get(tool.uti) ?
-                <div className={`transition-all w-full ${theme.primaryColor} hover:${theme.primaryHoverColor}`}>
+                <div className={`transition-all w-full hover:${theme.primaryHoverColor} rounded-md`}>
                   <p className={`text-sm hover:cursor-pointer ${theme.textColorSecondary} w-[90%] line-through`}>{tool.title}</p>
                   <p className='text-xs hover:cursor-pointer text-red-500 w-[100%]'>This action has been disabled by the creator.</p>
                 </div>
                 :
-                <div onClick={() => getToolSummary(tool.uti, i)} className={`flex w-full border-t ${theme.secondaryColor} ${i % 2 == 0 ? "bg-neutral-900" : ""} hover:bg-neutral-700`}>
+                <div onClick={() => getToolSummary(tool.uti, i)} className={`flex w-full p-2 hover:${theme.secondaryHoverColor} rounded-md`}>
                   {openList[i] && openList[i][0] ?
-                    <ChevronDown className='cursor-pointer transition-all m-auto'/>
+                    <ChevronDown size={20} className={`cursor-pointer transition-all m-auto ${theme.textColorPrimary}`}/>
                     :
-                    <ChevronRight className='cursor-pointer transition-all m-auto'/>
+                    <ChevronRight size={20} className={`cursor-pointer transition-all m-auto ${theme.textColorPrimary}`}/>
                   }
                   <p className={`text-sm hover:cursor-pointer ${theme.textColorPrimary} w-[90%]`}>{tool.title}</p>
-                  <Delete onClick={() => removeTool(tool.uti)} className='cursor-pointer transition-all hover:text-red-400 text-red-500 mr-2 m-auto'/>
+                  <Delete size={20} onClick={() => removeTool(tool.uti)} className='cursor-pointer transition-all hover:text-red-400 text-red-500 mr-2 m-auto'/>
                 </div>
                 }
                 <div>
                   {openList[i] && openList[i][0] ? 
-                    <div className={`text-sm ${theme.textColorSecondary} p-0 pr-2 pl-2 ${theme.primaryColor}`}>
+                    <div className={`text-sm ${theme.textColorSecondary} p-0 pr-2 pl-2 ${theme.secondaryColor}`}>
                       <p><span className='text-blue-400'>uti</span>: <span className='text-pink-400'>{openList[i][0].uti}</span></p>
                       <p><span className='text-blue-400'>endpoints</span>:</p> 
                       <div>
@@ -154,14 +144,10 @@ export default function RightSidebar({f4rmer}:{f4rmer:F4rmerType}) {
         <p>No tools have been added yet</p>
         }
         <div className='flex w-full'>
-        <Link href="/" className={`transition-all w-full text-center hover:${theme.hoverColor} ${theme.secondaryColor} ${theme.textColorPrimary} text-sm p-1`}>Browse tools</Link>
+        <Link href="/" className={`hover:${theme.textColorPrimary} border-2 hover:border-${theme.secondaryColor?.replace("bg-", "")} border-transparent rounded-md transition-all hover:${theme.hoverColor} cursor-pointer p-2 pl-3 flex ${theme.textColorSecondary} w-full text-sm gap-3`}><StoreIcon size={20}/>Browse tools</Link>
       </div>
         <div className=''>
-          <div className={`flex ml-auto ${theme.textColorPrimary}`}>
-          <p className='text-right ml-auto text-sm'>Share</p>
-          <Repeat2 size={20} className='mt-auto mb-auto ml-2'/>
-          </div>
-          <button className={`transition-all w-full text-center hover:${theme.hoverColor} ${theme.secondaryColor} ${theme.textColorPrimary} text-sm p-1`} onClick={() => getQR()}>Generate QR code</button>
+          <button className={`hover:${theme.textColorPrimary} border-2 hover:border-${theme.secondaryColor?.replace("bg-", "")} border-transparent rounded-md transition-all hover:${theme.hoverColor} cursor-pointer p-2 pl-3 flex ${theme.textColorSecondary} w-full text-sm gap-3`} onClick={() => getQR()}><QrCode size={20}/> Generate QR code</button>
           {
             qrImageURL.length > 0 ? 
             <div className='m-4'>
