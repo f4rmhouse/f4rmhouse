@@ -7,6 +7,7 @@ import { PHProvider } from './providers'
 import { ThemeProvider } from "./context/ThemeContext";
 import { ArtifactProvider } from "./context/ArtifactContext";
 import config from "../f4.config"
+import KeyboardHandlerWrapper from "./components/ui/KeyboardHandlerWrapper";
 
 export const metadata: Metadata = {
   title: "f4rmhouse",
@@ -25,6 +26,7 @@ export default function RootLayout({children,}: Readonly<{children: React.ReactN
         <ThemeProvider>
           <body>
             <ArtifactProvider>
+              <KeyboardHandlerWrapper />
               <div className="min-h-screen">
                 {
                 <nav className="fixed z-10 w-[100vw] border-b border-neutral-700 bg-black">

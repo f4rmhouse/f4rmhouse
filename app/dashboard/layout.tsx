@@ -5,6 +5,7 @@ import { SessionProvider } from '../context/SessionContext';
 import getSession from "../context/getSession";
 import { redirect } from 'next/navigation'
 import User from "../microstore/User";
+import KeyboardHandlerWrapper from "../components/KeyboardHandlerWrapper";
 
 export const metadata: Metadata = {
   title: "f4rmhouse",
@@ -47,6 +48,7 @@ export default async function DashboardLayout({children,}: Readonly<{children: R
         <div className="relative col-span-2">
           <Sidebar username={String(session?.user?.name)} img={String(session?.user?.image)}/>
         </div>
+        <KeyboardHandlerWrapper />
         <div>
           <div className="flex md:mt-0">
             <div>{children}</div>

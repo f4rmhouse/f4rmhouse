@@ -9,10 +9,11 @@ import RightSidebar from "@/app/components/ui/sidebar/RightSidebar";
 import getSession from "@/app/context/getSession";
 import Boxes from "./components/ui/chat-window/Boxes";
 import Store from "./microstore/Store";
-import { CircleHelp, Github } from "lucide-react";
+import { Github } from "lucide-react";
 import FPSCounter from './components/ui/FPSCounter';
 import { ThemeProvider } from "./context/ThemeContext";
 import ThemeToggleButton from "./components/ui/ThemeToggleButton";
+import HelpModal from "./components/ui/HelpModal";
 import config from "../f4.config";
 
 async function Dashboard() {
@@ -63,10 +64,7 @@ async function Dashboard() {
             GitHub 
           </a>
           <ThemeToggleButton />
-          <button className="flex text-neutral-500 hover:text-white px-1 underline text-xs">
-            <CircleHelp className="w-4 h-4" />
-            Help
-          </button>
+          <HelpModal />
           <FPSCounter />
           <p className="text-neutral-500 text-xs">v{config.version}</p>
         </div>

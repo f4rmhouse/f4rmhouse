@@ -9,7 +9,7 @@ import Link from "next/link";
 import { usePathname } from 'next/navigation'
 import { signOut } from "next-auth/react";
 import { handleSignOut } from "@/app/context/handleLogout";
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { SessionContext } from "@/app/context/SessionContext";
 import { ChartArea, CreditCard, LogOut, PanelRightClose, PanelRightOpen, Settings } from "lucide-react";
 import config from "../../../../f4.config"
@@ -20,6 +20,25 @@ export default function SearchBar({username, img}:{username:string, img:string})
   const session = useContext(SessionContext)
   const { theme } = useTheme();
   const [expand, setExpand] = useState<boolean>(false)
+  
+  // Add keyboard shortcut listener for Cmd+B to toggle sidebar
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Check for Cmd+B (metaKey is Cmd on Mac, ctrlKey would be Ctrl on Windows)
+      if ((event.metaKey || event.ctrlKey) && event.key === 'b') {
+        event.preventDefault(); // Prevent default browser behavior
+        setExpand(prev => !prev); // Toggle sidebar state
+      }
+    };
+
+    // Add event listener
+    window.addEventListener('keydown', handleKeyDown);
+    
+    // Clean up event listener on component unmount
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
 
   const menuItems = [
     { href: '/dashboard', label: 'Chat', icon: "🧑‍🌾"},

@@ -11,8 +11,9 @@ import getSession from "@/app/context/getSession";
 import User from "@/app/microstore/User";
 import Boxes from "../components/ui/chat-window/Boxes";
 import { PostHog } from 'posthog-node'
-import { CircleHelp, Github } from "lucide-react";
+import { Github } from "lucide-react";
 import ThemeToggleButton from "../components/ui/ThemeToggleButton";
+import HelpModal from "../components/ui/HelpModal";
 import FPSCounter from "../components/ui/FPSCounter";
 import config from "@/f4.config";
 
@@ -79,10 +80,7 @@ async function Dashboard() {
             GitHub 
           </a>
           <ThemeToggleButton />
-          <button className="flex text-neutral-500 hover:text-white px-1 underline text-xs">
-            <CircleHelp className="w-4 h-4" />
-            Help
-          </button>
+          <HelpModal />
           <FPSCounter />
           <p className="text-neutral-500 text-xs">v{config.version}</p>
         </div>
