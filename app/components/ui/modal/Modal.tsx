@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
  * @param param0 
  * @returns 
  */
-export default function Modal({children,open,title}: Readonly<{children: React.ReactNode, open: boolean, title:string}>) {
+export default function Modal({children, open, title, onClose}: Readonly<{children: React.ReactNode, open: boolean, title:string, onClose?: () => void}>) {
 
   const [isOpen, setIsOpen] = useState<boolean>(open);
 
@@ -17,6 +17,7 @@ export default function Modal({children,open,title}: Readonly<{children: React.R
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
       setIsOpen(false);
+      if (onClose) onClose();
     }
   };
 
@@ -28,7 +29,10 @@ export default function Modal({children,open,title}: Readonly<{children: React.R
             <div className="relative z-50 rounded-lg shadow bg-black bg-opacity-50 backdrop-blur-xl p-2">
               <div className="flex">
                 <p className="font-bold text-xs text-neutral-200">{title.toLocaleUpperCase()}</p>
-                <button onClick={() => setIsOpen(false)} className="transition-all hover:text-red-500 rounded-full cursor-pointer ml-auto p-2 hover:bg-neutral-700"><X /></button>
+                <button onClick={() => {
+                  setIsOpen(false);
+                  if (onClose) onClose();
+                }} className="transition-all hover:text-red-500 rounded-full cursor-pointer ml-auto p-2 hover:bg-neutral-700"><X /></button>
               </div>
               {children}
             </div>

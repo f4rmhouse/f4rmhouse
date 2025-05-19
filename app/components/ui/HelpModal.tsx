@@ -47,7 +47,11 @@ export default function HelpModal() {
         Help
       </button>
       
-      <Modal open={isModalOpen} title="Help & Keyboard Shortcuts">
+      <Modal 
+        open={isModalOpen} 
+        title="Help & Keyboard Shortcuts"
+        onClose={() => setIsModalOpen(false)}
+      >
         <div className="p-4">
           <div className={`mb-6 ${theme.textColorPrimary}`}>
             <h3 className="text-sm font-bold mb-3">Keyboard Shortcuts</h3>

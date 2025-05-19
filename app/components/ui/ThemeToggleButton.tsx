@@ -200,7 +200,11 @@ export default function ThemeToggleButton() {
         Theme
       </button>
       
-      <Modal open={isModalOpen} title="Choose a Theme">
+      <Modal 
+        open={isModalOpen} 
+        title="Choose a Theme"
+        onClose={() => setIsModalOpen(false)}
+      >
         <div className="p-4">
           <div className="grid grid-cols-2 gap-4">
             {Object.entries(themePresets).map(([key, themePreset]) => (
