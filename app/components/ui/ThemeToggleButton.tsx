@@ -71,7 +71,7 @@ const themePresets: Record<string, Theme> = {
     "secondaryHoverColor": "bg-gray-700",
     "textColorPrimary": "text-cyan-300",
     "textColorSecondary": "text-fuchsia-300",
-    "chatWindowStyle": "bg-gray-900"
+    "chatWindowStyle": "bg-black"
   },
   gpt: {
     "primaryColor": "bg-[#303030]",
@@ -84,7 +84,7 @@ const themePresets: Record<string, Theme> = {
     "secondaryHoverColor": "bg-[#876767]",
     "textColorPrimary": "text-white",
     "textColorSecondary": "text-gray-400",
-    "chatWindowStyle": "bg-[#212121]"
+    "chatWindowStyle": "bg-[#212121] text-xs"
   },
   sophie: {
     "primaryColor": "bg-[#30302e]",

@@ -73,6 +73,38 @@ export default function PromptBox({uti, toolbox, description, session, state, se
     }
     setChatSession(chatSession)
   }, [loading])
+  
+  // Add keyboard shortcut handlers
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Only handle shortcuts if not in an input field or textarea
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        return;
+      }
+      
+      // Cmd/Ctrl+O to toggle canvas
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'o') {
+        e.preventDefault();
+        // Toggle between canvas and chat
+        setState(state === 'canvas' ? 'chat' : 'canvas');
+      }
+      
+      // Cmd/Ctrl+X to clear chat
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'x') {
+        e.preventDefault();
+        chatSession.clear();
+        setCurrentSession([]);
+      }
+    };
+
+    // Add event listener
+    window.addEventListener('keydown', handleKeyDown);
+    
+    // Clean up event listener on component unmount
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [state, chatSession])
 
   /**
    * processStream processes the incoming stream of messages from the LLM.

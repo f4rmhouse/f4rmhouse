@@ -80,6 +80,25 @@ export default function RightSidebar({f4rmer}:{f4rmer:F4rmerType}) {
     })
   }
 
+  // Add keyboard shortcut listener for Cmd+M to toggle right sidebar
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Check for Cmd+M (metaKey is Cmd on Mac, ctrlKey would be Ctrl on Windows)
+      if ((event.metaKey || event.ctrlKey) && event.key === 'm') {
+        event.preventDefault(); // Prevent default browser behavior
+        setVisible(prev => !prev); // Toggle sidebar state
+      }
+    };
+
+    // Add event listener
+    window.addEventListener('keydown', handleKeyDown);
+    
+    // Clean up event listener on component unmount
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+  
   useEffect(() => {
     getProduct("html-upload")
   }, [])

@@ -1,10 +1,12 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 export default function KeyboardHandler() {
   const router = useRouter();
+  // State to track if right sidebar is visible (to be shared across components)
+  const [rightSidebarVisible, setRightSidebarVisible] = useState(false);
   
   useEffect(() => {
     let commandKeyPressed = false;
@@ -28,15 +30,15 @@ export default function KeyboardHandler() {
         }
       }
       
+      // Note: Cmd+B to toggle left sidebar is handled directly in Sidebar.tsx
+      
       // Check for Cmd+H to toggle between /store and home
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'h') {
-        console.log(e.key)
         // Prevent default browser behavior (history)
         e.preventDefault();
         
         // Check current location and toggle between /store and home
         const currentPath = window.location.pathname;
-        console.log(currentPath)
         if (currentPath === '/store') {
           // If we're in the store, go to home
           router.push('/');
@@ -45,6 +47,8 @@ export default function KeyboardHandler() {
           router.push('/store');
         }
       }
+      
+      // Note: Cmd+M to toggle right sidebar is handled directly in RightSidebar.tsx
     };
     
     const handleKeyUp = (e: KeyboardEvent) => {

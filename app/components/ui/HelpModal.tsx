@@ -12,8 +12,11 @@ export default function HelpModal() {
   // Keyboard shortcuts to display in the help modal
   const keyboardShortcuts = [
     { keys: 'Cmd/Ctrl+B', description: 'Toggle left sidebar' },
+    { keys: 'Cmd/Ctrl+M', description: 'Toggle right sidebar' },
     { keys: 'Cmd/Ctrl+H', description: 'Toggle between store and home' },
     { keys: 'Cmd/Ctrl+A', description: 'Open agent selector dropdown' },
+    { keys: 'Cmd/Ctrl+O', description: 'Open canvas' },
+    { keys: 'Cmd/Ctrl+X', description: 'Clear chat' },
     { keys: 'Cmd/Ctrl+<number>', description: 'Select agent by number' },
     { keys: 'Cmd/Ctrl+Backspace', description: 'Deselect everything on screen' }
   ]

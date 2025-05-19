@@ -41,7 +41,7 @@ export default function NewAIMessage({message, openCanvas}:{message:string| unde
       <div className='rounded-2xl rounded-tl-sm w-[92%]'>
           <div>
             <div className={`${theme.textColorPrimary} ${theme.aiMessageStyle ? theme.aiMessageStyle : "bg-transparent"} rounded-lg`}>
-              <div className="markdown-content" style={{backgroundColor: 'inherit'}}>
+              <div className="markdown-content" style={{backgroundColor: 'inherit', padding:0}}>
                 <ReactMarkdown>{message}</ReactMarkdown>
               </div>
             </div>
