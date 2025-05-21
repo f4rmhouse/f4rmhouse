@@ -48,6 +48,7 @@ const config: Config = {
       fontFamily: {
         'rocket': ['rocket', 'sans-serif'],
         'roboto': ['roboto', 'serif'],
+        'w95fa': ['w95fa', 'monospace'],
       },
       boxShadow: {
         'dark-tremor-input': '0 1px 2px 0 rgb(0 0 0 / 0.05)',

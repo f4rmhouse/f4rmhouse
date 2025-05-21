@@ -12,6 +12,17 @@ export default function KeyboardHandler() {
     let commandKeyPressed = false;
     
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Handle Tab key to focus the input field
+      if (e.key === 'Tab' && !(e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement)) {
+        e.preventDefault(); // Prevent default tab behavior
+        
+        // Find and focus the main input field
+        const inputField = document.querySelector('.grow.z-10');
+        if (inputField instanceof HTMLInputElement) {
+          inputField.focus();
+        }
+      }
+      
       // Check if the Command/Meta key is pressed
       if (e.key === 'Meta') {
         commandKeyPressed = true;
@@ -20,7 +31,7 @@ export default function KeyboardHandler() {
         if (window.getSelection) {
           const selection = window.getSelection();
           if (selection) {
-            selection.removeAllRanges();
+            // selection.removeAllRanges();
           }
         }
         
@@ -53,7 +64,7 @@ export default function KeyboardHandler() {
     
     const handleKeyUp = (e: KeyboardEvent) => {
       if (e.key === 'Meta') {
-        commandKeyPressed = false;
+        // commandKeyPressed = false;
       }
     };
     

@@ -66,11 +66,11 @@ class ToolManager {
 
     return endpoints.map((endpoint, i) => {
       return createMCPTool({
-        uti: "ascii_gen",
+        uti: "dashboarder",
         endpoint: endpoint.endpoints[0],
         title: `${endpoint.endpoints[0]}_${Math.random().toString(36).substring(2, 8)}`,
         endpoint_description: endpoint.descriptions[0],
-        tool_description: "This tool lets you write a love letter and generates ascii if needed.",
+        tool_description: "This tool lets you create a dashboard from a JSON config object.",
         parameters: endpoint.parameters
       });
     });
@@ -138,24 +138,63 @@ export async function POST(req: NextRequest) {
     }
     const model = ModelFactory.create(selectedModel);
 
+    let tmp_json_format = `
+    {
+        "title": "[string] the title of the dashboard",
+        "theme": "[string] supports the following: "plotly", "plotly_white", "plotly_dark", "ggplot2", "seaborn", "simple_white", "none"",
+        "width": "[number] the pixel width of the dashboard",
+        "height": "[number] the pixel height of the dashboard",
+        "subplots": {
+            "rows": [number] the number of rows in the dashboard,
+            "cols": [number] the number of columns in the dashboard,
+            "titles": [string[]] the titles of each chart in the dashboard,
+            "shared_xaxes": False,
+            "shared_yaxes": False
+        },
+        "data": object[] an array of objects with data for each chart,
+        "plots": an array of objects that looks like this [
+            {
+                "type": the type of chart (poltly charts): "scatter"|"bar"|"heatmap"|"contour"|"surface"|"scatter3d",
+                "x": [string] name of x-axis,
+                "y": [string] name of y-axis,
+                "mode": [string] how data points are displayed in a chart can have any of these values: 'markers', 'lines', 'lines+markers', 'text', 'markers+text', 'lines+text', 'lines+markers+text'
+                "line": [Object] an object with the folowing formst: {"color": "[string] "<the_color>", "width": [number] the width in pixels},
+                "name": [string] the name of the chart,
+                "row": [number] the width of the chart. Has to be lower than the total rows in the dashboard,
+                "col": [number] the height of the chart. Has to be lower than the total columns in the dashboard
+	            "markers": (optional, used in barcharts) [Object] display different colors for bars in stacked barcharts has the following format: {"colors": [array of colors]}
+            }
+	         ...
+        ],
+        "layout": {
+            "showlegend": [bool] true = show legend, false = hide legend,
+            "legend": [Object] an object with the following format: {"orientation": "h", "y": -0.1}
+        }
+    } 
+    `
+
     // Create and bind tools
     toolbox = [
       {
-        uti: "ascii-gen",
-        description: "This server provides a function that returns a fun ascii art made by a volunteer",
-        endpoint: "gen_ascii"
+        uti: "dashboarder",
+        description: "This server provides a function that can create a dashboard from a JSON object. The JSON object has to have the following format: " + tmp_json_format,
+        endpoint: "dashboard"
       }
     ]
 
     endpoints.push({
-      endpoints: ["create_love_letter"],
-      descriptions: ["Create a love letter for the two character names given as parameter"],
-      parameters: ["fr", "to"]
-    });
-    endpoints.push({
-      endpoints: ["gen_ascii"],
-      descriptions: ["Returns an ascii animal"],
-      parameters: ["name"]
+      endpoints: ["create_dashboard_from_json"],
+      descriptions: [`Generate a Plotly chart based on a JSON configuration.
+       Parameters:
+       -----------
+       config : dict or str
+           JSON configuration for the chart, either as a Python dictionary or a JSON string
+           it needs to have the following format: ${tmp_json_format}
+       Returns:
+       --------
+       fig : str
+           The url generated for the Plotly figure stored in an s3 bucket`],
+      parameters: ["config"]
     });
 
     const tools = await ToolManager.createMCPTools(toolbox ?? [], endpoints, email);

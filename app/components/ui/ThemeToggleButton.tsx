@@ -32,7 +32,7 @@ const themePresets: Record<string, Theme> = {
     secondaryHoverColor: "bg-neutral-400 transition-none",
     textColorPrimary: "text-black",
     textColorSecondary: "text-neutral-900",
-    chatWindowStyle: "bg-white shadow-[inset_1px_1px_1px_4px_rgba(0,_0,_0,_0.3)]"
+    chatWindowStyle: "bg-white shadow-[inset_1px_1px_1px_4px_rgba(0,_0,_0,_0.3)] font-w95fa"
   },
   sleek: {
     "primaryColor": "bg-gray-50 shadow-sm",
@@ -149,8 +149,8 @@ const themePresets: Record<string, Theme> = {
     "secondaryHoverColor": "bg-white",
     "textColorPrimary": "text-[#53534f]",
     "textColorSecondary": "text-[#53534f]",
-    "chatWindowStyle": "bg-white border-2 border-[#808bd2]",
-    "aiMessageStyle": "bg-[#f0f6fa] text-[#6f7192] shadow border-2 border-[#a4b4d3]"
+    "chatWindowStyle": "bg-white border-2 border-[#808bd2] font-w95fa",
+    "aiMessageStyle": "bg-[#f0f6fa] text-[#6f7192] shadow border-2 border-[#a4b4d3] font-w95fa"
   },
   telegraph: {
     "primaryColor": "bg-white text-black",

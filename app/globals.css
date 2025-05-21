@@ -55,6 +55,13 @@ body {
   font-style: normal;
 }
 
+@font-face {
+  font-family: 'w95fa';
+  src: url('fonts/w95fa/W95FA.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+}
+
 /* dark */
 .markdown-body {
   color-scheme: dark;
