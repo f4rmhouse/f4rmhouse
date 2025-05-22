@@ -177,24 +177,99 @@ export async function POST(req: NextRequest) {
     toolbox = [
       {
         uti: "dashboarder",
-        description: "This server provides a function that can create a dashboard from a JSON object. The JSON object has to have the following format: " + tmp_json_format,
+        description: "This server provides a function that can create a dashboard from a JSON object. To start the creation process edit layout with uuid as an empty string. This will create an empty layout for you that you can edit.",
         endpoint: "dashboard"
       }
     ]
 
     endpoints.push({
-      endpoints: ["create_dashboard_from_json"],
-      descriptions: [`Generate a Plotly chart based on a JSON configuration.
-       Parameters:
-       -----------
-       config : dict or str
-           JSON configuration for the chart, either as a Python dictionary or a JSON string
-           it needs to have the following format: ${tmp_json_format}
-       Returns:
-       --------
-       fig : str
-           The url generated for the Plotly figure stored in an s3 bucket`],
-      parameters: ["config"]
+      endpoints: ["render"],
+      descriptions: [`
+        Generate a Plotly chart based on a JSON configuration.
+        Parameters:
+        -----------
+        uuid: str
+            the uuid of the dashboard to render
+        Returns:
+        --------
+        url: str 
+          the url of the dashboard stored as an html file
+        `],
+      parameters: ["uuid"]
+    });
+    endpoints.push({
+      endpoints: ["edit_layout"],
+      descriptions: [`
+        Generate a Plotly layout.
+    
+    Parameters:
+    -----------
+    uuid: str 
+        the uuid of the dashboard to edit
+    title:str 
+        the title of the dashboard
+    theme:str 
+        the theme of the dashboard supports all plotly themes
+    width:str 
+        width in pixels of the dashboard
+    height:str 
+        height in picels of the dashboard
+    rows:str 
+        number of rows has to be integer bigger than 0
+    cols:str 
+        number of columns has to be integer bigger than 0
+    
+    Returns:
+    --------
+    uuid: str 
+      the uuid of the layout
+        `],
+      parameters: ["uuid", "title", "theme", "width", "height", "rows", "cols"]
+    });
+
+    endpoints.push({
+      endpoints: ["insert_chart"],
+      descriptions: [`
+        Append a new chart to the dashboard.
+    
+    Parameters:
+    -----------
+    uuid: str 
+        the uuid of the dashboard to append the chart to
+    chart_type: str
+        the type of chart (poltly charts): "scatter"|"bar"|"heatmap"|"contour"|"surface"|"scatter3d". When creating a line chart use the 'scatter' type.
+    x_values: str
+        the x values to be displayed in the chart. Has to be an array like: [23,2132,5,43] or ["A", "B", "C"] etc
+    y_values: str
+        the y values to be displayed in the chart. Has to be an array like: [23,2132,5,43] or ["A", "B", "C"] etc
+    z_values: str
+        only needed when chart_type is "heatmap","contour","surface" or "scatter3d" optional when chart_type is "scatter" or "bar" (use [] in its place). Has to be an array like: [23,2132,5,43] or ["A", "B", "C"] etc
+    row: str
+        the row that the chart will be displayed on
+    col: str
+        the column the chart will be displayed on
+    Returns:
+    --------
+    uuid: str 
+      the uuid of the chart
+        `],
+      parameters: ["uuid", "chart_type", "x_values", "y_values", "z_values", "row", "col"]
+    });
+    endpoints.push({
+      endpoints: ["create_new_dashboard"],
+      descriptions: [`
+        Create a new dashboard 
+        Parameters:
+    -----------
+    rows: str 
+      number of rows in the dashboard 
+    cols: str
+        number of columns in the dashboard
+    --------
+    uuid: str 
+    the uuid of the new dashboard 
+        `],
+      parameters: ["rows", "cols"]
     });
 
     const tools = await ToolManager.createMCPTools(toolbox ?? [], endpoints, email);

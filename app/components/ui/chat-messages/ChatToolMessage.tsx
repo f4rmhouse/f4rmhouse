@@ -1,10 +1,43 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { LangchainMessageType } from "../../types/LangchainMessageType";
 import { CirclePlus } from "lucide-react";
 import { ToolMessageType } from "../../types/ToolMessageType";
+import { useArtifact } from "../../../context/ArtifactContext";
 
-export default function RemoteToolResponse({message, debug}:{message:string | undefined, debug: Object}) {
+export default function RemoteToolResponse({message, debug}:{message:string | undefined, debug: any}) {
   const [showMore, setShowMore] = useState<boolean>(false)
+  const { addArtifact, setCurrentArtifact } = useArtifact()
+  
+  // Function to extract URLs from a string
+  const extractUrls = (text: string): string[] => {
+    // Regular expression to match URLs
+    // This pattern matches common URL formats including http, https, ftp protocols
+    const urlRegex = /(?:https?|ftp):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?/gi;
+    
+    // Extract all URLs from the text
+    return text.match(urlRegex) || [];
+  }
+  
+  // Check if debug.content contains a URL, extract it, and set it as the current artifact
+  useEffect(() => {
+    console.log("DEBUG: ", debug.kwargs.content)
+    if (debug?.kwargs.content && typeof debug.kwargs.content === 'string') {
+      const urls = extractUrls(debug.kwargs.content);
+      
+      if (urls.length > 0) {
+        // Use the first URL found in the content
+        const url = urls[0];
+        
+        // Set the URL as the current artifact
+        console.log("DEBUG: ", url)
+        setCurrentArtifact(url);
+        
+        // Dispatch a custom event to open the canvas
+        const event = new CustomEvent('openCanvas', { detail: { url } });
+        document.dispatchEvent(event);
+      }
+    }
+  }, [debug?.content])
   return (
     <div className="">
       <div className="flex">

@@ -23,26 +23,6 @@ export default function KeyboardHandler() {
         }
       }
       
-      // Check if the Command/Meta key is pressed
-      if (e.key === 'Meta') {
-        commandKeyPressed = true;
-        
-        // Clear any text selection
-        if (window.getSelection) {
-          const selection = window.getSelection();
-          if (selection) {
-            // selection.removeAllRanges();
-          }
-        }
-        
-        // Blur any focused element
-        if (document.activeElement instanceof HTMLElement) {
-          document.activeElement.blur();
-        }
-      }
-      
-      // Note: Cmd+B to toggle left sidebar is handled directly in Sidebar.tsx
-      
       // Check for Cmd+H to toggle between /store and home
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'h') {
         // Prevent default browser behavior (history)

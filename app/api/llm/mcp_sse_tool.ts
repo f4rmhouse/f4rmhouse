@@ -5,9 +5,9 @@ import { DynamicStructuredTool } from "@langchain/core/tools";
 import { z } from "zod";
 
 function createMCPTool({ uti, endpoint, title, endpoint_description, tool_description, parameters = [] }: F4ToolParams) {
-    if (!parameters || !parameters.length) {
-        throw new Error('No parameters defined for this tool');
-    }
+    //if (!parameters || !parameters.length) {
+    //    throw new Error('No parameters defined for this tool');
+    //}
 
     const zodSchema = z.object(
         Object.fromEntries(
@@ -28,7 +28,7 @@ function createMCPTool({ uti, endpoint, title, endpoint_description, tool_descri
 
             const url = new URL(`${baseUrl}/products/sse?uti=${uti}`)
             const url2 = new URL("http://127.0.0.1:8080/sse")
-            const transport = new SSEClientTransport(url);
+            const transport = new SSEClientTransport(url2);
             await client.connect(transport);
 
             try {

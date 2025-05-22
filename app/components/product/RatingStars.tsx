@@ -9,13 +9,13 @@ export default function RatingStars({value, size, color}: {value: string, size:n
 
   return (
     <div className={`flex text-${color}`}>
-      {Array.from(Array(Number(value.split(".")[0]))).map((_,i) => <Star size={size} key={i} />)}
+      {Array.from(Array(Number(value.split(".")[0]))).map((_,i) => <Star fill="currentColor" size={size} key={i} />)}
       {value.includes(".") ? 
         <></>
         :
         <></>
       }
-      {Array.from(Array(5 - Math.ceil(Number(value)))).map((_,i) => <Star size={size} key={i} />)}
+      {Array.from(Array(5 - Math.ceil(Number(value)))).map((_,i) => <Star fill="none" size={size} key={i} />)}
     </div>
   )
 }

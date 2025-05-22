@@ -42,7 +42,7 @@ export default function RateReviewButton({rid, uid, rating, rated}:{rid:string, 
 
   return (
     <button onClick={() => rate()} className={currentRated ? "transition-all flex text-white hover:text-neutral-400":"flex text-neutral-400 hover:text-white"}>
-      <Heart />
+      <Heart size={15}/>
       <p className="m-auto text-xs">{r}</p>
     </button>
   )

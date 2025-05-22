@@ -48,8 +48,6 @@ export default function PromptBox({uti, toolbox, description, session, state, se
 
   const [chatSession, setChatSession] = useState<ChatSession>(new ChatSession())
 
-  const transport:"MCP"|"REST" = "REST"
-
   /** Absolutely needed */
   const [currentSession, setCurrentSession] = useState<ChatMessageType[]>([]) 
   const { messages, input, setInput, handleInputChange, setMessages } = useChat({});
@@ -97,12 +95,22 @@ export default function PromptBox({uti, toolbox, description, session, state, se
       }
     };
 
-    // Add event listener
+    // Add event listener for keyboard shortcuts
     window.addEventListener('keydown', handleKeyDown);
     
-    // Clean up event listener on component unmount
+    // Add event listener for openCanvas custom event
+    const handleOpenCanvas = (event: CustomEvent) => {
+      // Switch to canvas view when the event is triggered
+      setState('canvas');
+    };
+
+    // Add event listener for the custom event
+    document.addEventListener('openCanvas', handleOpenCanvas as EventListener);
+    
+    // Clean up event listeners on component unmount
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('openCanvas', handleOpenCanvas as EventListener);
     };
   }, [state, chatSession])
 

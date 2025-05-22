@@ -15,7 +15,7 @@ import { useSession } from "next-auth/react";
 import axios from "axios";
 import { remark } from 'remark';
 import html from 'remark-html';
-import { ArrowRight, UsersRound } from "lucide-react";
+import { ArrowLeft, UsersRound } from "lucide-react";
 
 type Params = Promise<{ slug: string }>
 
@@ -155,7 +155,7 @@ export default function DetailPage({ params }: { params: Params }) {
           {product?
           <>
           <div className="flex flex-col sm:flex-row mb-2">
-          <Link href="/store" className="transition-all hover:bg-neutral-700 cursor-pointer text-neutral-500 hover:text-neutral-300 rounded-full mt-auto mb-auto p-2 mr-5"><ArrowRight /></Link>
+          <Link href="/store" className="transition-all hover:bg-neutral-700 cursor-pointer text-neutral-500 hover:text-neutral-300 rounded-full mt-auto mb-auto p-2 mr-5"><ArrowLeft/></Link>
           <div className="flex">
             <img className="h-10 rounded-full aspect-square object-cover" height={10} src={"https://f4-public.s3.eu-central-1.amazonaws.com/showcases/" + product.uti + "/thumbnail.jpg"}/>
             <div className="pl-5">
