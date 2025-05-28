@@ -6,16 +6,12 @@ import { useChat } from "ai/react";
 
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
-import { LangchainMessageType } from "../../types/LangchainMessageType";
 import ChatAIMessage from "../chat-messages/ChatAIMessage";
 import ChatToolMessage from "../chat-messages/ChatToolMessage";
-import { ToolMessageType } from "../../types/ToolMessageType";
 import ChatInitToolCallMessage from "../chat-messages/ChatInitToolCallMessage";
 import ChatMessageType from "../../types/ChatMessageType";
 import ChatUserMessage from "../chat-messages/ChatUserMessage";
 import ChatErrorMessage from "../chat-messages/ChatErrorMessage";
-import Link from "next/link";
-import Modal from "../modal/Modal";
 import Timer from "../misc/Timer";
 import UserInput from "./UserInput";
 import ModelSelector from "./ModelSelector";
@@ -52,6 +48,7 @@ export default function PromptBoxSimple({uti, description}: {uti: string, descri
   const [currentSession, setCurrentSession] = useState<ChatMessageType[]>([]) 
   const { messages, input, setInput, handleInputChange, setMessages } = useChat({});
   const [loading, setLoading] = useState<boolean>(false)
+  const [latestMessage, setLatestMessage] = useState<string>("")
 
   useEffect(() => {
     setMessages(chatSession.getNextJSMessages())
@@ -79,7 +76,7 @@ export default function PromptBoxSimple({uti, description}: {uti: string, descri
         if (done) break;
 
         const chunk = new TextDecoder().decode(value);
-        StreamProcessor.processChunk(chunk, chatSession, MSStart)
+        StreamProcessor.processTokenChunk(chunk, chatSession, MSStart, setLatestMessage, loading)
       }
     } catch (err) {
       console.error(err)
@@ -88,6 +85,18 @@ export default function PromptBoxSimple({uti, description}: {uti: string, descri
       setLoading(false);
     }
   }
+
+
+  //let postData: PostDataType = {
+  //  messages: chatSession.getNextJSMessages(), 
+  //  description: description,
+  //  show_intermediate_steps: false,
+  //  email: "",
+  //  provider: "",
+  //  token: "",
+  //  f4rmer: uti,
+  //  model: selectedModel
+  //}
 
   /**
    * sendMessage handles the submission of user messages to the LLM.
@@ -142,80 +151,64 @@ export default function PromptBoxSimple({uti, description}: {uti: string, descri
 
     await processStream(chatSession.getMessages().length, stream, MSStart) 
   }
+  
 
   return (
     <div className="sm:flex overflow-hidden w-[100%]">
       <div className={`flex transition-all w-[100%]`}>
-    <div className={`flex w-full rounded-xl overflow-auto w-[100%]`}>
-    <div className="flex flex-col w-[100%] md:p-0 grow overflow-hidden">
-      {currentSession.length === 0 ? (
-        <></>
-      ) : null}
-      <div
-        className={`no-scrollbar flex flex-col-reverse w-full mb-4 pb-20 pl-7 gap-5 transition-all duration-500 overflow-y-scroll scrollb ${currentSession.length > 0 ? 'opacity-100' : 'opacity-0 h-0'}`}
-        ref={messageContainerRef}
-      >
-        {loading ? 
-          <div className="flex gap-2"><img className="h-[30px] rounded-full" src="https://f4-public.s3.eu-central-1.amazonaws.com/public/assets/f4-logo-yellow-small.png"/> <div className='p-2'><p><span className="">🤔</span> thinking...</p><div className="text-xs bg-black rounded-full p-1 border border-neutral-700"><Timer /></div></div></div>
-          :
-          <></>
-        }
-        {currentSession.length > 0 ? (
-          [...currentSession]
-            .reverse()
-            .map((m, i) => {
-              switch (m.role) {
-                case "user":
-                  return (<ChatUserMessage key={i} content={m.content} timestamp={m.timestamp}/>)
-                case "tool_init":
-                  return (<ChatInitToolCallMessage key={i} message={m.content} debug={chatSession.getDebug(m.id) ?? {message: "no extra information"}}/>)
-                case "system":
-                  return (<ChatAIMessage key={i} message={m.content} openCanvas={() => console.log("open canvas")}/>)
-                case "tool_response":
-                  return (<ChatToolMessage key={i} message={m.content} debug={chatSession.getDebug(m.id) ?? {message: "no extra information"}}/>)
-                case "error":
-                  return (<ChatErrorMessage key={i} content={m.content}/>)
+        <div className={`flex w-full rounded-xl overflow-auto w-[100%]`}>
+          <div className="flex flex-col w-[100%] md:p-0 grow overflow-hidden">
+            {currentSession.length === 0 ? (
+              <></>
+            ) : null}
+            <div
+              className={`no-scrollbar flex flex-col-reverse w-full mb-4 pb-20 pl-7 gap-5 transition-all duration-500 overflow-y-scroll scrollb ${currentSession.length > 0 ? 'opacity-100' : 'opacity-0 h-0'}`}
+              ref={messageContainerRef}
+            >
+              {loading ? 
+                <div className="flex gap-2"><img className="h-[30px] rounded-full" src="https://f4-public.s3.eu-central-1.amazonaws.com/public/assets/f4-logo-yellow-small.png"/> <div className='p-2'><p><span className="">🤔</span> thinking...</p><div className="text-xs bg-black rounded-full p-1 border border-neutral-700"><Timer /></div></div></div>
+                :
+                <></>
               }
-            })
-        ) : (
-          ""
-        )}
-      </div>
-
-      <div className={`transition-all duration-500 ease-in-out w-[100%] ${currentSession.length > 0 ? '' : ''}`}>
-        <UserInput onSubmit={sendMessage} onChange={handleInputChange} value={input}>
-          <div className="flex p-0 mt-2">
-            <ModelSelector onModelSelect={(e:any) => {setSelectedModel(e)}} selectedModel={selectedModel}/>
-          </div>
-        </UserInput>
-      </div>
-    </div>
-    </div>
-    <div className="absolute bg-transparent right-[3%] top-[10%]">
-      <div className={`flex flex-col gap-2 ${messages.length == 0 ? "opacity-0" : "opacity-100"}`}>
-        <button onClick={() => {setMessages([]);setCurrentSession([])}} className={`transition-all hover:rotate-[-90deg] rounded-md p-2 ${config.theme.textColorPrimary ? config.theme.textColorPrimary : "text-white"}`}><RotateCcw size={15}/></button>
-      </div> 
-    </div>
-    {promptForUserLogin ? 
-      <div onClick={() => setPromptForUserLogin(false)} className={`${promptForUserLogin ? "" : "hidden"} transition-all absolute top-0 left-0 w-full h-full bg-black bg-opacity-50`}>
-        <Modal open={promptForUserLogin} title="🙏">
-          <div className="p-5">
-            <p className="text-2xl font-bold">Appreciate you for using f4rmhouse.</p>
-            <p className="text-neutral-400">Sign in and add actions to your LLM to automate your digital work!</p>
-            <div className="w-full flex">
-              <Link href="/login" className="transition-all hover:bg-neutral-400 bg-neutral-200 mt-5 pt-2 pb-2 w-full rounded-full text-black text-center">Sign in</Link>
+              {currentSession.length > 0 ? (
+                [...currentSession]
+                  .reverse()
+                  .map((m, i) => {
+                    switch (m.role) {
+                      case "user":
+                        return (<ChatUserMessage key={i} content={m.content} timestamp={m.timestamp}/>)
+                      case "tool_init":
+                        return (<ChatInitToolCallMessage key={i} message={m.content} debug={chatSession.getDebug(m.id) ?? {message: "no extra information"}}/>)
+                      case "system":
+                        return (<ChatAIMessage key={i} message={m.content} openCanvas={() => console.log("open canvas")}/>)
+                      case "tool_response":
+                        return (<ChatToolMessage key={i} message={m.content} debug={chatSession.getDebug(m.id) ?? {message: "no extra information"}}/>)
+                      case "error":
+                        return (<ChatErrorMessage key={i} content={m.content}/>)
+                    }
+                  })
+              ) : (
+                ""
+              )}
             </div>
-            <button onClick={() => {setPromptForUserLogin(false)}} className="z-99 text-sm text-center text-neutral-300 pt-2 w-full underline">not yet!</button>
+          <div className={`transition-all duration-500 ease-in-out w-[100%] p-5 ${currentSession.length > 0 ? '' : ''}`}>
+            <UserInput onSubmit={sendMessage} onChange={handleInputChange} value={input}>
+              <div className="flex p-0 mt-2">
+                <ModelSelector onModelSelect={(e:any) => {setSelectedModel(e)}} selectedModel={selectedModel}/>
+              </div>
+            </UserInput>
           </div>
-        </Modal>
+        </div>
       </div>
-      :
-      <></>
-    }
-    </div>
-    <div className={`flex transition-all ease-in-out text-white rounded-md w-full bg-white hidden`}>
-      <Canvas />
-    </div>
+      <div className="absolute bg-transparent right-[3%] top-[10%]">
+        <div className={`flex flex-col gap-2 ${messages.length == 0 ? "opacity-0" : "opacity-100"}`}>
+          <button onClick={() => {setMessages([]);setCurrentSession([])}} className={`transition-all hover:rotate-[-90deg] rounded-md p-2 ${config.theme.textColorPrimary ? config.theme.textColorPrimary : "text-white"}`}><RotateCcw size={15}/></button>
+        </div> 
+      </div>
+      </div>
+      <div className={`flex transition-all ease-in-out text-white rounded-md w-full bg-white hidden`}>
+        <Canvas />
+      </div>
     </div>
   )
 }

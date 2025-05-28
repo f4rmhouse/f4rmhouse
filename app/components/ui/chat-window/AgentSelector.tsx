@@ -1,20 +1,9 @@
 import { Bot, BotMessageSquare } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { useTheme } from "../../../context/ThemeContext";
+import F4rmerType from '../../types/F4rmerType';
 
-interface Agent {
-  id: string;
-  name: string;
-}
-
-// List of available agents
-const availableAgents: Agent[] = [
-  { id: 'seo-agent', name: 'SEO Agent' },
-  { id: 'webdev-gpt', name: 'WebDevGPT' },
-  { id: 'lawyer-gpt', name: 'LawyerGPT' }
-];
-
-export default function AgentSelector({ onAgentSelect, selectedAgent }: { onAgentSelect: (agent: Agent) => void, selectedAgent: Agent | null }) {
+export default function AgentSelector({ f4rmers, onAgentSelect, selectedF4rmer }: { f4rmers: F4rmerType[], onAgentSelect: (agent: F4rmerType) => void, selectedF4rmer: F4rmerType | null }) {
   const { theme } = useTheme();
   const selectRef = useRef<HTMLSelectElement>(null);
   
@@ -43,19 +32,19 @@ export default function AgentSelector({ onAgentSelect, selectedAgent }: { onAgen
       // Option+number (Alt+number) to select agent by index
       if (event.ctrlKey) {
         const numKey = parseInt(event.key);
-        if (!isNaN(numKey) && numKey >= 1 && numKey <= availableAgents.length) {
+        if (!isNaN(numKey) && numKey >= 1 && numKey <= f4rmers.length) {
           event.preventDefault();
           
           // Get agent at index (subtract 1 since arrays are 0-indexed but keys start at 1)
-          const agentIndex = numKey - 1;
-          const selectedAgent = availableAgents[agentIndex];
+          const f4merIndex = numKey - 1;
+          const selectedF4rmer = f4rmers[f4merIndex];
 
           // Select the agent
-          onAgentSelect(selectedAgent);
+          onAgentSelect(selectedF4rmer);
           
           // Update the select element's value
           if (selectRef.current) {
-            selectRef.current.value = selectedAgent.id;
+            selectRef.current.value = selectedF4rmer.title;
           }
         }
       }
@@ -72,9 +61,9 @@ export default function AgentSelector({ onAgentSelect, selectedAgent }: { onAgen
   
   const handleAgentChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedId = event.target.value;
-    const agent = availableAgents.find(agent => agent.id === selectedId);
-    if (agent) {
-      onAgentSelect(agent);
+    const f4rmer = f4rmers.find(f4rmer => f4rmer.title === selectedId);
+    if (f4rmer) {
+      onAgentSelect(f4rmer);
     }
   };
   
@@ -87,12 +76,12 @@ export default function AgentSelector({ onAgentSelect, selectedAgent }: { onAgen
         id="agent-selector"
         ref={selectRef}
         className={`transition-all rounded-r-md cursor-pointer ${theme.textColorSecondary} block w-full text-xs border-none bg-transparent`}
-        value={selectedAgent?.id || availableAgents[0].id}
+        value={selectedF4rmer?.title|| f4rmers[0].title}
         onChange={handleAgentChange}
       >
-        {availableAgents.map((agent) => (
-          <option key={agent.id} value={agent.id}>
-            {agent.name}
+        {f4rmers.map((f4rmer:F4rmerType) => (
+          <option key={f4rmer.uid} value={f4rmer.title}>
+            {f4rmer.title}
           </option>
         ))}
       </select>

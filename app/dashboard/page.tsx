@@ -41,13 +41,16 @@ async function Dashboard() {
       created: "0"
   }
 
+  let f4s:F4rmerType[] = [data]
+
   try {
-    let f4s = await user.getF4rmers()
-    if (f4s.length == 0) {
+    let remote_f4s = await user.getF4rmers()
+    if (remote_f4s.length == 0) {
       await user.createF4rmer(data)
+      f4s = [data]
     }
     else {
-      data = f4s[0]
+      f4s = remote_f4s
     }
   }
   catch(err) {
@@ -64,7 +67,7 @@ async function Dashboard() {
         <div className="mt-10">
           <div className="overflow-hidden">
             <div>
-              <Boxes data={data} session={session}/>
+              <Boxes f4rmers={f4s} session={session}/>
               <RightSidebar f4rmer={data}/>
             </div>
           </div>

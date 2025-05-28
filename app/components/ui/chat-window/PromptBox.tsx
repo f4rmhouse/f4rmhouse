@@ -24,6 +24,7 @@ import Canvas from "./Canvas";
 import ChatSession from "./utils/ChatSession";
 import { PostDataType } from "./utils/types";
 import StreamProcessor from "./utils/StreamProcessor";
+import F4rmerType from "../../types/F4rmerType";
 
 /**
  * PromptBox is the text input box at the bottom of the screen on /f4rmers/details page
@@ -36,39 +37,46 @@ import StreamProcessor from "./utils/StreamProcessor";
  * 
  * @returns 
  */
-export default function PromptBox({uti, toolbox, description, session, state, setState}: {uti: string, toolbox: ProductType[], description: string, session: F4Session, state: "canvas" | "chat" | "preview", setState: (state: "canvas" | "chat" | "preview") => void}) {
+export default function PromptBox({session, state, setState, f4rmers}: {session: F4Session, state: "canvas" | "chat" | "preview", setState: (state: "canvas" | "chat" | "preview") => void, f4rmers: F4rmerType[]}) {
   const { theme } = useTheme();
   const messageContainerRef = useRef<HTMLDivElement | null>(null);
-  // Neede for streaming tokens not messages
-  // const bufferRef = useRef<string>('');
-
   const [promptForUserLogin, setPromptForUserLogin] = useState<boolean>(false)
   const [selectedModel, setSelectedModel] = useState<any>(config.models[Object.keys(config.models)[0]][0]);
-  const [selectedAgent, setSelectedAgent] = useState<any>({ id: 'seo-agent', name: 'SEO Agent' });
-
+  const [selectedAgent, setSelectedAgent] = useState<F4rmerType|undefined>(f4rmers ? f4rmers[0] : undefined);
   const [chatSession, setChatSession] = useState<ChatSession>(new ChatSession())
-
-  /** Absolutely needed */
   const [currentSession, setCurrentSession] = useState<ChatMessageType[]>([]) 
   const { messages, input, setInput, handleInputChange, setMessages } = useChat({});
   const [loading, setLoading] = useState<boolean>(false)
   const [latestMessage, setLatestMessage] = useState<string>("")
+  const [availableF4rmers, setAvailableF4rmers] = useState<F4rmerType[]>([])
 
   useEffect(() => {
-    setMessages(chatSession.messages)
-  }, [chatSession.messages])
-
-  useEffect(() => {
-    setMessages(chatSession.messages)
-  }, [latestMessage])
-
-  useEffect(() => {
-    if(loading) {
-      chatSession.streaming = false
+    if(f4rmers) {
+      setSelectedAgent(f4rmers[0])
+      setAvailableF4rmers(f4rmers)
     }
     else {
-      chatSession.streaming = false
+      let defaultF4rmers = [
+        {
+          uid: "default-f4rmer", 
+          title: "Default F4rmer", 
+          jobDescription: "You are a helpful assistant known as a 'f4rmer' on the 'f4rmhouse' platform. You know how to be helpful and write very nicely formatted markdown answers to user prompts. Users asking you questions will be able to give you tools to make you even more useful. Always reason through step by step when answering complex question if you can't answer some question be sure to remind users that there are tools available on the platform that can help them.", 
+          toolbox: [], 
+          creator: "", 
+          created: "0"
+        }
+      ]
+      setAvailableF4rmers(defaultF4rmers)
+      setSelectedAgent(defaultF4rmers[0])
     }
+  }, [f4rmers]) 
+
+  useEffect(() => {
+    setMessages(chatSession.messages)
+  }, [latestMessage, chatSession.messages])
+
+  useEffect(() => {
+    chatSession.streaming = false
     setChatSession(chatSession)
   }, [loading])
   
@@ -178,15 +186,19 @@ export default function PromptBox({uti, toolbox, description, session, state, se
       alert("Please select a model to use.")
       return
     }
+    if(selectedAgent == null || selectedAgent.title == ""){
+      alert("Please select an agent to use.")
+      return
+    }
 
     let postData: PostDataType = {
       messages: chatSession.getNextJSMessages(), 
-      description: description,
+      description: selectedAgent.jobDescription,
       show_intermediate_steps: false,
       email: session.user.email,
       provider: session.provider,
       token: session.access_token,
-      f4rmer: uti,
+      f4rmer: selectedAgent.title,
       model: selectedModel
     }
 
@@ -205,7 +217,9 @@ export default function PromptBox({uti, toolbox, description, session, state, se
       <div className={`flex transition-all ${state === "chat" ? "m-auto" : "m-0"}`}>
     <div className={`relative m-auto pt-0 md:pt-0 w-[100vw] h-[100vh] sm:h-[93vh] overflow-hidden ${state === "chat" ? "sm:w-[16cm]" : "sm:w-[10cm]"} ${theme.chatWindowStyle ? theme.chatWindowStyle : ""}`}>
       <div className={`w-full w-[100%] ${theme.textColorSecondary} p-2`}>
-        <AgentSelector onAgentSelect={(e:any) => {setSelectedAgent(e)}} selectedAgent={selectedAgent}/> 
+        {selectedAgent != undefined ? (
+          <AgentSelector f4rmers={availableF4rmers} onAgentSelect={(e:any) => {setSelectedAgent(e)}} selectedF4rmer={selectedAgent}/> 
+        ):<></>}
       </div>
       <div className="no-scrollbar flex flex-col w-full transition-all duration-500 overflow-y-auto flex-grow h-full">
         <div

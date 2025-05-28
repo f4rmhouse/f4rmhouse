@@ -11,6 +11,7 @@ import { LineNumberedTextarea } from "@/app/components/ui/LineNumberedTextarea";
 import ModelSelector from "@/app/components/ui/chat-window/ModelSelector";
 import { Sparkles } from "lucide-react";
 import PromptBoxSimple from "@/app/components/ui/chat-window/PromptBoxSimple";
+import ErrorModal from "@/app/components/ui/modal/ErrorModal";
 
 const SYS_PROMPT = `**System Prompt for AI Agent**
 
@@ -45,7 +46,7 @@ Use this prompt to guide your responses effectively, ensuring that each interact
  */
 export default function CreateF4rmerForm() {
   const router = useRouter()
-  const { data: session, } = useSession();
+  const { data: session } = useSession();
 
   const [selectedModel, setSelectedModel] = useState<any>(config.models[Object.keys(config.models)[0]][0]);
   const [showPreview, setShowPreview] = useState<boolean>(false)
@@ -53,6 +54,8 @@ export default function CreateF4rmerForm() {
   const [systemPrompt, setSystemPrompt] = useState<string>("")
   const [shortDescription, setShortDescription] = useState<string>("");
   const [isMobile, setIsMobile] = useState<boolean>(false);
+  const [showErrorModal, setShowErrorModal] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   useEffect(() => {
     // Handler to call on window resize
@@ -129,8 +132,69 @@ export default function CreateF4rmerForm() {
     }
   }
 
+  const createAgent = () => {
+    setShowPreview(false)
+    
+    // Validate form fields
+    if (!name.trim()) {
+      setErrorMessage("Please provide a name for your agent")
+      setShowErrorModal(true)
+      return
+    }
+    
+    if (!systemPrompt.trim()) {
+      setErrorMessage("Please provide a system prompt for your agent")
+      setShowErrorModal(true)
+      return
+    }
+    
+    if(session && session.user) {
+      if(session.user.email == null || session.user.email == undefined) {
+        setErrorMessage("User email is not available")
+        setShowErrorModal(true)
+        return
+      }
+      
+      // Tell TypeScript to ignore the potential error with session.provider because it does
+      // not undersand how session works
+      // @ts-expect-error - Session includes provider property from auth context
+      let user = new User(session.user.email, session.provider, session.access_token)
+      
+      // Create the f4rmer object
+      let f4rmer: F4rmerType = {
+        uid: "uid",
+        title: name, 
+        jobDescription: systemPrompt, 
+        toolbox: [],
+        creator: session.user.email,
+        created: new Date().toISOString()
+      }
+      
+      // Create the f4rmer and redirect to home on success
+      user.createF4rmer(f4rmer)
+        .then(() => router.push("/"))
+        .catch(err => {
+          console.error("Error creating agent:", err)
+          let errorMsg = "Failed to create agent"
+          
+          // Try to extract more specific error message if available
+          if (err.response && err.response.data && err.response.data.message) {
+            errorMsg = "There was a server error when trying to create your agent. Please try again later. Error: " + err.response.data.message
+          } else if (typeof err.message === 'string') {
+            errorMsg = "There was a server error when trying to create your agent. Please try again later. Error: " + err.message
+          }
+          
+          setErrorMessage(errorMsg)
+          setShowErrorModal(true)
+        })
+    } else {
+      setErrorMessage("You must be logged in to create an agent")
+      setShowErrorModal(true)
+    }
+  }
+
   return(
-    <div className="">
+    <div className="w-full ml-10">
       {isMobile ?
       <div className="flex w-full h-[100vh]">
         <div className="text-center p-4 m-auto">
@@ -139,7 +203,7 @@ export default function CreateF4rmerForm() {
         </div>
       </div>
       :
-      <div className={`w-[90vw] lg:w-[${showPreview ? "90vw" : "50vw"}] p-3 flex`}>
+      <div className={`flex w-[90vw] m-auto lg:w-[90vw] p-3`}>
       <div className="w-full">
       <div className="flex items-center gap-2 mt-10">
         <Link href="/" className="hover:opacity-80 transition-all">
@@ -201,8 +265,7 @@ export default function CreateF4rmerForm() {
         </form>
       </div>
       </div>
-      <div className={`bg-neutral-900/50 rounded-lg w-[100%] ${showPreview ? "block" : "hidden"}`}>
-        <h2 className="text-2xl font-semibold text-neutral-100">Preview</h2>
+      <div className={`bg-neutral-900/50 rounded-lg w-[100%] mt-10 ${showPreview ? "block" : "hidden"}`}>
         <div className="bg-neutral-900/50 rounded-lg w-[100%]">
           <PromptBoxSimple uti={name} description={systemPrompt}/>
         </div>
@@ -210,7 +273,7 @@ export default function CreateF4rmerForm() {
         <button onClick={() => setShowPreview(false)} className="cursor-pointer transition-all hover:opacity-80 rounded-md font-medium text-sm bg-neutral-800 py-2 px-6">Close preview</button>
         <button 
           className={`cursor-pointer transition-all ${config.theme.accentColor ?? "bg-neutral-500"} hover:${config.theme.hoverColor ?? "bg-neutral-600"} py-2 px-6 rounded-md font-medium text-sm`}
-          onClick={() => setShowPreview(false)}
+          onClick={() => createAgent()}
         >
           Create Agent
         </button>
@@ -218,6 +281,14 @@ export default function CreateF4rmerForm() {
       </div>
     </div>
     }
+    
+    {/* Error Modal */}
+    <ErrorModal 
+      open={showErrorModal} 
+      setIsOpen={setShowErrorModal} 
+      title="Error Creating Agent" 
+      content={errorMessage} 
+    />
     </div>
   )
 }
