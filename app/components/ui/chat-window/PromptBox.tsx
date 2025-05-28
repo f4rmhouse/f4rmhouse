@@ -26,6 +26,7 @@ import ChatSession from "./utils/ChatSession";
 import { PostDataType } from "./utils/types";
 import StreamProcessor from "./utils/StreamProcessor";
 import F4rmerType from "../../types/F4rmerType";
+import User from "@/app/microstore/User";
 
 /**
  * PromptBox is the text input box at the bottom of the screen on /f4rmers/details page
@@ -298,11 +299,16 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
       f4rmer={selectedAgent} 
       isVisible={state === "edit"}
       onClose={() => setState("chat")}
-      onSave={(updatedF4rmer) => {
+      onSave={(updatedF4rmer:F4rmerType) => {
         // Handle saving the updated f4rmer
-        console.log("Saving updated f4rmer:", updatedF4rmer);
-        // Here you would update the f4rmer in your state/database
-        setState("chat");
+        let user = new User(session.user.email, session.provider, session.access_token)
+        user.updateF4rmer(updatedF4rmer).then(e => {
+          alert("Your f4rmer was updated successfully!")
+          setState("chat")
+        }).catch(e => {
+          console.log("Failed to update f4rmer:", e)
+          alert("Failed to update f4rmer")
+        })
       }}
     />
 
