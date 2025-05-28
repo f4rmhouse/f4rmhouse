@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import F4rmerType from '../../types/F4rmerType';
 import { useTheme } from '../../../context/ThemeContext';
 
@@ -20,12 +20,12 @@ export default function F4rmerEditor({ f4rmer, isVisible, onClose, onSave }: F4r
   const [jobDescription, setJobDescription] = useState<string>(f4rmer?.jobDescription || '');
   
   // Update local state when f4rmer changes
-  useState(() => {
+  useEffect(() => {
     if (f4rmer) {
       setTitle(f4rmer.title);
       setJobDescription(f4rmer.jobDescription);
     }
-  });
+  }, [f4rmer]);
   
   const handleSave = () => {
     if (!f4rmer) return;
@@ -60,6 +60,7 @@ export default function F4rmerEditor({ f4rmer, isVisible, onClose, onSave }: F4r
             placeholder="Write the f4rmer's system prompt here..."
             value={jobDescription}
             onChange={(e) => setJobDescription(e.target.value)}
+            rows={20}
           />
         </div>
         <div className="flex justify-between mt-4">

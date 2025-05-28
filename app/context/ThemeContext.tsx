@@ -11,7 +11,29 @@ type ThemeContextType = {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>(config.theme)
+  // Initialize theme from localStorage or fallback to default config
+  const [theme, setThemeState] = useState<Theme>(() => {
+    // Check if we're in the browser environment
+    if (typeof window !== 'undefined') {
+      const savedTheme = localStorage.getItem('f4rmhouse-theme')
+      if (savedTheme) {
+        try {
+          return JSON.parse(savedTheme) as Theme
+        } catch (error) {
+          console.error('Failed to parse saved theme:', error)
+        }
+      }
+    }
+    return config.theme
+  })
+
+  // Wrapper for setTheme that also saves to localStorage
+  const setTheme = (newTheme: Theme) => {
+    setThemeState(newTheme)
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('f4rmhouse-theme', JSON.stringify(newTheme))
+    }
+  }
 
   // Apply theme whenever it changes
   useEffect(() => {

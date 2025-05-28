@@ -184,9 +184,25 @@ const themePresets: Record<string, Theme> = {
 export default function ThemeToggleButton() {
   const { theme, setTheme } = useTheme()
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [activeThemeKey, setActiveThemeKey] = useState<string>(() => {
+    // Try to get the active theme key from localStorage
+    if (typeof window !== 'undefined') {
+      const savedThemeKey = localStorage.getItem('f4rmhouse-theme-key')
+      if (savedThemeKey) {
+        return savedThemeKey
+      }
+    }
+    // Default to 'midnight' if no saved theme key
+    return 'midnight'
+  })
   
   const applyTheme = (themeKey: string) => {
     setTheme(themePresets[themeKey])
+    setActiveThemeKey(themeKey)
+    // Save the theme key to localStorage
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('f4rmhouse-theme-key', themeKey)
+    }
     setIsModalOpen(false)
   }
 
@@ -197,7 +213,7 @@ export default function ThemeToggleButton() {
         className="flex text-neutral-500 hover:text-white px-1 underline text-xs"
       >
         <Palette className="w-4 h-4" />
-        Theme
+        Theme: {activeThemeKey}
       </button>
       
       <Modal 
@@ -211,7 +227,7 @@ export default function ThemeToggleButton() {
               <button
                 key={key}
                 onClick={() => applyTheme(key)}
-                className={`p-4 rounded-md transition-all ${themePreset.primaryColor} ${themePreset.textColorPrimary} hover:opacity-90 capitalize`}
+                className={`p-4 rounded-md transition-all ${themePreset.primaryColor} ${themePreset.textColorPrimary} hover:opacity-90 capitalize ${activeThemeKey === key ? 'ring-2 ring-offset-2 ring-offset-black ring-white' : ''}`}
               >
                 <div className="flex items-center justify-between">
                   <span>{key}</span>
