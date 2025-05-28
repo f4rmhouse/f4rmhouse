@@ -12,7 +12,7 @@ import User from "@/app/microstore/User";
  * @returns 
  */
 function Boxes({f4rmers, session}: {f4rmers:F4rmerType[],session:F4Session}) {
-  const [state, setState] = useState<"canvas" | "chat" | "preview">(config.defaultState)
+  const [state, setState] = useState<"canvas" | "chat" | "preview" | "edit">(config.defaultState)
   return(
     <div className="flex overflow-hidden">
       <PromptBox f4rmers={f4rmers} state={state} setState={setState} session={session}/>

@@ -12,7 +12,8 @@ import ChatInitToolCallMessage from "../chat-messages/ChatInitToolCallMessage";
 import ChatMessageType from "../../types/ChatMessageType";
 import ChatUserMessage from "../chat-messages/ChatUserMessage";
 import ChatErrorMessage from "../chat-messages/ChatErrorMessage";
-import { ArrowLeftToLine, ArrowRightToLine, RotateCcw } from "lucide-react";
+import { ArrowLeftToLine, ArrowRightToLine, Pencil, RotateCcw } from "lucide-react";
+import F4rmerEditor from "./F4rmerEditor";
 import Link from "next/link";
 import Modal from "../modal/Modal";
 import Timer from "../misc/Timer";
@@ -37,7 +38,7 @@ import F4rmerType from "../../types/F4rmerType";
  * 
  * @returns 
  */
-export default function PromptBox({session, state, setState, f4rmers}: {session: F4Session, state: "canvas" | "chat" | "preview", setState: (state: "canvas" | "chat" | "preview") => void, f4rmers: F4rmerType[]}) {
+export default function PromptBox({session, state, setState, f4rmers}: {session: F4Session, state: "canvas" | "chat" | "preview" | "edit", setState: (state: "canvas" | "chat" | "preview" | "edit") => void, f4rmers: F4rmerType[]}) {
   const { theme } = useTheme();
   const messageContainerRef = useRef<HTMLDivElement | null>(null);
   const [promptForUserLogin, setPromptForUserLogin] = useState<boolean>(false)
@@ -214,8 +215,8 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
 
   return (
     <div className="sm:flex overflow-hidden w-[100vw]">
-      <div className={`flex transition-all ${state === "chat" ? "m-auto" : "m-0"}`}>
-    <div className={`relative m-auto pt-0 md:pt-0 w-[100vw] h-[100vh] sm:h-[93vh] overflow-hidden ${state === "chat" ? "sm:w-[16cm]" : "sm:w-[10cm]"} ${theme.chatWindowStyle ? theme.chatWindowStyle : ""}`}>
+      <div className={`flex transition-all ${state === "canvas" ? "m-0" : "m-auto"}`}>
+    <div className={`relative m-auto pt-0 md:pt-0 w-[100vw] h-[100vh] sm:h-[93vh] overflow-hidden ${state === "chat" || state === "edit" ? "sm:w-[16cm]" : "sm:w-[10cm]"} ${theme.chatWindowStyle ? theme.chatWindowStyle : ""}`}>
       <div className={`w-full w-[100%] ${theme.textColorSecondary} p-2`}>
         {selectedAgent != undefined ? (
           <AgentSelector f4rmers={availableF4rmers} onAgentSelect={(e:any) => {setSelectedAgent(e)}} selectedF4rmer={selectedAgent}/> 
@@ -268,6 +269,7 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
       </div>
     </div>
     <div className="absolute bg-transparent sm:static ml-2 right-2 top-[40%]">
+      <button onClick={() => state === "edit" ? setState("chat") : setState("edit")} className={`transition-all hover:rotate-[90deg] rounded-md p-2 ${theme.textColorPrimary ? theme.textColorPrimary : "text-white"}`}><Pencil size={15}/></button>
       <div className={`flex flex-col gap-2 ${chatSession.getMessages().length == 0 ? "opacity-0" : "opacity-100"}`}>
         <button onClick={() => {chatSession.clear();setCurrentSession([])}} className={`transition-all hover:rotate-[-90deg] rounded-md p-2 ${theme.textColorPrimary ? theme.textColorPrimary : "text-white"}`}><RotateCcw size={15}/></button>
       </div> 
@@ -289,9 +291,21 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
       <></>
     }
     </div>
-    <div className={`flex transition-all ease-in-out text-white rounded-md w-full bg-white ${state === "chat" ? "opacity-0 hidden" : "opacity-100"}`}>
+    <div className={`flex transition-all ease-in-out text-white rounded-md w-full bg-white ${state !== "canvas" ? "opacity-0 hidden" : "opacity-100"}`}>
       <Canvas />
     </div>
+    <F4rmerEditor 
+      f4rmer={selectedAgent} 
+      isVisible={state === "edit"}
+      onClose={() => setState("chat")}
+      onSave={(updatedF4rmer) => {
+        // Handle saving the updated f4rmer
+        console.log("Saving updated f4rmer:", updatedF4rmer);
+        // Here you would update the f4rmer in your state/database
+        setState("chat");
+      }}
+    />
+
     </div>
   )
 }
