@@ -138,41 +138,6 @@ export async function POST(req: NextRequest) {
     }
     const model = ModelFactory.create(selectedModel);
 
-    let tmp_json_format = `
-    {
-        "title": "[string] the title of the dashboard",
-        "theme": "[string] supports the following: "plotly", "plotly_white", "plotly_dark", "ggplot2", "seaborn", "simple_white", "none"",
-        "width": "[number] the pixel width of the dashboard",
-        "height": "[number] the pixel height of the dashboard",
-        "subplots": {
-            "rows": [number] the number of rows in the dashboard,
-            "cols": [number] the number of columns in the dashboard,
-            "titles": [string[]] the titles of each chart in the dashboard,
-            "shared_xaxes": False,
-            "shared_yaxes": False
-        },
-        "data": object[] an array of objects with data for each chart,
-        "plots": an array of objects that looks like this [
-            {
-                "type": the type of chart (poltly charts): "scatter"|"bar"|"heatmap"|"contour"|"surface"|"scatter3d",
-                "x": [string] name of x-axis,
-                "y": [string] name of y-axis,
-                "mode": [string] how data points are displayed in a chart can have any of these values: 'markers', 'lines', 'lines+markers', 'text', 'markers+text', 'lines+text', 'lines+markers+text'
-                "line": [Object] an object with the folowing formst: {"color": "[string] "<the_color>", "width": [number] the width in pixels},
-                "name": [string] the name of the chart,
-                "row": [number] the width of the chart. Has to be lower than the total rows in the dashboard,
-                "col": [number] the height of the chart. Has to be lower than the total columns in the dashboard
-	            "markers": (optional, used in barcharts) [Object] display different colors for bars in stacked barcharts has the following format: {"colors": [array of colors]}
-            }
-	         ...
-        ],
-        "layout": {
-            "showlegend": [bool] true = show legend, false = hide legend,
-            "legend": [Object] an object with the following format: {"orientation": "h", "y": -0.1}
-        }
-    } 
-    `
-
     // Create and bind tools
     toolbox = [
       {
@@ -185,91 +150,67 @@ export async function POST(req: NextRequest) {
     endpoints.push({
       endpoints: ["render"],
       descriptions: [`
-        Generate a Plotly chart based on a JSON configuration.
-        Parameters:
-        -----------
-        uuid: str
-            the uuid of the dashboard to render
-        Returns:
-        --------
-        url: str 
-          the url of the dashboard stored as an html file
-        `],
-      parameters: ["uuid"]
-    });
-    endpoints.push({
-      endpoints: ["edit_layout"],
-      descriptions: [`
-        Generate a Plotly layout.
+        Render the dashboard and return a URL to the generated HTML visualization.
     
-    Parameters:
-    -----------
-    uuid: str 
-        the uuid of the dashboard to edit
-    title:str 
-        the title of the dashboard
-    theme:str 
-        the theme of the dashboard supports all plotly themes
-    width:str 
-        width in pixels of the dashboard
-    height:str 
-        height in picels of the dashboard
-    rows:str 
-        number of rows has to be integer bigger than 0
-    cols:str 
-        number of columns has to be integer bigger than 0
+    This function takes a dashboard UUID and renders the current state of the dashboard,
+    uploading the result to S3 and returning a public URL for viewing.
     
+    Args:
+        uuid (str): Unique identifier for the dashboard to render
+        theme (str): Plotly theme template to use (default: 'plotly_dark'). Options include:
+          'plotly', 'plotly_white', 'plotly_dark', 'ggplot2', 'seaborn', 'simple_white', 'none'
+        
     Returns:
-    --------
-    uuid: str 
-      the uuid of the layout
+        str: URL to the rendered dashboard HTML file
         `],
-      parameters: ["uuid", "title", "theme", "width", "height", "rows", "cols"]
+      parameters: ["uuid::string::Unique identifier for the dashboard to render", "theme::str::Plotly theme template to use (default: 'plotly_dark'). Options include: 'plotly', 'plotly_white', 'plotly_dark', 'ggplot2', 'seaborn', 'simple_white', 'none'"]
     });
 
     endpoints.push({
       endpoints: ["insert_chart"],
       descriptions: [`
-        Append a new chart to the dashboard.
+        Append a new chart to the dashboard with specified parameters.
     
-    Parameters:
-    -----------
-    uuid: str 
-        the uuid of the dashboard to append the chart to
-    chart_type: str
-        the type of chart (poltly charts): "scatter"|"bar"|"heatmap"|"contour"|"surface"|"scatter3d". When creating a line chart use the 'scatter' type.
-    x_values: str
-        the x values to be displayed in the chart. Has to be an array like: [23,2132,5,43] or ["A", "B", "C"] etc
-    y_values: str
-        the y values to be displayed in the chart. Has to be an array like: [23,2132,5,43] or ["A", "B", "C"] etc
-    z_values: str
-        only needed when chart_type is "heatmap","contour","surface" or "scatter3d" optional when chart_type is "scatter" or "bar" (use [] in its place). Has to be an array like: [23,2132,5,43] or ["A", "B", "C"] etc
-    row: str
-        the row that the chart will be displayed on
-    col: str
-        the column the chart will be displayed on
+    This function creates a new chart in the dashboard at the specified position with the
+    given dimensions and optional data. The chart is identified by its title and type.
+    
+    Args:
+        uuid (str): Unique identifier for the dashboard
+        chart_title (str): Title to display for the chart
+        chart_type (str): Type of chart to create (e.g., 'scatter', 'line', 'bar', 'histogram', 'box', 'heatmap', '3dscatter', 'us_heatmap', 'indicator')
+        span_width (int): Number of columns the chart should span
+        span_height (int): Number of rows the chart should span
+        start_row (int): Starting row position (1-indexed)
+        start_col (int): Starting column position (1-indexed)
+        data (Optional[Dict]): Additional data parameters for specific chart types:
+          - For 'us_heatmap': 'locations', 'colorscale', 'colorbar_title', 'text', 'hoverinfo'
+          - For 'indicator': 'value', 'mode', 'prefix', 'suffix', 'font_size', 'reference', 'relative'
+        
     Returns:
-    --------
-    uuid: str 
-      the uuid of the chart
+        str: The dashboard UUID for chaining operations
         `],
-      parameters: ["uuid", "chart_type", "x_values", "y_values", "z_values", "row", "col"]
+      parameters: ["uuid::string::Unique identifier for the dashboard", "chart_title::string::Title to display for the chart", "chart_type::string::Type of chart to create (e.g., 'scatter', 'line', 'bar', 'histogram', 'box', 'heatmap', '3dscatter', 'us_heatmap')", "span_width::int::Number of columns the chart should span", "span_height::int::Number of rows the chart should span", "start_row::int::Starting row position (1-indexed)", "start_col::int::Starting column position (1-indexed)", "data::object::Optional Additional data parameters for specific chart types (1)- For 'us_heatmap' the dict should look like {'locations': [array of locations], 'colorscale': [array of colors], 'colorbar_title': string, 'text': [array of text], 'hoverinfo': string} (2) For 'indicator' the dict should look like {'value': int, 'mode': string, 'prefix': string, 'suffix': string, 'font_size': int, 'reference': int, 'relative': bool}"]
     });
+
     endpoints.push({
       endpoints: ["create_new_dashboard"],
       descriptions: [`
-        Create a new dashboard 
-        Parameters:
-    -----------
-    rows: str 
-      number of rows in the dashboard 
-    cols: str
-        number of columns in the dashboard
-    --------
-    uuid: str 
-    the uuid of the new dashboard 
+        Create a new empty dashboard with specified dimensions.
+    
+    This function initializes a new dashboard with the given number of rows and columns.
+    Optionally, a custom layout can be provided to specify how cells should be arranged and sized.
+    
+    Args:
+        num_rows (int): Number of rows in the dashboard grid
+        num_cols (int): Number of columns in the dashboard grid
+        layout (Optional[list]): Optional custom layout specification as a list of tuples
+                                 in the format [(row, col, colspan, rowspan), ...]
+                                 where each tuple defines a cell's position and dimensions
+        
+    Returns:
+        str: The dashboard UUID for chaining operations
         `],
-      parameters: ["rows", "cols"]
+      parameters: ["num_rows::int::Number of rows in the dashboard grid", "num_cols::int::Number of columns in the dashboard grid", "layout::array::Optional custom layout specification as a list of tuples in the format [(row, col, colspan, rowspan), ...] where each tuple defines a cell's position and dimensions"]
     });
 
     const tools = await ToolManager.createMCPTools(toolbox ?? [], endpoints, email);

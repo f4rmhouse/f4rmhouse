@@ -11,10 +11,44 @@ function createMCPTool({ uti, endpoint, title, endpoint_description, tool_descri
 
     const zodSchema = z.object(
         Object.fromEntries(
-            parameters.map(param => [
-                param,
-                z.string().describe(`Parameter ${param}: ${endpoint_description}`)
-            ])
+            parameters.map((p:string) => {
+                let name = p.split("::")[0]
+                let type = p.split("::")[1]
+                let desc = p.split("::")[2]
+                console.log(name, type, desc)
+                switch (type) {
+                    case "string":
+                        return [
+                            name,
+                            z.string().describe(desc)
+                        ]
+                    case "int":
+                        return [
+                            name,
+                            z.number().describe(desc)
+                        ]
+                    case "boolean":
+                        return [
+                            name,
+                            z.boolean().describe(desc)
+                        ]
+                    case "array":
+                        return [
+                            name,
+                            z.array(z.string()).describe(desc)
+                        ]
+                    case "object":
+                        return [
+                            name,
+                            z.object({}).describe(desc)
+                        ]
+                    default:
+                        return [
+                            name,
+                            z.string().describe(desc)
+                        ]
+                }
+            })
         )
     )
 
