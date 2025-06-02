@@ -113,7 +113,7 @@ export default function CreateF4rmerForm() {
       body: JSON.stringify({
         description: SYS_PROMPT,
         messages: ['Generate a system prompt to a useful AI agent called ' + name + ' with short description: "' + shortDescription + '" (ignore it if it is empty)'],
-        model: { "id": "claude-3-7-sonnet-20250219", "name": "Claude 3.5 Sonnet", "provider": "anthropic"},
+        model: { "id": "claude-sonnet-4-20250514", "name": "Claude 4 Sonnet", "provider": "anthropic"},
       })
     });
 

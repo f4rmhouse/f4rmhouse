@@ -15,7 +15,7 @@ import { useSession } from "next-auth/react";
 import axios from "axios";
 import { remark } from 'remark';
 import html from 'remark-html';
-import { ArrowLeft, UsersRound } from "lucide-react";
+import { ArrowLeft, UsersRound, Star, ShoppingCart, Heart, Shield, Award, CheckCircle2, PackagePlus } from "lucide-react";
 
 type Params = Promise<{ slug: string }>
 
@@ -29,15 +29,6 @@ export default function DetailPage({ params }: { params: Params }) {
     const oci = new OCI();
     const store = new Store();
     const ps = use(params)
-    var sc = [
-      "https://cdnp.kittl.com/51d12197-8a4c-47ad-a1ea-96d4b1a329b0_kittl-ai-image-generator-2-dalle-3-black-model-bpoc-galactic-fashion-retro-space-ship-illustration.jpg?auto=compress,format",
-      "https://images.ctfassets.net/kftzwdyauwt9/Nw3a33C8bfO7VJMCTNgSz/3633c190fd7309970a9ac85d7c7d3989/avocado-square.jpg?w=3840&q=90&fm=webp",
-      "https://static1.srcdn.com/wordpress/wp-content/uploads/2022/06/DALL-E-mini-Shiba-inu.jpg",
-      "https://miro.medium.com/v2/resize:fit:1400/1*0FwivlgxFRvSoPFl5xQpFw.png",
-      "https://images.ctfassets.net/kftzwdyauwt9/5VVBxDWhs6Cp6REifYnloS/81c02b5d73db5dc85365e15feb3b58e4/Anastronautridingahorseinaphotorealisticstyle9.jpg",
-      "https://upload.wikimedia.org/wikipedia/en/4/41/DALL-E_2_artificial_intelligence_digital_image_generated_photo.jpg",
-      "https://s.yimg.com/ny/api/res/1.2/0wl0v9nGN6azAn0SmTOKxQ--/YXBwaWQ9aGlnaGxhbmRlcjt3PTY0MDtoPTQ2Nw--/https://s.yimg.com/os/creatr-uploaded-images/2022-04/cacc8fa0-b652-11ec-af75-438ac34a567d"
-    ]
 
     const [product, setProduct] = useState<ProductType|null>(null)
     const [reviews, setReviews] = useState<ReviewType[]>([]);
@@ -50,17 +41,18 @@ export default function DetailPage({ params }: { params: Params }) {
     const [ratingDescriptions, setRaingDescriptions] = useState<string[]>(["No rating", "😡 Bad", "😐 OK", "🙂 Decent", "😄 Solid", "🤩 Amazing"])
     const [requestsAmt, setRequestAmt] = useState<number>(0)
     const [noActionFound, setNoActionFound] = useState<boolean>(false)
-    const [noServerConnection, setNoServerConnection] = useState<boolean>(false)
+    const [endpoints, setEndpoints] = useState<any[]>([])
 
     useEffect(() => {
       try{
       oci.getByUTI(ps.slug).then(e => {
         const res = e.Message;
+        console.log(res)
         if(e.Code == 201){
           setNoActionFound(true)
           return
         }
-        res.showcase = sc;
+        res.showcase = [];
         getShowcase(res.uti)
         setProduct(res)
         axios.get(`https://f4-public.s3.eu-central-1.amazonaws.com/showcases/${res.uti}/README.md`).then(async e => {
@@ -148,114 +140,294 @@ export default function DetailPage({ params }: { params: Params }) {
     }
 
     return (
-      <div className="m-auto">
-        <div className="relative max-w-screen-2xl w-[90vw] justify-between mx-auto pt-20">
+      <div className="m-auto bg-zinc-950">
+        <div className="relative max-w-screen-2xl w-[95vw] justify-between mx-auto pt-10">
           {!noActionFound ?
           <div>
           {product?
           <>
-          <div className="flex flex-col sm:flex-row mb-2">
-          <Link href="/store" className="transition-all hover:bg-neutral-700 cursor-pointer text-neutral-500 hover:text-neutral-300 rounded-full mt-auto mb-auto p-2 mr-5"><ArrowLeft/></Link>
-          <div className="flex">
-            <img className="h-10 rounded-full aspect-square object-cover" height={10} src={"https://f4-public.s3.eu-central-1.amazonaws.com/showcases/" + product.uti + "/thumbnail.jpg"}/>
-            <div className="pl-5">
-              <p className="text-xs font-mono text-neutral-400">{product.uid}</p>
-              <h1 className="text-sm sm:text-2xl">{product.title}</h1>
-              <p className="text-neutral-400 text-xs sm:text-sm">{product.description}</p>
-              <p className="text-neutral-400 text-xs sm:text-sm">{product.uti} {product.version}</p>
-            </div>
+          <div className="flex flex-row mb-4 text-sm text-neutral-400 border-b border-neutral-800 pb-2">
+            <Link href="/store" className="hover:text-blue-400 transition-colors flex items-center"><ArrowLeft size={14} className="mr-1"/>Back to Store</Link>
+            <span className="mx-2">/</span>
+            <Link href="/store/category" className="hover:text-blue-400 transition-colors">AI Tools</Link>
+            <span className="mx-2">/</span>
+            <span className="text-neutral-300">{product.title}</span>
           </div>
-            <div className="hidden sm:ml-auto">
-              <button className="transition-all bg-opacity-50 bg-blue-500 text-white p-2 pr-4 pl-4 text-sm rounded-md text-blue-100 hover:bg-blue-500 hover:text-white flex"><UsersRound className="mr-2 m-auto" size={15}/>Community</button>
-            </div>
-          </div>
-          <div className="sm:grid sm:grid-cols-12 gap-2 mb-5">
-            <div className="sm:col-span-8 rounded-xl relative">
+          <div className="sm:grid sm:grid-cols-12 gap-6 mb-8">
+            <div className="sm:col-span-5 lg:col-span-7 rounded-lg overflow-hidden bg-zinc-900 border border-neutral-800 sticky top-5 self-start">
               {showcase.length > 0 ? 
-                <ImageBanner images={showcase} />
+                <div className="relative">
+                  <ImageBanner images={showcase} />
+                </div>
                 :
-                <p>No showcase</p>
+                <div className="aspect-square flex items-center justify-center bg-zinc-900 border-neutral-800">
+                  <img 
+                    className="w-3/4 h-3/4 object-contain opacity-90" 
+                    src={"https://f4-public.s3.eu-central-1.amazonaws.com/showcases/" + product.uti + "/thumbnail.jpg"}
+                    alt={product.title}
+                  />
+                </div>
               }
             </div>
-            <div className="col-span-12 md:col-span-4 p-5 flex-col">
-              <div className="border p-2 rounded border-neutral-800 bg-zinc-900">
-                <div className="markdown-body" dangerouslySetInnerHTML={{ __html: readme}} />
-                <p>{product.overview}</p>
-              </div>
-              <div className="w-full mt-2">
-                <PricingCard product={product} pricing={{name: "", type: "primary", features: [], disclaimer: "", cta: "+ Add", deal: "deal", price: 0.01, pricePeriod: "request"}}/>
-              </div>
-            </div>
-          </div>
-          <div className="gap-8 mt-2 sm:flex grid grid-cols-3 border border-neutral-800 bg-zinc-900 rounded p-4 justify-between">
-            <Property type="Rating" title={String(rating)} subtitle={ratingDescriptions[Math.round(rating)]}/>
-            <Property type="Reviews" title={String(reviews.length)} subtitle={getReviewDescription(reviews.length)}/>
-            <Property type="Developer" title={String(product.developer)} subtitle="A+"/>
-            <div className="sm:hidden">
-              <Property type="" title="" subtitle=""/>
-            </div>
-            <Property type="Usage in 24hrs" title={String(requestsAmt)} subtitle={getAnalyticsDescription(requestsAmt)}/>
-            <div className="sm:hidden">
-              <Property type="" title="" subtitle=""/>
-            </div>
-          </div>
-          <div className="mt-2 mb-10">
-            <h2 className="text-xl mt-5 font-bold mb-5">Reviews & ratings</h2>
-            <div className="sm:grid sm:grid-cols-12 gap-2">
-              <div className="col-span-3 bg-zinc-900 self-start border border-neutral-800 rounded p-2">
-                <div>
-                  <div className="flex">
-                    <h3 className="text-8xl font-bold opacity-80 font-sans">{rating}</h3>
-                    <p className="mt-auto">out of 5</p>
+            
+            <div className="col-span-12 sm:col-span-7 lg:col-span-5 flex flex-col mt-4 sm:mt-0">
+              <div className="mb-4">
+                <div className="flex items-center">
+                  <p className="text-xs font-medium bg-blue-600 text-white px-2 py-0.5 rounded mr-2">VERIFIED</p>
+                  <p className="text-xs font-mono text-neutral-400">{product.uid}</p>
+                </div>
+                <h1 className="text-2xl sm:text-3xl font-bold text-white mt-1 mb-1">{product.title}</h1>
+                
+                <div className="flex items-center mb-2">
+                  <div className="flex mr-2">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} size={16} className={i < Math.round(rating) ? "text-yellow-400 fill-yellow-400" : "text-neutral-600"} />
+                    ))}
                   </div>
+                  <span className="text-sm text-neutral-300 mr-1">{rating}</span>
+                  <a href="#reviews" className="text-sm text-blue-400 hover:underline">({reviews.length} reviews)</a>
+                  <span className="mx-2 text-neutral-600">|</span>
+                  <span className="text-sm text-neutral-300">{requestsAmt} uses in last 24h</span>
+                </div>
+                <p className="text-neutral-400 text-xs">Version {product.version} • By <span className="text-blue-400 hover:underline cursor-pointer">{product.developer}</span></p>
+              </div>
+              
+              <div className="bg-zinc-900 border border-neutral-800 rounded-lg p-4 mb-4">
+                <div className="flex justify-between items-center mb-3">
+                  <div>
+                    <p className="text-xl font-bold text-white">$0.01 <span className="text-sm font-normal text-neutral-400">per request</span></p>
+                    <div className="flex items-center mt-1">
+                      <CheckCircle2 size={14} className="text-green-500 mr-1" />
+                      <span className="text-sm text-green-500">Deployed</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center">
+                    <button className="bg-yellow-500 hover:bg-yellow-600 text-black font-medium py-2 px-4 rounded-md mr-2 transition-colors flex items-center">
+                      <PackagePlus size={16} className="mr-1" />
+                      Add to toolbox 
+                    </button>
+                    <button className="p-2 rounded-md border border-neutral-700 hover:bg-neutral-800 transition-colors">
+                      <Heart size={16} className="text-neutral-400" />
+                    </button>
+                  </div>
+                </div>
+                
+                <div className="flex flex-col space-y-2 mt-3">
+                  <div className="flex items-center text-sm text-neutral-300">
+                    <CheckCircle2 size={14} className="text-green-500 mr-2" />
+                    Unlimited access to this tool
+                  </div>
+                  <div className="flex items-center text-sm text-neutral-300">
+                    <CheckCircle2 size={14} className="text-green-500 mr-2" />
+                    Pay only for what you use
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-zinc-900 border border-neutral-800 rounded-lg p-4 mb-4">
+                <h2 className="text-lg font-bold mb-3">About this tool</h2>
+                <div className="markdown-body text-sm text-neutral-300" dangerouslySetInnerHTML={{ __html: readme}} />
+                <p className="text-sm text-neutral-300 mt-2">{product.overview}</p>
+              </div>
+            </div>
+          </div>
+
+
+          <div className="bg-zinc-900 border border-neutral-800 rounded-lg p-4 mb-8">
+            <h2 className="text-lg font-bold mb-3 flex items-center">
+              <Shield className="mr-2 text-blue-400" size={18} />
+              Technical Specifications
+            </h2>
+            
+            {product.endpoints.length > 0 ? 
+              <div className="space-y-4">
+                {product.endpoints.map((e:any, j:number) => {
+                  return (
+                    <div key={j} className="mb-4">
+                      <p className="text-base font-medium text-white mb-2 pb-1 border-b border-neutral-700">{e.name}</p>
+                      <table className="w-full border-collapse my-2">
+                        <thead>
+                          <tr className="text-left bg-zinc-800">
+                            <th className="py-2 px-3 font-medium text-xs uppercase tracking-wider text-neutral-300 rounded-tl">Parameter</th>
+                            <th className="py-2 px-3 font-medium text-xs uppercase tracking-wider text-neutral-300">Type</th>
+                            <th className="py-2 px-3 font-medium text-xs uppercase tracking-wider text-neutral-300 rounded-tr">Description</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                        {e.parameters.map((p:any, i:number) => {
+                          return (
+                            <tr key={i} className="border-b border-neutral-800 hover:bg-zinc-800 transition-colors">
+                              <td className="py-2 px-3 text-sm font-mono text-white">{p.parameter.name}</td>
+                              <td className="py-2 px-3 text-sm text-blue-400 font-medium">{p.parameter.type}</td>
+                              <td className="py-2 px-3 text-sm text-neutral-400">{p.parameter.description}</td>
+                            </tr>
+                          )
+                        })}
+                        </tbody>
+                      </table>
+                    </div>
+                  )
+                })}
+              </div>
+              :
+              <p className="text-neutral-400 text-sm italic">No technical specifications available for this product.</p>
+            }
+          </div>
+          
+          <div className="bg-zinc-900 border border-neutral-800 rounded-lg p-4 mb-8">
+            <h2 className="text-lg font-bold mb-3 flex items-center">
+              <Award className="mr-2 text-green-500" size={18} />
+              Security & Compliance
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="flex items-start p-3 bg-zinc-800 rounded-lg">
+                <Shield className="text-green-500 mr-2 mt-0.5" size={16} />
+                <div>
+                  <p className="text-sm font-medium text-white">Data Protection</p>
+                  <p className="text-xs text-neutral-400">Your data is encrypted and securely processed</p>
+                </div>
+              </div>
+              <div className="flex items-start p-3 bg-zinc-800 rounded-lg">
+                <CheckCircle2 className="text-green-500 mr-2 mt-0.5" size={16} />
+                <div>
+                  <p className="text-sm font-medium text-white">Compliance Certified</p>
+                  <p className="text-xs text-neutral-400">Meets industry standards for AI safety</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="reviews" className="mb-12 border-t border-neutral-800 pt-8">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold">Customer Reviews</h2>
+              <Link href={`/dashboard/create/review/${product.uti}`} className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors flex items-center">
+                <Star size={16} className="mr-1" />
+                Write a Review
+              </Link>
+            </div>
+            
+            <div className="sm:grid sm:grid-cols-12 gap-6">
+              <div className="col-span-4 lg:col-span-3 bg-zinc-900 self-start border border-neutral-800 rounded-lg p-4 sticky top-5">
+                <div className="text-center mb-4">
+                  <h3 className="text-6xl font-bold text-white mb-1">{rating}</h3>
+                  <div className="flex justify-center mb-1">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} size={16} className={i < Math.round(rating) ? "text-yellow-400 fill-yellow-400" : "text-neutral-600"} />
+                    ))}
+                  </div>
+                  <p className="text-sm text-neutral-400">{reviews.length} global ratings</p>
+                </div>
+                
+                <div className="space-y-2">
                   <ReviewProgress value="5" percentage={`${Math.floor(histogram[4]*100)}%`}/> 
                   <ReviewProgress value="4" percentage={`${Math.floor(histogram[3]*100)}%`}/> 
                   <ReviewProgress value="3" percentage={`${Math.floor(histogram[2]*100)}%`}/> 
                   <ReviewProgress value="2" percentage={`${Math.floor(histogram[1]*100)}%`}/> 
                   <ReviewProgress value="1" percentage={`${Math.floor(histogram[0]*100)}%`}/> 
                 </div>
-                <div className="mt-10 border-t border-neutral-600">
-                  <h2 className="font-bold">Review this product</h2>
-                  <p className="text-sm">Share your thoughts with other users</p>
-                  <Link href={`/dashboard/create/review/${product.uti}`} className="">
-                    <p className="text-center rounded-full w-[100%] border mt-5 border-neutral-500 text-center hover:bg-gray-800 transition-all text-sm p-1">Write a review</p>
+                
+                <div className="mt-6 pt-4 border-t border-neutral-700">
+                  <h3 className="font-bold mb-1">Review this product</h3>
+                  <p className="text-sm text-neutral-400 mb-3">Share your experience with the community</p>
+                  <Link href={`/dashboard/create/review/${product.uti}`} className="block">
+                    <p className="text-center rounded-md w-full border border-neutral-600 hover:bg-neutral-800 transition-all text-sm py-2 font-medium">Write a customer review</p>
                   </Link>
                 </div>
               </div>
-              <div className="col-span-9">
-                <div>
-                  <p>{reviews.length} Reviews</p>
+              
+              <div className="col-span-8 lg:col-span-9 mt-6 sm:mt-0">
+                <div className="flex items-center justify-between mb-4 pb-2 border-b border-neutral-800">
+                  <p className="text-lg font-medium">{reviews.length} Customer Reviews</p>
+                  <div className="flex items-center">
+                    <span className="text-sm text-neutral-400 mr-2">Sort by:</span>
+                    <select className="bg-zinc-800 border border-neutral-700 text-sm rounded-md py-1 px-2 text-neutral-300 focus:outline-none focus:ring-1 focus:ring-blue-500">
+                      <option>Most recent</option>
+                      <option>Highest rated</option>
+                      <option>Lowest rated</option>
+                    </select>
+                  </div>
                 </div>
+                
                 {serverError || reviews.length == 0 ?
-                  <div className="text-center">
-                    <p className="text-4xl">😔</p>
-                    <p className="font-mono">No reviews found for this tool.</p>
+                  <div className="text-center py-10 bg-zinc-900 border border-neutral-800 rounded-lg">
+                    <p className="text-4xl mb-2">😔</p>
+                    <p className="font-medium text-neutral-300 mb-1">No reviews yet</p>
+                    <p className="text-sm text-neutral-500">Be the first to review this product</p>
                   </div>
                   :
-                  <>
+                  <div className="space-y-4">
                     {reviews.map((review, i) => {
                       if (review != undefined) {
                         return <Review key={i} review={review} />
                       }
                     })}
-                  </>
+                  </div>
                 }
               </div>
             </div>
           </div>
+          
+          <div className="mb-12 border-t border-neutral-800 pt-8">
+            <h2 className="text-2xl font-bold mb-6">Customers also viewed</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="bg-zinc-900 border border-neutral-800 rounded-lg overflow-hidden hover:border-neutral-700 transition-colors">
+                  <div className="aspect-video bg-zinc-800 flex items-center justify-center">
+                    <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
+                      <span className="text-white font-bold">AI</span>
+                    </div>
+                  </div>
+                  <div className="p-3">
+                    <h3 className="font-medium text-white mb-1 truncate">Similar AI Tool {i}</h3>
+                    <div className="flex items-center mb-2">
+                      <div className="flex mr-1">
+                        {[...Array(5)].map((_, j) => (
+                          <Star key={j} size={12} className={j < 4 ? "text-yellow-400 fill-yellow-400" : "text-neutral-600"} />
+                        ))}
+                      </div>
+                      <span className="text-xs text-neutral-400">(24)</span>
+                    </div>
+                    <p className="text-sm text-neutral-400 mb-2 line-clamp-2">Another useful AI tool for your workflow</p>
+                    <p className="text-sm font-medium">$0.01 <span className="text-xs text-neutral-500">per request</span></p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
           </>
           :
-          <div className="grid grid-cols-3 gap-10 h-6 animate-pulse">
-            <div className="h-[5vh] col-span-3 bg-neutral-800 rounded-xl"></div>
-            <div className="h-[60vh] col-span-2 bg-neutral-800 rounded-xl"></div>
-            <div className="h-[60vh] col-span-1 bg-neutral-800 rounded-xl"></div>
-            <div className="h-[5vh] col-span-3 bg-neutral-800 rounded-xl"></div>
-            <div className="h-[50vh] col-span-3 bg-neutral-800 rounded-xl"></div>
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 animate-pulse">
+            {/* Breadcrumb skeleton */}
+            <div className="h-6 col-span-12 bg-neutral-800 rounded-md mb-4"></div>
+            
+            {/* Product image skeleton */}
+            <div className="h-[60vh] col-span-12 md:col-span-5 bg-neutral-800 rounded-lg"></div>
+            
+            {/* Product details skeleton */}
+            <div className="col-span-12 md:col-span-7 space-y-4">
+              <div className="h-8 w-3/4 bg-neutral-800 rounded-md"></div>
+              <div className="h-4 w-1/4 bg-neutral-800 rounded-md"></div>
+              <div className="h-20 bg-neutral-800 rounded-md"></div>
+              <div className="h-40 bg-neutral-800 rounded-md"></div>
+              <div className="h-60 bg-neutral-800 rounded-md"></div>
+            </div>
+            
+            {/* Reviews skeleton */}
+            <div className="h-[30vh] col-span-12 bg-neutral-800 rounded-lg mt-6"></div>
           </div>
           }
           </div>
           :
-          <div className="flex"><p className="m-auto text-xl">This action doesn't exist 😞</p></div>}
+          <div className="flex flex-col items-center justify-center py-16">
+            <div className="w-16 h-16 bg-neutral-800 rounded-full flex items-center justify-center mb-4">
+              <span className="text-2xl">😞</span>
+            </div>
+            <h2 className="text-xl font-bold mb-2">Product Not Found</h2>
+            <p className="text-neutral-400 mb-6">The product you're looking for doesn't exist or has been removed.</p>
+            <Link href="/store" className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-md transition-colors">
+              Return to Store
+            </Link>
+          </div>}
         </div>
       </div>
     );

@@ -17,11 +17,11 @@ export default function ImageBanner({images}: {images: string[]}) {
         <button onClick={() => setCurrentPage((p) => (p-1+images.length)%images.length)} className="hidden md:block transition-all text-neutral-600 hover:text-sky-500 rounded-md bg-transparent"><ChevronLeft size="40" /></button>
         <div className="overflow-hidden bg-transparent text-black flex rounded-xl">
           <div className="transition-all h-full duration-[300ms] ease-in-out" style={{ transform: `translate3d(${-currentPage* 100}%, 0, 0)` }}>
-            <div className="whitespace-nowrap md:h-[50vh] relative">
+            <div className="whitespace-nowrap md:h-[65vh] relative">
               {
                 images.map((e,i) => {
                   return(
-                    <div key={i} className="md:h-[50vh] w-full inline-block">
+                    <div key={i} className="md:h-[70vh] w-full inline-block">
                       <img
                         className="flex m-auto object-cover max-h-full max-w-full"
                         src={images[i]} 

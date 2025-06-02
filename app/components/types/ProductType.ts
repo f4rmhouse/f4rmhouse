@@ -18,6 +18,7 @@ type ProductType = {
   tags: string[],
   deployed: boolean,
   deployment_type: string
+  endpoints: any[]
 }
 
 export default ProductType;
