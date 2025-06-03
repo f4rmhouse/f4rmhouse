@@ -3,7 +3,8 @@ import { useChat } from "ai/react";
 
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
-import { useTheme } from "../../../context/ThemeContext";
+import { useTheme } from "@/app/context/ThemeContext"
+import { useAgent } from "@/app/context/AgentContext";
 import F4Session from "../../types/F4Session";
 import ProductType from "../../types/ProductType";
 import ChatAIMessage from "../chat-messages/ChatAIMessage";
@@ -41,35 +42,19 @@ import User from "@/app/microstore/User";
  */
 export default function PromptBox({session, state, setState, f4rmers}: {session: F4Session, state: "canvas" | "chat" | "preview" | "edit", setState: (state: "canvas" | "chat" | "preview" | "edit") => void, f4rmers: F4rmerType[]}) {
   const { theme } = useTheme();
+  const { selectedAgent, setSelectedAgent, availableAgents, setAvailableAgents } = useAgent();
   const messageContainerRef = useRef<HTMLDivElement | null>(null);
   const [promptForUserLogin, setPromptForUserLogin] = useState<boolean>(false)
   const [selectedModel, setSelectedModel] = useState<any>(config.models[Object.keys(config.models)[0]][0]);
-  const [selectedAgent, setSelectedAgent] = useState<F4rmerType|undefined>(f4rmers ? f4rmers[0] : undefined);
   const [chatSession, setChatSession] = useState<ChatSession>(new ChatSession())
   const [currentSession, setCurrentSession] = useState<ChatMessageType[]>([]) 
   const { messages, input, setInput, handleInputChange, setMessages } = useChat({});
   const [loading, setLoading] = useState<boolean>(false)
   const [latestMessage, setLatestMessage] = useState<string>("")
-  const [availableF4rmers, setAvailableF4rmers] = useState<F4rmerType[]>([])
 
   useEffect(() => {
-    if(f4rmers) {
-      setSelectedAgent(f4rmers[0])
-      setAvailableF4rmers(f4rmers)
-    }
-    else {
-      let defaultF4rmers = [
-        {
-          uid: "default-f4rmer", 
-          title: "Default F4rmer", 
-          jobDescription: "You are a helpful assistant known as a 'f4rmer' on the 'f4rmhouse' platform. You know how to be helpful and write very nicely formatted markdown answers to user prompts. Users asking you questions will be able to give you tools to make you even more useful. Always reason through step by step when answering complex question if you can't answer some question be sure to remind users that there are tools available on the platform that can help them.", 
-          toolbox: [], 
-          creator: "", 
-          created: "0"
-        }
-      ]
-      setAvailableF4rmers(defaultF4rmers)
-      setSelectedAgent(defaultF4rmers[0])
+    if(f4rmers && f4rmers.length > 0) {
+      setAvailableAgents(f4rmers)
     }
   }, [f4rmers]) 
 
@@ -219,9 +204,7 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
       <div className={`flex transition-all ${state === "canvas" ? "m-0" : "m-auto"}`}>
     <div className={`relative m-auto pt-0 md:pt-0 w-[100vw] h-[100vh] sm:h-[93vh] overflow-hidden ${state === "chat" || state === "edit" ? "sm:w-[16cm]" : "sm:w-[10cm]"} ${theme.chatWindowStyle ? theme.chatWindowStyle : ""}`}>
       <div className={`w-full w-[100%] ${theme.textColorSecondary} p-2`}>
-        {selectedAgent != undefined ? (
-          <AgentSelector f4rmers={availableF4rmers} onAgentSelect={(e:any) => {setSelectedAgent(e)}} selectedF4rmer={selectedAgent}/> 
-        ):<></>}
+        <AgentSelector />
       </div>
       <div className="no-scrollbar flex flex-col w-full transition-all duration-500 overflow-y-auto flex-grow h-full">
         <div

@@ -68,7 +68,7 @@ async function Dashboard() {
           <div className="overflow-hidden">
             <div>
               <Boxes f4rmers={f4s} session={session}/>
-              <RightSidebar f4rmer={data}/>
+              <RightSidebar />
             </div>
           </div>
         </div>

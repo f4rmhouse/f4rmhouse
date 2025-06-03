@@ -15,14 +15,16 @@ import { ChevronDown, ChevronRight, QrCode, Store as StoreIcon} from "lucide-rea
 import { Delete, PanelLeftClose, PanelRightClose, Repeat2, Wrench } from 'lucide-react';
 import Store from '@/app/microstore/Store';
 import { useTheme } from "../../../context/ThemeContext";
+import { useAgent } from "../../../context/AgentContext";
 
-export default function RightSidebar({f4rmer}:{f4rmer:F4rmerType}) {
+export default function RightSidebar() {
   const { theme } = useTheme();
   const { data: session, status } = useSession();
+  const { selectedAgent } = useAgent();
 
   const [qrImageURL, setQrImageURL] = useState<string>("")
   const [loading, setLoading] = useState<boolean>(false)
-  const [openList, setOpenList] = useState<any[]>(f4rmer.toolbox.map(e => {}))
+  const [openList, setOpenList] = useState<any[]>(selectedAgent?.toolbox?.map(e => {}) || [])
   const [toolHasBeenDisabledByCreator, setToolHasBeenDisabledByCreator] = useState<Map<string, boolean>>(new Map())
 
   const [visible, setVisible] = useState<boolean>(false)
@@ -47,12 +49,13 @@ export default function RightSidebar({f4rmer}:{f4rmer:F4rmerType}) {
   }
 
   const removeTool = (uti:string) => {
+    if (!selectedAgent || !session?.user) return;
     
-    let newF4rmer = f4rmer
-    newF4rmer.toolbox = f4rmer.toolbox.filter((e:ProductType) => e.uti != uti)
+    let newF4rmer = {...selectedAgent}
+    newF4rmer.toolbox = selectedAgent.toolbox.filter((e:ProductType) => e.uti != uti)
     // @ts-expect-error
     const user = new User(String(session.user.email), String(session.provider), String(session.access_token));
-    user.updateF4rmer(f4rmer)
+    user.updateF4rmer(newF4rmer)
   }
 
   const getToolSummary = (uti:string, index: number) => {
@@ -98,28 +101,23 @@ export default function RightSidebar({f4rmer}:{f4rmer:F4rmerType}) {
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
-  
-  useEffect(() => {
-    getProduct("html-upload")
-  }, [])
 
   return (
     <div>
     <div onMouseEnter={() => setVisible(true)} onMouseLeave={() => setVisible(false)} className={`p-2 fixed right-0 w-[50%] sm:w-[16%] h-[100vh] z-10 top-0 border-${theme.secondaryColor?.replace("bg-", "")} ${theme.chatWindowStyle} transition-transform duration-300 ease-in-out transform ${visible ? 'translate-x-0' : 'translate-x-full'}`}>
       <div className='h-[95%] flex flex-col'>
-        {f4rmer.toolbox ?
-        <div className={`rounded-md`}>
-          {f4rmer.toolbox.map((tool:any, i:number) => {
-            return(
-              <div key={i}> 
-                {toolHasBeenDisabledByCreator.get(tool.uti) ?
+        {selectedAgent?.toolbox ?
+        <div className="space-y-1 max-h-[50vh] overflow-y-auto pr-1">
+          {selectedAgent.toolbox.map((tool, index) => (
+            <div key={index}>
+              {toolHasBeenDisabledByCreator.get(tool.uti) ?
                 <div className={`transition-all w-full hover:${theme.primaryHoverColor} rounded-md`}>
                   <p className={`text-sm hover:cursor-pointer ${theme.textColorSecondary} w-[90%] line-through`}>{tool.title}</p>
                   <p className='text-xs hover:cursor-pointer text-red-500 w-[100%]'>This action has been disabled by the creator.</p>
                 </div>
                 :
-                <div onClick={() => getToolSummary(tool.uti, i)} className={`flex w-full p-2 hover:${theme.secondaryHoverColor} rounded-md`}>
-                  {openList[i] && openList[i][0] ?
+                <div onClick={() => getToolSummary(tool.uti, index)} className={`flex w-full p-2 hover:${theme.secondaryHoverColor} rounded-md`}>
+                  {openList[index] && openList[index][0] ?
                     <ChevronDown size={20} className={`cursor-pointer transition-all m-auto ${theme.textColorPrimary}`}/>
                     :
                     <ChevronRight size={20} className={`cursor-pointer transition-all m-auto ${theme.textColorPrimary}`}/>
@@ -127,37 +125,37 @@ export default function RightSidebar({f4rmer}:{f4rmer:F4rmerType}) {
                   <p className={`text-sm hover:cursor-pointer ${theme.textColorPrimary} w-[90%]`}>{tool.title}</p>
                   <Delete size={20} onClick={() => removeTool(tool.uti)} className='cursor-pointer transition-all hover:text-red-400 text-red-500 mr-2 m-auto'/>
                 </div>
-                }
-                <div>
-                  {openList[i] && openList[i][0] ? 
-                    <div className={`text-sm ${theme.textColorSecondary} p-0 pr-2 pl-2 ${theme.secondaryColor}`}>
-                      <p><span className='text-blue-400'>uti</span>: <span className='text-pink-400'>{openList[i][0].uti}</span></p>
-                      <p><span className='text-blue-400'>endpoints</span>:</p> 
-                      <div>
-                        {
-                          openList[i][0].endpoints.map((e:string, endpointIndex:number) => {
-                            return(
-                              <div key={endpointIndex} className='pl-2'>
-                                <p className='text-blue-400'>{e}<span className='text-neutral-300 mr-5'>: </span></p>
-                                <div className='flex'>
-                                  <p className='text-blue-400 pl-2 mr-1'>description<span className='text-neutral-300 mr-5'>: </span></p>
-                                  <p className='text-pink-400'>{openList[i][0].descriptions[endpointIndex]} </p>
-                                </div>
-                                <p><span className='text-blue-400 pl-2'>parameters</span>: <span className='text-pink-400'>{openList[i][0].parameters[endpointIndex]}</span></p>
+              }
+              <div>
+                {openList[index] && openList[index][0] ? 
+                  <div className={`text-sm ${theme.textColorSecondary} p-0 pr-2 pl-2 ${theme.secondaryColor}`}>
+                    <p><span className='text-blue-400'>uti</span>: <span className='text-pink-400'>{openList[index][0].uti}</span></p>
+                    <p><span className='text-blue-400'>endpoints</span>:</p> 
+                    <div>
+                      {
+                        openList[index][0].endpoints.map((e:string, endpointIndex:number) => {
+                          return(
+                            <div key={endpointIndex} className='pl-2'>
+                              <p className='text-blue-400'>{e}<span className='text-neutral-300 mr-5'>: </span></p>
+                              <div className='flex'>
+                                <p className='text-blue-400 pl-2 mr-1'>description<span className='text-neutral-300 mr-5'>: </span></p>
+                                <p className='text-pink-400'>{openList[index][0].descriptions[endpointIndex]} </p>
                               </div>
-                              )
-                          })
-                        }
-                      </div>
-                      <p><span className='text-blue-400'>cluster</span>:</p>
-                      {openList[i][0].ips.map((e:string, j:number) => <p key={j} className='pl-2 text-pink-400'><span className='text-neutral-300 pr-1'>-</span>{e}</p>)}
+                              <p><span className='text-blue-400 pl-2'>parameters</span>: <span className='text-pink-400'>{openList[index][0].parameters[endpointIndex]}</span></p>
+                            </div>
+                            )
+                        })
+                      }
                     </div>
-                    :
-                    <></>
-                  }
-                </div>
-              </div>)
-          })}
+                    <p><span className='text-blue-400'>cluster</span>:</p>
+                    {openList[index][0].ips.map((e:string, j:number) => <p key={j} className='pl-2 text-pink-400'><span className='text-neutral-300 pr-1'>-</span>{e}</p>)}
+                  </div>
+                  :
+                  <></>
+                }
+              </div>
+            </div>
+          ))}
         </div>
         :
         <p>No tools have been added yet</p>

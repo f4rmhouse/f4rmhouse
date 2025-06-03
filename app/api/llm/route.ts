@@ -61,15 +61,15 @@ class ToolManager {
       return a_add;
     });
   }
-  static async createMCPTools(toolbox: any[] | undefined, endpoints: Endpoint[], email: string) {
+  static async createMCPTools(toolbox: any[] | undefined, endpoints: any[], email: string) {
     if (!toolbox || !endpoints.length) return [];
 
     return endpoints.map((endpoint, i) => {
       return createMCPTool({
         uti: "dashboarder",
-        endpoint: endpoint.endpoints[0],
-        title: `${endpoint.endpoints[0]}_${Math.random().toString(36).substring(2, 8)}`,
-        endpoint_description: endpoint.descriptions[0],
+        endpoint: endpoint.name,
+        title: `${endpoint.name}_${Math.random().toString(36).substring(2, 8)}`,
+        endpoint_description: endpoint.description,
         tool_description: "This tool lets you create a dashboard from a JSON config object.",
         parameters: endpoint.parameters
       });
@@ -115,22 +115,27 @@ export async function POST(req: NextRequest) {
       toolbox = f4rmerData?.[0]?.tool_box ?? [];
     }
 
-    toolbox = []
+    // toolbox = []
 
     // Process endpoints
     let endpoints: Endpoint[] = [];
-    for (const tool of toolbox ?? []) {
-      const summary = await session.getSummary(tool.uti);
-      if (summary?.ips) {
-        endpoints.push({
-          endpoints: Array.from(summary.endpoints),
-          descriptions: Array.from(summary.descriptions),
-          parameters: Array.from(summary.parameters)
-        });
-      }
-    }
+    // for (const tool of toolbox ?? []) {
+    //   const summary = await session.getSummary(tool.uti);
+    //   if (summary?.ips) {
+    //     //endpoints.push({
+    //     //  endpoints: Array.from(summary.endpoints),
+    //     //  descriptions: Array.from(summary.descriptions),
+    //     //  parameters: Array.from(summary.parameters)
+    //     //});
+    //   }
+    // }
 
-    endpoints = []
+    if(toolbox?.length) {
+      endpoints = toolbox?.[0].endpoints
+    }
+    else {
+      endpoints = []
+    }
 
     // Initialize model
     if (!selectedModel) {
@@ -138,84 +143,32 @@ export async function POST(req: NextRequest) {
     }
     const model = ModelFactory.create(selectedModel);
 
-    // Create and bind tools
-    toolbox = [
-      {
-        uti: "dashboarder",
-        description: "This server provides a function that can create a dashboard from a JSON object. To start the creation process edit layout with uuid as an empty string. This will create an empty layout for you that you can edit.",
-        endpoint: "dashboard"
-      }
-    ]
+    // endpoints.push({
+    //   endpoints: ["create_new_dashboard"],
+    //   descriptions: [`
+    //     Create a new empty dashboard with specified dimensions.
+    
+    // This function initializes a new dashboard with the given number of rows and columns.
+    // Optionally, a custom layout can be provided to specify how cells should be arranged and sized.
+    
+    // Args:
+    //     num_rows (int): Number of rows in the dashboard grid
+    //     num_cols (int): Number of columns in the dashboard grid
+    //     layout (Optional[list]): Optional custom layout specification as a list of tuples
+    //                              in the format [(row, col, colspan, rowspan), ...]
+    //                              where each tuple defines a cell's position and dimensions
+    //     
+    // Returns:
+    //     str: The dashboard UUID for chaining operations
+    //     `],
+    //   parameters: ["num_rows::int::Number of rows in the dashboard grid", "num_cols::int::Number of columns in the dashboard grid", "layout::array::Optional custom layout specification as a list of tuples in the format [(row, col, colspan, rowspan), ...] where each tuple defines a cell's position and dimensions"]
+    // });
 
-    endpoints.push({
-      endpoints: ["render"],
-      descriptions: [`
-        Render the dashboard and return a URL to the generated HTML visualization.
-    
-    This function takes a dashboard UUID and renders the current state of the dashboard,
-    uploading the result to S3 and returning a public URL for viewing.
-    
-    Args:
-        uuid (str): Unique identifier for the dashboard to render
-        theme (str): Plotly theme template to use (default: 'plotly_dark'). Options include:
-          'plotly', 'plotly_white', 'plotly_dark', 'ggplot2', 'seaborn', 'simple_white', 'none'
-        
-    Returns:
-        str: URL to the rendered dashboard HTML file
-        `],
-      parameters: ["uuid::string::Unique identifier for the dashboard to render", "theme::str::Plotly theme template to use (default: 'plotly_dark'). Options include: 'plotly', 'plotly_white', 'plotly_dark', 'ggplot2', 'seaborn', 'simple_white', 'none'"]
-    });
-
-    endpoints.push({
-      endpoints: ["insert_chart"],
-      descriptions: [`
-        Append a new chart to the dashboard with specified parameters.
-    
-    This function creates a new chart in the dashboard at the specified position with the
-    given dimensions and optional data. The chart is identified by its title and type.
-    
-    Args:
-        uuid (str): Unique identifier for the dashboard
-        chart_title (str): Title to display for the chart
-        chart_type (str): Type of chart to create (e.g., 'scatter', 'line', 'bar', 'histogram', 'box', 'heatmap', '3dscatter', 'us_heatmap', 'indicator')
-        span_width (int): Number of columns the chart should span
-        span_height (int): Number of rows the chart should span
-        start_row (int): Starting row position (1-indexed)
-        start_col (int): Starting column position (1-indexed)
-        data (Optional[Dict]): Additional data parameters for specific chart types:
-          - For 'us_heatmap': 'locations', 'colorscale', 'colorbar_title', 'text', 'hoverinfo'
-          - For 'indicator': 'value', 'mode', 'prefix', 'suffix', 'font_size', 'reference', 'relative'
-        
-    Returns:
-        str: The dashboard UUID for chaining operations
-        `],
-      parameters: ["uuid::string::Unique identifier for the dashboard", "chart_title::string::Title to display for the chart", "chart_type::string::Type of chart to create (e.g., 'scatter', 'line', 'bar', 'histogram', 'box', 'heatmap', '3dscatter', 'us_heatmap')", "span_width::int::Number of columns the chart should span", "span_height::int::Number of rows the chart should span", "start_row::int::Starting row position (1-indexed)", "start_col::int::Starting column position (1-indexed)", "data::object::Optional Additional data parameters for specific chart types (1)- For 'us_heatmap' the dict should look like {'locations': [array of locations], 'colorscale': [array of colors], 'colorbar_title': string, 'text': [array of text], 'hoverinfo': string} (2) For 'indicator' the dict should look like {'value': int, 'mode': string, 'prefix': string, 'suffix': string, 'font_size': int, 'reference': int, 'relative': bool}"]
-    });
-
-    endpoints.push({
-      endpoints: ["create_new_dashboard"],
-      descriptions: [`
-        Create a new empty dashboard with specified dimensions.
-    
-    This function initializes a new dashboard with the given number of rows and columns.
-    Optionally, a custom layout can be provided to specify how cells should be arranged and sized.
-    
-    Args:
-        num_rows (int): Number of rows in the dashboard grid
-        num_cols (int): Number of columns in the dashboard grid
-        layout (Optional[list]): Optional custom layout specification as a list of tuples
-                                 in the format [(row, col, colspan, rowspan), ...]
-                                 where each tuple defines a cell's position and dimensions
-        
-    Returns:
-        str: The dashboard UUID for chaining operations
-        `],
-      parameters: ["num_rows::int::Number of rows in the dashboard grid", "num_cols::int::Number of columns in the dashboard grid", "layout::array::Optional custom layout specification as a list of tuples in the format [(row, col, colspan, rowspan), ...] where each tuple defines a cell's position and dimensions"]
-    });
+    console.log("endpoints: ", endpoints)
 
     const tools = await ToolManager.createMCPTools(toolbox ?? [], endpoints, email);
     const toolNode = new ToolNode(tools);
-    
+
     if (!model.bindTools) {
       throw new LLMServiceError('Selected model does not support tools', 400);
     }

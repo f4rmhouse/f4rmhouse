@@ -257,7 +257,7 @@ class User {
   async addTool(usr:string, uid:string, tid:string): Promise<F4rmerType[]> {
     try {
       const response: AxiosResponse = await axios.post(
-        `${this.baseUrl}/user/f4rmer/add/tool?usr=${usr}&uid=${uid}&tid=${tid}`, {},
+        `${this.baseUrl}/user/f4rmer/add/tool?username=${usr}&uid=${uid}&tid=${tid}`, {},
         {
           headers: { Authorization: `${this.token}`, "X-Username": this.username, "X-Provider": this.provider}
         }

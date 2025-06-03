@@ -11,12 +11,13 @@ function createMCPTool({ uti, endpoint, title, endpoint_description, tool_descri
 
     const zodSchema = z.object(
         Object.fromEntries(
-            parameters.map((p:string) => {
-                let name = p.split("::")[0]
-                let type = p.split("::")[1]
-                let desc = p.split("::")[2]
+            parameters.map((p:any) => {
+                let name = p.parameter.name
+                let type = p.parameter.type
+                let desc = p.parameter.description
                 console.log(name, type, desc)
                 switch (type) {
+                    case "str":
                     case "string":
                         return [
                             name,
@@ -32,6 +33,7 @@ function createMCPTool({ uti, endpoint, title, endpoint_description, tool_descri
                             name,
                             z.boolean().describe(desc)
                         ]
+                    case "list":
                     case "array":
                         return [
                             name,
@@ -61,8 +63,8 @@ function createMCPTool({ uti, endpoint, title, endpoint_description, tool_descri
             const baseUrl = process.env.NEXT_PUBLIC_APP_ENV === 'production' ? 'http://localhost:8000' : 'http://localhost:8000';
 
             const url = new URL(`${baseUrl}/products/sse?uti=${uti}`)
-            const url2 = new URL("http://127.0.0.1:8080/sse")
-            const transport = new SSEClientTransport(url2);
+            //const url2 = new URL("http://127.0.0.1:8080/sse")
+            const transport = new SSEClientTransport(url);
             await client.connect(transport);
 
             try {

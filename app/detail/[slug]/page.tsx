@@ -15,7 +15,11 @@ import { useSession } from "next-auth/react";
 import axios from "axios";
 import { remark } from 'remark';
 import html from 'remark-html';
-import { ArrowLeft, UsersRound, Star, ShoppingCart, Heart, Shield, Award, CheckCircle2, PackagePlus } from "lucide-react";
+import { ArrowLeft, UsersRound, Star, ShoppingCart, Heart, Shield, Award, CheckCircle2, PackagePlus, ChevronDown, ChevronUp, Hammer } from "lucide-react";
+import F4rmerType from "@/app/components/types/F4rmerType";
+import User from "@/app/microstore/User";
+import F4rmerSelectModal from "@/app/components/ui/modal/F4rmerSelectModal";
+import { useAgent } from "@/app/context/AgentContext";
 
 type Params = Promise<{ slug: string }>
 
@@ -26,6 +30,7 @@ type Params = Promise<{ slug: string }>
  */
 export default function DetailPage({ params }: { params: Params }) {
     const { data: session, status } = useSession();
+    const { availableAgents, setAvailableAgents } = useAgent();
     const oci = new OCI();
     const store = new Store();
     const ps = use(params)
@@ -33,15 +38,15 @@ export default function DetailPage({ params }: { params: Params }) {
     const [product, setProduct] = useState<ProductType|null>(null)
     const [reviews, setReviews] = useState<ReviewType[]>([]);
     const [serverError, setServerError] = useState<boolean>(false)
+    const [collapsedTables, setCollapsedTables] = useState<{[key: number]: boolean}>({})
 
     const [showcase, setShowcase] = useState<string[]>([])
     const [readme, setReadme] = useState<string>("") 
     const [histogram, setHistogram] = useState<number[]>([0,0,0,0,0]) // x = review rating, y = amount
     const [rating, setRating] = useState<number>(0.0)
-    const [ratingDescriptions, setRaingDescriptions] = useState<string[]>(["No rating", "😡 Bad", "😐 OK", "🙂 Decent", "😄 Solid", "🤩 Amazing"])
     const [requestsAmt, setRequestAmt] = useState<number>(0)
     const [noActionFound, setNoActionFound] = useState<boolean>(false)
-    const [endpoints, setEndpoints] = useState<any[]>([])
+    const [isF4rmerModalOpen, setIsF4rmerModalOpen] = useState<boolean>(false)
 
     useEffect(() => {
       try{
@@ -97,32 +102,6 @@ export default function DetailPage({ params }: { params: Params }) {
       }
     },[reviews])
 
-    const getReviewDescription = (rs:number) => {
-      if(rs < 5) {
-        return "Minimal"
-      }
-      if (rs < 10) {
-        return "Few"
-      }
-      return "Massive"
-    }
-
-    const getAnalyticsDescription = (amt:number) => {
-      if (amt < 10) {
-        return "Almost none"
-      }
-      
-      if(amt < 100) {
-        return "Minimal"
-      }
-      
-      if (amt < 1000) {
-        return "Moderate"
-      }
-
-      return "High"
-    }
-
     const getShowcase = (uti:string) => {
         oci.getShowcase(uti).then(imgs => {
           if (imgs.length > 0){
@@ -137,6 +116,39 @@ export default function DetailPage({ params }: { params: Params }) {
             setShowcase([])
           }
         })
+    }
+
+    const addToolToToolbox = (f4rmerId: string) => {
+      if(session?.user && product) {
+        // @ts-expect-error
+        let user = new User(session.user.email, String(session.provider), String(session.access_token));
+        console.log(product.uid)
+        // @ts-expect-error
+        user.addTool(session.user.email, f4rmerId, product.uid)
+          .then(() => {
+            // You could add a success notification here
+            console.log(`Added tool to F4rmer ${f4rmerId}`);
+          })
+          .catch(error => {
+            console.error("Error adding tool to F4rmer:", error);
+          });   
+      }
+    }
+
+    const getUserf4s = () => {
+      if(session?.user) {
+        // @ts-expect-error
+        let user = new User(session.user.email, String(session.provider), String(session.access_token));
+        user.getF4rmers().then((f4s: F4rmerType[]) => {
+          setAvailableAgents(f4s);
+          setIsF4rmerModalOpen(true);
+        }).catch(error => {
+          console.error("Error fetching F4rmers:", error);
+        })
+      } else {
+        // If user is not logged in, you might want to redirect to login
+        console.log("User not logged in");
+      }
     }
 
     return (
@@ -172,12 +184,7 @@ export default function DetailPage({ params }: { params: Params }) {
             
             <div className="col-span-12 sm:col-span-7 lg:col-span-5 flex flex-col mt-4 sm:mt-0">
               <div className="mb-4">
-                <div className="flex items-center">
-                  <p className="text-xs font-medium bg-blue-600 text-white px-2 py-0.5 rounded mr-2">VERIFIED</p>
-                  <p className="text-xs font-mono text-neutral-400">{product.uid}</p>
-                </div>
                 <h1 className="text-2xl sm:text-3xl font-bold text-white mt-1 mb-1">{product.title}</h1>
-                
                 <div className="flex items-center mb-2">
                   <div className="flex mr-2">
                     {[...Array(5)].map((_, i) => (
@@ -202,7 +209,10 @@ export default function DetailPage({ params }: { params: Params }) {
                     </div>
                   </div>
                   <div className="flex items-center">
-                    <button className="bg-yellow-500 hover:bg-yellow-600 text-black font-medium py-2 px-4 rounded-md mr-2 transition-colors flex items-center">
+                    <button 
+                      onClick={getUserf4s} 
+                      className="bg-yellow-500 hover:bg-yellow-600 text-black font-medium py-2 px-4 rounded-md mr-2 transition-colors flex items-center"
+                    >
                       <PackagePlus size={16} className="mr-1" />
                       Add to toolbox 
                     </button>
@@ -235,36 +245,49 @@ export default function DetailPage({ params }: { params: Params }) {
 
           <div className="bg-zinc-900 border border-neutral-800 rounded-lg p-4 mb-8">
             <h2 className="text-lg font-bold mb-3 flex items-center">
-              <Shield className="mr-2 text-blue-400" size={18} />
-              Technical Specifications
+              <Hammer className="mr-2 text-blue-400" size={18} />
+              Tools 
             </h2>
             
             {product.endpoints.length > 0 ? 
               <div className="space-y-4">
                 {product.endpoints.map((e:any, j:number) => {
+                  // Default to collapsed unless explicitly set to false
+                  const isCollapsed = collapsedTables[j] !== false;
                   return (
                     <div key={j} className="mb-4">
-                      <p className="text-base font-medium text-white mb-2 pb-1 border-b border-neutral-700">{e.name}</p>
-                      <table className="w-full border-collapse my-2">
-                        <thead>
-                          <tr className="text-left bg-zinc-800">
-                            <th className="py-2 px-3 font-medium text-xs uppercase tracking-wider text-neutral-300 rounded-tl">Parameter</th>
-                            <th className="py-2 px-3 font-medium text-xs uppercase tracking-wider text-neutral-300">Type</th>
-                            <th className="py-2 px-3 font-medium text-xs uppercase tracking-wider text-neutral-300 rounded-tr">Description</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                        {e.parameters.map((p:any, i:number) => {
-                          return (
-                            <tr key={i} className="border-b border-neutral-800 hover:bg-zinc-800 transition-colors">
-                              <td className="py-2 px-3 text-sm font-mono text-white">{p.parameter.name}</td>
-                              <td className="py-2 px-3 text-sm text-blue-400 font-medium">{p.parameter.type}</td>
-                              <td className="py-2 px-3 text-sm text-neutral-400">{p.parameter.description}</td>
+                      <div 
+                        className="flex items-center justify-between text-base font-medium text-white mb-2 pb-1 border-b border-neutral-700 cursor-pointer"
+                        onClick={() => setCollapsedTables(prev => ({ ...prev, [j]: !prev[j] }))}
+                      >
+                        <p>{e.name}</p>
+                        <button className="text-neutral-400 hover:text-white transition-colors">
+                          {isCollapsed ? <ChevronDown size={18} /> : <ChevronUp size={18} />}
+                        </button>
+                      </div>
+                      <p className="py-2 px-3 text-sm text-neutral-400">{isCollapsed ? e.description.split(".")[0] + ".": e.description}</p>
+                      {!isCollapsed && (
+                        <table className="w-full border-collapse my-2">
+                          <thead>
+                            <tr className="text-left bg-zinc-800">
+                              <th className="py-2 px-3 font-medium text-xs uppercase tracking-wider text-neutral-300 rounded-tl">Parameter</th>
+                              <th className="py-2 px-3 font-medium text-xs uppercase tracking-wider text-neutral-300">Type</th>
+                              <th className="py-2 px-3 font-medium text-xs uppercase tracking-wider text-neutral-300 rounded-tr">Description</th>
                             </tr>
-                          )
-                        })}
-                        </tbody>
-                      </table>
+                          </thead>
+                          <tbody>
+                          {e.parameters.map((p:any, i:number) => {
+                            return (
+                              <tr key={i} className="border-b border-neutral-800 hover:bg-zinc-800 transition-colors">
+                                <td className="py-2 px-3 text-sm font-mono text-white">{p.parameter.name}</td>
+                                <td className="py-2 px-3 text-sm text-blue-400 font-medium">{p.parameter.type}</td>
+                                <td className="py-2 px-3 text-sm text-neutral-400">{p.parameter.description}</td>
+                              </tr>
+                            )
+                          })}
+                          </tbody>
+                        </table>
+                      )}
                     </div>
                   )
                 })}
@@ -429,6 +452,13 @@ export default function DetailPage({ params }: { params: Params }) {
             </Link>
           </div>}
         </div>
+        {/* F4rmer Select Modal */}
+        <F4rmerSelectModal
+          open={isF4rmerModalOpen}
+          onClose={() => setIsF4rmerModalOpen(false)}
+          product={product}
+          onAddToF4rmer={addToolToToolbox}
+        />
       </div>
     );
   }

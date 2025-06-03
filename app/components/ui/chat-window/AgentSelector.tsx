@@ -1,10 +1,12 @@
 import { Bot, BotMessageSquare } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { useTheme } from "../../../context/ThemeContext";
+import { useAgent } from "../../../context/AgentContext";
 import F4rmerType from '../../types/F4rmerType';
 
-export default function AgentSelector({ f4rmers, onAgentSelect, selectedF4rmer }: { f4rmers: F4rmerType[], onAgentSelect: (agent: F4rmerType) => void, selectedF4rmer: F4rmerType | null }) {
+export default function AgentSelector() {
   const { theme } = useTheme();
+  const { selectedAgent, setSelectedAgent, availableAgents } = useAgent();
   const selectRef = useRef<HTMLSelectElement>(null);
   
   // Add keyboard shortcut listener for Cmd+A to open agent selector and Option+number to select agents
@@ -32,19 +34,19 @@ export default function AgentSelector({ f4rmers, onAgentSelect, selectedF4rmer }
       // Option+number (Alt+number) to select agent by index
       if (event.ctrlKey) {
         const numKey = parseInt(event.key);
-        if (!isNaN(numKey) && numKey >= 1 && numKey <= f4rmers.length) {
+        if (!isNaN(numKey) && numKey >= 1 && numKey <= availableAgents.length) {
           event.preventDefault();
           
           // Get agent at index (subtract 1 since arrays are 0-indexed but keys start at 1)
           const f4merIndex = numKey - 1;
-          const selectedF4rmer = f4rmers[f4merIndex];
+          const agent = availableAgents[f4merIndex];
 
           // Select the agent
-          onAgentSelect(selectedF4rmer);
+          setSelectedAgent(agent);
           
           // Update the select element's value
           if (selectRef.current) {
-            selectRef.current.value = selectedF4rmer.title;
+            selectRef.current.value = agent.title;
           }
         }
       }
@@ -57,13 +59,13 @@ export default function AgentSelector({ f4rmers, onAgentSelect, selectedF4rmer }
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, []);
+  }, [availableAgents, setSelectedAgent]);
   
   const handleAgentChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedId = event.target.value;
-    const f4rmer = f4rmers.find(f4rmer => f4rmer.title === selectedId);
-    if (f4rmer) {
-      onAgentSelect(f4rmer);
+    const selectedTitle = event.target.value;
+    const agent = availableAgents.find(agent => agent.title === selectedTitle);
+    if (agent) {
+      setSelectedAgent(agent);
     }
   };
   
@@ -76,10 +78,10 @@ export default function AgentSelector({ f4rmers, onAgentSelect, selectedF4rmer }
         id="agent-selector"
         ref={selectRef}
         className={`transition-all rounded-r-md cursor-pointer ${theme.textColorSecondary} block w-full text-xs border-none bg-transparent`}
-        value={selectedF4rmer?.title|| f4rmers[0].title}
+        value={selectedAgent?.title || (availableAgents.length > 0 ? availableAgents[0].title : '')}
         onChange={handleAgentChange}
       >
-        {f4rmers.map((f4rmer:F4rmerType) => (
+        {availableAgents.map((f4rmer:F4rmerType) => (
           <option key={f4rmer.uid} value={f4rmer.title}>
             {f4rmer.title}
           </option>

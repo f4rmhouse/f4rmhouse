@@ -6,6 +6,7 @@ import { SessionProvider } from 'next-auth/react'
 import { PHProvider } from './providers'
 import { ThemeProvider } from "./context/ThemeContext";
 import { ArtifactProvider } from "./context/ArtifactContext";
+import { AgentProvider } from "./context/AgentContext";
 import config from "../f4.config"
 import KeyboardHandlerWrapper from "./components/ui/KeyboardHandlerWrapper";
 
@@ -24,8 +25,9 @@ export default function RootLayout({children,}: Readonly<{children: React.ReactN
       <PHProvider>
       <SessionProvider>
         <ThemeProvider>
-          <body>
-            <ArtifactProvider>
+          <AgentProvider>
+            <body>
+              <ArtifactProvider>
               <KeyboardHandlerWrapper />
               <div className="min-h-screen">
                 {
@@ -44,8 +46,9 @@ export default function RootLayout({children,}: Readonly<{children: React.ReactN
                   {children}
                 </div>
               </div>
-            </ArtifactProvider>
-          </body>
+              </ArtifactProvider>
+            </body>
+          </AgentProvider>
         </ThemeProvider>
         </SessionProvider>
         </PHProvider>
