@@ -13,7 +13,7 @@ import ChatInitToolCallMessage from "../chat-messages/ChatInitToolCallMessage";
 import ChatMessageType from "../../types/ChatMessageType";
 import ChatUserMessage from "../chat-messages/ChatUserMessage";
 import ChatErrorMessage from "../chat-messages/ChatErrorMessage";
-import { ArrowLeftToLine, ArrowRight, ArrowRightToLine, CornerRightUp, Paperclip, Pencil, RotateCcw } from "lucide-react";
+import { ArrowLeft, ArrowLeftToLine, ArrowRight, ArrowRightToLine, CornerRightUp, Paperclip, Pencil, RotateCcw } from "lucide-react";
 import F4rmerEditor from "./F4rmerEditor";
 import Link from "next/link";
 import Modal from "../modal/Modal";
@@ -245,9 +245,17 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
               <button className={`hover:${theme.secondaryColor} rounded-md transition-all p-0 px-3 ${theme.textColorSecondary ? theme.textColorSecondary : "text-neutral-300"}`}>
                 <Paperclip size={14}/>
               </button>
-              <button onClick={() => setState("chat")} className={`ml-auto rounded-md transition-all px-3`}>
+              <>
+              {state == "canvas" ?
+              <button onClick={() => {setState("chat")}} className={`ml-auto rounded-md transition-all px-3 ${theme.textColorSecondary ? theme.textColorSecondary : "text-neutral-300"}`}>
                 <span className=""><ArrowRight size={15}/></span>
               </button>
+              :
+              <button onClick={() => setState("canvas")} className={`ml-auto rounded-md transition-all px-3 ${theme.textColorSecondary ? theme.textColorSecondary : "text-neutral-300"}`}>
+                <span className=""><ArrowLeft size={15}/></span>
+              </button>
+              }
+              </>
               <button type="submit" className={`ml-auto rounded-md transition-all px-3 ${theme.accentColor}`}>
                 <span className=""><CornerRightUp size={15}/></span>
               </button>

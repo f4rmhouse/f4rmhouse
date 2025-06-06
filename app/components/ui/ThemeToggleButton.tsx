@@ -101,15 +101,15 @@ const themePresets: Record<string, Theme> = {
   },
   shadcn: {
     "primaryColor": "bg-black shadow-sm",
-    "secondaryColor": "bg-slate-900",
+    "secondaryColor": "bg-black",
     "accentColor": "bg-white text-black",
     "hoverColor": "bg-neutral-200",
     "backgroundColor": "bg-black",
     "backgroundImage": "",
-    "primaryHoverColor": "bg-slate-900",
-    "secondaryHoverColor": "bg-slate-800",
-    "textColorPrimary": "text-slate-50",
-    "textColorSecondary": "text-slate-400",
+    "primaryHoverColor": "bg-black",
+    "secondaryHoverColor": "bg-black",
+    "textColorPrimary": "text-white",
+    "textColorSecondary": "text-neutral-400",
     "chatWindowStyle": "bg-black"
   },
   hacker: {
@@ -167,17 +167,17 @@ const themePresets: Record<string, Theme> = {
     "aiMessageStyle": "bg-white"
   },
   gpt6: {
-    "primaryColor": "bg-white text-black",
-    "secondaryColor": "bg-neutral-100",
-    "accentColor": "bg-gradient-to-b from-[#9c70a3] to-[#e79e95] text-white",
+    "primaryColor": "bg-transparent text-black",
+    "secondaryColor": "bg-white bg-opacity-10 backdrop-blur-xl",
+    "accentColor": "bg-gradient-to-b from-[#e8b9b3] to-[#e79e95] text-white",
     "hoverColor": "bg-blue-100",
-    "backgroundColor": "bg-green-500",
+    "backgroundColor": "bg-transparent",
     "backgroundImage": "https://images7.alphacoders.com/134/1343197.jpeg",
     "primaryHoverColor": "bg-gray-100",
     "secondaryHoverColor": "bg-gray-100",
     "textColorPrimary": "text-black",
     "textColorSecondary": "text-neutral-800",
-    "chatWindowStyle": "bg-white"
+    "chatWindowStyle": "bg-white bg-opacity-10 backdrop-blur-xl"
   },
   notion: {
     "primaryColor": "bg-[#f8f8f7]",

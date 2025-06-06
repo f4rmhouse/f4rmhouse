@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
-import { LangchainMessageType } from "../../types/LangchainMessageType";
-import { CirclePlus } from "lucide-react";
-import { ToolMessageType } from "../../types/ToolMessageType";
+import { CirclePlus, Hammer } from "lucide-react";
 import { useArtifact } from "../../../context/ArtifactContext";
+import { useTheme } from "../../../context/ThemeContext";
 
 export default function RemoteToolResponse({message, debug}:{message:string | undefined, debug: any}) {
   const [showMore, setShowMore] = useState<boolean>(false)
-  const { addArtifact, setCurrentArtifact } = useArtifact()
+  const { theme } = useTheme();
+  const { addArtifact } = useArtifact()
   
   // Function to extract URLs from a string
   const extractUrls = (text: string): string[] => {
@@ -36,22 +36,23 @@ export default function RemoteToolResponse({message, debug}:{message:string | un
       }
     }
   }, [debug?.kwargs.content, addArtifact])
+
   return (
     <div className="">
-      <div className="flex">
-        <button className="bg-neutral-900 rounded text-neutral-400" onClick={() => setShowMore(p => !p)}>
-          <CirclePlus size={15}/>
+      <div onClick={() => setShowMore(p => !p)} className={`group flex ${theme.secondaryColor} rounded-md p-2 shadow hover:${theme.primaryColor} cursor-pointer`}>
+        <button className={`group-hover:rotate-45 transition-all rounded ${theme.textColorPrimary ? theme.textColorPrimary : "text-white"}`} onClick={() => setShowMore(p => !p)}>
+          <Hammer size={15}/>
         </button>
-        <p className="mt-auto ml-2 text-xs font-mono text-green-400">Action response </p>
+        <p className={`mt-auto ml-2 text-xs ${theme.textColorPrimary ? theme.textColorPrimary : "text-white"}`}>Action response </p>
       </div>
-      <div className=''>
+      <div className='w-full'>
           <div className="w-full">
           {
             showMore ?
-            <div className="w-full">
+            <div className="">
               <div className="block w-full text-neutral-400 text-xs font-mono">{<div><pre>{JSON.stringify(debug, null, 2) }</pre></div>}</div>
-              <button className="flex bg-neutral-900 rounded w-[100%] text-neutral-400 p-1" onClick={() => setShowMore(p => !p)}>
-              <CirclePlus size={15}/>
+              <button className={`flex ${theme.secondaryColor} rounded w-[100%] text-neutral-400 p-1`} onClick={() => setShowMore(p => !p)}>
+              <Hammer size={15}/>
               <p className="text-xs font-mono bg-neutral-900 ml-2">{String("hide")}</p>
               </button>
             </div>

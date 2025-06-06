@@ -13,6 +13,8 @@ export default function NewAIMessage({message}:{message:string| undefined}) {
   const { theme } = useTheme();
 
   return (
+    <>
+    {message &&
     <div className="flex gap-2 w-full text-black font-base">
       <img className="h-[30px] rounded-full" src="https://pbs.twimg.com/media/CrghjJoUMAEBcO_.jpg"/> 
       <div className='rounded-2xl rounded-tl-sm w-[92%]'>
@@ -25,5 +27,7 @@ export default function NewAIMessage({message}:{message:string| undefined}) {
           </div>
       </div>
     </div>
+    }
+    </>
   )
 }

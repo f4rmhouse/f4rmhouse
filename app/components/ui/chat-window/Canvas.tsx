@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import config from '../../../../f4.config'
-import { Download, RefreshCcw } from 'lucide-react'
+import { Download, RefreshCcw, X } from 'lucide-react'
 import { useArtifact } from '../../../context/ArtifactContext'
 import { useTheme } from '../../../context/ThemeContext'
 
@@ -13,21 +13,38 @@ export default function Canvas() {
   const { currentArtifact, artifacts, setCurrentArtifact } = useArtifact()
   const [artifactType, setArtifactType] = useState<"image"|"html"|"video"|null>(null)
 
+  // Function to get file name from URL
+  const getFileName = (url: string) => {
+    const parts = url.split('/');
+    return parts[parts.length - 1];
+  }
+  
+  // Function to determine artifact type based on file extension
+  const getArtifactType = (url: string) => {
+    const format = url.split(".").pop()?.toLowerCase();
+    switch (format) {
+      case "html":
+        return "html";
+      case "jpg":
+      case "jpeg":
+      case "png":
+      case "gif":
+      case "svg":
+        return "image";
+      default:
+        return "image";
+    }
+  }
+
   useEffect(() => {
     console.log("artifacts: ", artifacts)
     if(artifacts.length > 0){
       setArtifact(artifacts[artifacts.length-1])
-      const format = artifacts[artifacts.length-1].split(".").pop()
-      switch (format) {
-        case "html":
-          setArtifactType("html")
-          if (iframeRef.current) {
-            iframeRef.current.src = artifacts[artifacts.length-1]
-          }
-          break;
-        default:
-          setArtifactType("image")
-          break;
+      const artifactType = getArtifactType(artifacts[artifacts.length-1]);
+      setArtifactType(artifactType)
+      
+      if (artifactType === "html" && iframeRef.current) {
+        iframeRef.current.src = artifacts[artifacts.length-1]
       }
     }
   },[currentArtifact, artifacts])
@@ -47,41 +64,64 @@ export default function Canvas() {
   }
 
   return (
-    <div className={`relative h-full w-full rounded-md border ${theme.secondaryColor?.replace('bg-', 'border-')}`}>
-      <div className={`absolute z-10 flex gap-2 ${theme.primaryColor ? theme.primaryColor : "bg-neutral-800"} w-full items-center`}>
+    <div className={`relative h-full w-full rounded-md flex flex-col overflow-auto`}>
+      {/* Tabs for artifacts */}
+      <div className={`absolute w-full flex overflow-x-auto ${theme.secondaryColor} bg-opacity-0 rounded-t-md`}>
+        {artifacts.map((artifactUrl, index) => (
+          <button
+            key={index}
+            onClick={() => setCurrentArtifact(artifactUrl)}
+            className={`px-3 py-2 text-sm whitespace-nowrap flex items-center gap-1 ${
+              currentArtifact === artifactUrl 
+                ? `${theme.primaryColor} ${theme.textColorPrimary}` 
+                : `${theme.textColorSecondary}`
+            }`}
+          >
+            <span className="max-w-[100px] truncate">{getFileName(artifactUrl)}</span>
+          </button>
+        ))}
+      </div>
+      
+      {/* Controls */}
+      <div className={`z-10 absolute flex gap-0 w-full items-center p-1`}>
         <button
           onClick={reloadIframe}
-          className={`rounded-md p-2 hover:rotate-[-90deg] ${theme.textColorPrimary ? theme.textColorPrimary : "text-white"} transition-all`}
+          className={`ml-auto rounded-md p-2 hover:rotate-[-90deg] ${theme.textColorPrimary} transition-all`}
           title="Reload content"
         >
-          <RefreshCcw size={15} className={theme.textColorPrimary} />
+          <RefreshCcw size={15} />
         </button>
         <a
           href={currentArtifact}
-          download="a_file.html"
-          className={`rounded-md p-2 ${theme.primaryColor} hover:${theme.primaryHoverColor} transition-all`}
+          download={getFileName(currentArtifact || "")}
+          className={`rounded-md p-2 transition-all ${theme.textColorPrimary}`}
           title="Download content"
         >
-          <Download size={15} className={theme.textColorPrimary} />
+          <Download size={15} />
         </a>
       </div>
-      {artifactType === "html" ? (
-        <iframe
-          ref={iframeRef}
-          src={artifacts[artifacts.length-1]}
-          className="h-full w-full border-none rounded-md pt-8"
-          sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-        />
-      ) : (
-        <div className="flex h-full w-full">
-          {artifact.length > 0 &&
-            <img
-              src={artifact}
-              className="m-auto rounded-md"
-            />
-          }
-        </div>
-      )}
+      
+      {/* Content area */}
+      <div className="flex-grow overflow-auto">
+        {artifactType === "html" ? (
+          <iframe
+            ref={iframeRef}
+            src={currentArtifact || ""}
+            className="h-full w-full border-none rounded-b-md"
+            sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+          />
+        ) : (
+          <div className="flex overflow-auto">
+            {artifact.length > 0 &&
+              <img
+                src={artifact}
+                className="rounded-md m-auto"
+                alt={getFileName(artifact)}
+              />
+            }
+          </div>
+        )}
+      </div>
     </div>
   )
 }
