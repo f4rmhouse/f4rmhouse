@@ -62,7 +62,7 @@ class ToolManager {
     });
   }
   static async createMCPTools(toolbox: any[] | undefined, endpoints: any[], email: string) {
-    if (!toolbox || !endpoints.length) return [];
+    if (!toolbox || !endpoints || !endpoints.length) return [];
 
     return endpoints.map((endpoint, i) => {
       return createMCPTool({
@@ -131,7 +131,11 @@ export async function POST(req: NextRequest) {
     // }
 
     if(toolbox?.length) {
-      endpoints = toolbox?.[0].endpoints
+      toolbox?.map((tool: any) => {
+        if(tool.endpoints) {
+          endpoints.push(...tool.endpoints)
+        }
+      })
     }
     else {
       endpoints = []

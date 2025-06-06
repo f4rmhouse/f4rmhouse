@@ -16,17 +16,14 @@ import { useTheme } from "../../../context/ThemeContext";
 export default function UserInput({onSubmit, onChange, value, children}: {onSubmit: (e: FormEvent<HTMLFormElement>) => any, onChange: (e:any) => void, value: string, children?: React.ReactNode}) {
   const { theme } = useTheme();
   return(
-    <form onSubmit={onSubmit} className={`${theme.secondaryColor ? theme.secondaryColor.replace("bg", "border") : "border neutral-700"} flex flex-col ${theme.primaryColor ? theme.primaryColor : "bg-neutral-800"}`}>
-      <div className="flex w-full">
+    <form onSubmit={onSubmit} className={`${theme.secondaryColor ? theme.secondaryColor.replace("bg", "border") : "border neutral-700"} rounded-md flex flex-col ${theme.primaryColor ? theme.primaryColor : "bg-neutral-800"}`}>
+      <div className="flex w-full p-1">
         <input
-          className={`grow ${theme.textColorPrimary} ${theme.primaryColor ? theme.primaryColor : "bg-neutral-800"} border-none z-10`}
+          className={`border-none grow ${theme.textColorPrimary} ${theme.primaryColor ? theme.primaryColor : "bg-neutral-800"} border-none z-10 focus:outline-none focus:ring-0`}
           value={value}
           placeholder={"Ask me anything"}
           onChange={onChange}
         />
-        <button type="submit" className={`transition-all shrink-0 ${theme.accentColor} ${theme.hoverColor ? "hover:" + theme.hoverColor : ""} rounded-md flex`}>
-          <span className="p-3 pr-3 pl-3"><CornerRightUp size={20}/></span>
-        </button>
       </div>
       <div>
         {children}

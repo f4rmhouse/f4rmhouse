@@ -70,14 +70,11 @@ export default function AgentSelector() {
   };
   
   return (
-    <div className={`group cursor-pointer flex ${theme.primaryColor} hover:${theme.primaryHoverColor} transition-all`}>
-      <label htmlFor="agent-selector" className="text-xs m-auto">
-        <BotMessageSquare className={`m-auto ml-2 ${theme.accentColor ? theme.accentColor.replace("bg", "text") : "text-blue-500"}`} size={15}/>
-      </label>
+    <div className={`rounded-md group cursor-pointer flex ${theme.primaryColor} hover:${theme.primaryHoverColor} transition-all`}>
       <select
         id="agent-selector"
         ref={selectRef}
-        className={`transition-all rounded-r-md cursor-pointer ${theme.textColorSecondary} block w-full text-xs border-none bg-transparent`}
+        className={`transition-all rounded-md cursor-pointer ${theme.textColorSecondary} block w-full text-xs border-none bg-transparent`}
         value={selectedAgent?.title || (availableAgents.length > 0 ? availableAgents[0].title : '')}
         onChange={handleAgentChange}
       >

@@ -64,7 +64,7 @@ async function Dashboard() {
     <main>
       <div>
         <div>
-        <div className="mt-10">
+        <div className="mt-5">
           <div className="overflow-hidden">
             <div>
               <Boxes f4rmers={f4s} session={session}/>
@@ -84,7 +84,6 @@ async function Dashboard() {
           </a>
           <ThemeToggleButton />
           <HelpModal />
-          <FPSCounter />
           <p className="text-neutral-500 text-xs">v{config.version}</p>
         </div>
         {error && (

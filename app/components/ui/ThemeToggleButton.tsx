@@ -136,7 +136,7 @@ const themePresets: Record<string, Theme> = {
     "secondaryHoverColor": "bg-gray-800",
     "textColorPrimary": "text-gray-100",
     "textColorSecondary": "text-gray-400",
-    "chatWindowStyle": "bg-[#1f1f1f]"
+    "chatWindowStyle": "bg-transparent"
   },
   msn: {
     "primaryColor": "bg-[#d5e0f4]",
@@ -178,6 +178,20 @@ const themePresets: Record<string, Theme> = {
     "textColorPrimary": "text-black",
     "textColorSecondary": "text-neutral-800",
     "chatWindowStyle": "bg-white"
+  },
+  notion: {
+    "primaryColor": "bg-[#f8f8f7]",
+    "secondaryColor": "bg-[#f8f8f7]",
+    "accentColor": "bg-[#32302c]",
+    "hoverColor": "bg-[#32302c]",
+    "backgroundColor": "bg-[#f8f8f7]",
+    "backgroundImage": "",
+    "primaryHoverColor": "bg-[#32302c]",
+    "secondaryHoverColor": "bg-[#32302c]",
+    "textColorPrimary": "text-gray-800",
+    "textColorSecondary": "text-gray-500",
+    "chatWindowStyle": "bg-white border",
+    "aiMessageStyle": "bg-gray-50 rounded-md p-2"
   },
 };
 

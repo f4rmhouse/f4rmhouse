@@ -9,31 +9,8 @@ import { useTheme } from "../../../context/ThemeContext"
 import ReactMarkdown from 'react-markdown';
 import './markdown.css';
 
-export default function NewAIMessage({message, openCanvas}:{message:string| undefined, openCanvas: () => any}) {
+export default function NewAIMessage({message}:{message:string| undefined}) {
   const { theme } = useTheme();
-  const { addArtifact } = useArtifact()
-  
-  // Regular expression for detecting URLs
-  const urlRegex = /(https?:\/\/[^\s)]+[^\s.,)])/g;
-  
-  // Function to convert text with URLs to JSX with clickable links
-  const renderTextWithLinks = (text: string) => {
-    const parts = text.split(urlRegex);
-    const matches = text.match(urlRegex);
-    let currentUrlIndex = 0;
-    
-    return parts.map((part, index) => {
-      if (matches && index < parts.length - 1) {
-        const url = matches[currentUrlIndex];
-        currentUrlIndex++;
-        if(url) {
-          addArtifact(url)
-          // openCanvas()
-        }
-      }
-      return part;
-    });
-  };
 
   return (
     <div className="flex gap-2 w-full text-black font-base">

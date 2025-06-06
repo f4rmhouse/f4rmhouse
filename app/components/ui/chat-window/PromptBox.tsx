@@ -13,7 +13,7 @@ import ChatInitToolCallMessage from "../chat-messages/ChatInitToolCallMessage";
 import ChatMessageType from "../../types/ChatMessageType";
 import ChatUserMessage from "../chat-messages/ChatUserMessage";
 import ChatErrorMessage from "../chat-messages/ChatErrorMessage";
-import { ArrowLeftToLine, ArrowRightToLine, Pencil, RotateCcw } from "lucide-react";
+import { ArrowLeftToLine, ArrowRight, ArrowRightToLine, CornerRightUp, Paperclip, Pencil, RotateCcw } from "lucide-react";
 import F4rmerEditor from "./F4rmerEditor";
 import Link from "next/link";
 import Modal from "../modal/Modal";
@@ -203,16 +203,13 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
     <div className="sm:flex overflow-hidden w-[100vw]">
       <div className={`flex transition-all ${state === "canvas" ? "m-0" : "m-auto"}`}>
     <div className={`relative m-auto pt-0 md:pt-0 w-[100vw] h-[100vh] sm:h-[93vh] overflow-hidden ${state === "chat" || state === "edit" ? "sm:w-[16cm]" : "sm:w-[10cm]"} ${theme.chatWindowStyle ? theme.chatWindowStyle : ""}`}>
-      <div className={`w-full w-[100%] ${theme.textColorSecondary} p-2`}>
-        <AgentSelector />
-      </div>
       <div className="no-scrollbar flex flex-col w-full transition-all duration-500 overflow-y-auto flex-grow h-full">
         <div
           className={`p-2 no-scrollbar flex flex-col-reverse w-full gap-5 transition-all duration-500 overflow-y-scroll scrollb ${currentSession.length > 0 ? 'opacity-100' : 'opacity-0 h-0'}`}
           ref={messageContainerRef}
         >
           {loading ? 
-            <div className="flex gap-2 ml-2"><img className="h-[30px] rounded-full" src="https://pbs.twimg.com/media/CrghjJoUMAEBcO_.jpg"/> <div className={`p-2 ${theme.textColorSecondary}`}><p><span className="">🤔</span> thinking...</p><div className="text-xs"><Timer /></div></div></div>
+            <div className="flex gap-2 ml-2"><img className="h-[30px] rounded-full" src="https://pbs.twimg.com/media/CrghjJoUMAEBcO_.jpg"/> <div className={`p-2 ${theme.textColorSecondary}`}><p className=""><span className=""></span>Thinking...</p><div className="text-xs"><Timer /></div></div></div>
             :
             <></>
           }
@@ -226,7 +223,7 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
                   case "tool_init":
                     return (<ChatInitToolCallMessage key={i} message={m.content} debug={chatSession.getDebug(m.id) ?? {message: "no extra information"}}/>)
                   case "system":
-                    return (<ChatAIMessage key={i} message={m.content} openCanvas={() => setState("canvas")}/>)
+                    return (<ChatAIMessage key={i} message={m.content} />)
                   case "tool_response":
                     return (<ChatToolMessage key={i} message={m.content} debug={chatSession.getDebug(m.id) ?? {message: "no extra information"}}/>)
                   case "error":
@@ -237,15 +234,22 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
             ""
           )}
         </div>
-        <div className={`mt-auto sticky transition-all ${state === "canvas" ? "w-[98%]" : "w-[99%]"} ml-1 mr-2 ${chatSession.getMessages().length > 0 ? "bottom-[10%] sm:bottom-12 pb-1" : "bottom-[calc(50vh)]"}`}>
-            <div className={`${chatSession.getMessages().length === 0 ? "opacity-100" : "opacity-0"} pb-5`}>
+        <div className={`mt-auto sticky transition-all ${state === "canvas" ? "w-[98%]" : "w-[99%]"} ml-1 mr-2 ${chatSession.getMessages().length > 0 ? "bottom-[10%] sm:bottom-0 pb-1" : "bottom-[calc(40vh)]"}`}>
+            <div className={`${chatSession.getMessages().length === 0 ? "opacity-100" : "opacity-0"} pb-1`}>
               <h1 className={`text-2xl ${theme.textColorPrimary ? theme.textColorPrimary : "text-white"}`}>{config.welcomeText.replace("{{username}}", session.user.name === "undefined" ? "anon" : session.user.name.split(" ")[0])}</h1>
             </div>
           <UserInput onSubmit={sendMessage} onChange={handleInputChange} value={input}>
             <div className="flex p-0">
+              <AgentSelector />
               <ModelSelector onModelSelect={(e:any) => {setSelectedModel(e)}} selectedModel={selectedModel}/>
-              <button onClick={() => setState(state === "canvas" ? "chat" : "canvas")} className={`transition-all p-2 ${theme.textColorSecondary ? theme.textColorSecondary : "text-neutral-300"} hover:${theme.secondaryHoverColor ? theme.secondaryHoverColor : ""}`}>
-                {state === "canvas" ? <ArrowRightToLine size={15}/> : <ArrowLeftToLine size={15}/>}
+              <button className={`hover:${theme.secondaryColor} rounded-md transition-all p-0 px-3 ${theme.textColorSecondary ? theme.textColorSecondary : "text-neutral-300"}`}>
+                <Paperclip size={14}/>
+              </button>
+              <button onClick={() => setState("chat")} className={`ml-auto rounded-md transition-all px-3`}>
+                <span className=""><ArrowRight size={15}/></span>
+              </button>
+              <button type="submit" className={`ml-auto rounded-md transition-all px-3 ${theme.accentColor}`}>
+                <span className=""><CornerRightUp size={15}/></span>
               </button>
             </div>
           </UserInput>
@@ -275,7 +279,7 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
       <></>
     }
     </div>
-    <div className={`flex transition-all ease-in-out text-white rounded-md w-full bg-white ${state !== "canvas" ? "opacity-0 hidden" : "opacity-100"}`}>
+    <div className={`flex transition-all ease-in-out rounded-md bg-transparent w-[65%] ${state !== "canvas" ? "opacity-0 hidden" : "opacity-100"}`}>
       <Canvas />
     </div>
     <F4rmerEditor 

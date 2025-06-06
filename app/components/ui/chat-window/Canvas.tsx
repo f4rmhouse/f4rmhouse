@@ -11,15 +11,26 @@ export default function Canvas() {
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const [artifact, setArtifact] = useState<string>("")
   const { currentArtifact, artifacts, setCurrentArtifact } = useArtifact()
+  const [artifactType, setArtifactType] = useState<"image"|"html"|"video"|null>(null)
 
   useEffect(() => {
-    if(currentArtifact){
-      setArtifact(currentArtifact)
-      if (iframeRef.current) {
-        iframeRef.current.src = currentArtifact
+    console.log("artifacts: ", artifacts)
+    if(artifacts.length > 0){
+      setArtifact(artifacts[artifacts.length-1])
+      const format = artifacts[artifacts.length-1].split(".").pop()
+      switch (format) {
+        case "html":
+          setArtifactType("html")
+          if (iframeRef.current) {
+            iframeRef.current.src = artifacts[artifacts.length-1]
+          }
+          break;
+        default:
+          setArtifactType("image")
+          break;
       }
     }
-  },[currentArtifact])
+  },[currentArtifact, artifacts])
 
   const reloadIframe = () => {
     if (iframeRef.current) {
@@ -54,12 +65,21 @@ export default function Canvas() {
           <Download size={15} className={theme.textColorPrimary} />
         </a>
       </div>
-      <iframe
-        ref={iframeRef}
-        src={artifacts[artifacts.length-1]}
-        className="h-full w-full border-none rounded-md pt-8"
-        sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-      />
+      {artifactType === "html" ? (
+        <iframe
+          ref={iframeRef}
+          src={artifacts[artifacts.length-1]}
+          className="h-full w-full border-none rounded-md pt-8"
+          sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+        />
+      ) : (
+        <div className="flex h-full w-full">
+        <img
+          src={artifact}
+          className="m-auto rounded-md"
+        />
+        </div>
+      )}
     </div>
   )
 }

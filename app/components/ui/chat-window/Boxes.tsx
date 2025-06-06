@@ -7,6 +7,7 @@ import config from "../../../../f4.config"
 import User from "@/app/microstore/User";
 import { X, Plus } from "lucide-react";
 import { useTheme } from "../../../context/ThemeContext";
+import { motion, AnimatePresence, Reorder } from "framer-motion";
 
 /**
  * Boxes component that displays multiple PromptBoxes as tabs
@@ -29,7 +30,7 @@ function Boxes({f4rmers, session}: {f4rmers:F4rmerType[],session:F4Session}) {
         id: "tab-" + Date.now(),
         state: config.defaultState,
         isActive: true,
-        title: "Chat 1"
+        title: "1"
       }]);
     }
   }, []);
@@ -43,7 +44,7 @@ function Boxes({f4rmers, session}: {f4rmers:F4rmerType[],session:F4Session}) {
         id: newTabId,
         state: config.defaultState,
         isActive: true,
-        title: `Chat ${prevTabs.length + 1}`
+        title: `${prevTabs.length + 1}`
       }
     ]);
   };
@@ -76,6 +77,49 @@ function Boxes({f4rmers, session}: {f4rmers:F4rmerType[],session:F4Session}) {
       }))
     );
   };
+  
+  // Drag and drop handlers
+  const [draggedTabId, setDraggedTabId] = useState<string | null>(null);
+  
+  const handleDragStart = (e: React.DragEvent<HTMLDivElement>, id: string) => {
+    setDraggedTabId(id);
+    // Set the drag image to be the tab itself
+    if (e.dataTransfer) {
+      e.dataTransfer.effectAllowed = 'move';
+    }
+  };
+  
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+  
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>, targetId: string) => {
+    e.preventDefault();
+    
+    if (draggedTabId && draggedTabId !== targetId) {
+      setTabs(prevTabs => {
+        // Find the indices of the dragged and target tabs
+        const draggedTabIndex = prevTabs.findIndex(tab => tab.id === draggedTabId);
+        const targetTabIndex = prevTabs.findIndex(tab => tab.id === targetId);
+        
+        if (draggedTabIndex === -1 || targetTabIndex === -1) return prevTabs;
+        
+        // Create a new array with the dragged tab moved to the target position
+        const newTabs = [...prevTabs];
+        const [draggedTab] = newTabs.splice(draggedTabIndex, 1);
+        newTabs.splice(targetTabIndex, 0, draggedTab);
+        
+        return newTabs;
+      });
+    }
+    
+    setDraggedTabId(null);
+  };
+  
+  const handleDragEnd = () => {
+    setDraggedTabId(null);
+  };
 
   // Update state for a specific tab
   const updateTabState = (id: string, newState: "canvas" | "chat" | "preview" | "edit") => {
@@ -87,35 +131,76 @@ function Boxes({f4rmers, session}: {f4rmers:F4rmerType[],session:F4Session}) {
   };
 
   return(
-    <div className="fixed flex flex-col w-full overflow-hidden">
-      {/* Tab Bar */}
-      <div className={`flex items-center bg-black`}>
-        {tabs.map(tab => (
-          <div 
-            key={tab.id} 
-            className={`flex items-center mr-2 px-3 py-1 rounded-t-md cursor-pointer ${tab.isActive 
-              ? `${theme.primaryColor || 'bg-gray-800'} ${theme.textColorPrimary || 'text-white'}` 
-              : `hover:bg-gray-700 ${theme.textColorSecondary || 'text-gray-400'}`}`}
-            onClick={() => activateTab(tab.id)}
-          >
-            <span className="mr-2 text-xs">{tab.title}</span>
-            <button 
-              onClick={(e) => {
-                e.stopPropagation();
-                closeTab(tab.id);
-              }}
-              className="hover:text-red-500"
-            >
-              <X size={14} />
-            </button>
-          </div>
-        ))}
-        <button 
-          onClick={addTab}
-          className={`p-1 rounded-md ${theme.textColorSecondary || 'text-gray-400'} hover:${theme.secondaryHoverColor || 'text-gray-300'}`}
+    <div className="absolute flex flex-row top-8 w-full h-[95%] overflow-hidden">
+      {/* Tab Bar - Now on the left side */}
+      <div className={`flex flex-col items-start m-0 ${theme.backgroundColor} ${theme.secondaryColor} h-full`}>
+        <Reorder.Group 
+          axis="y" 
+          values={tabs} 
+          onReorder={setTabs} 
+          className="w-full"
         >
-          <Plus size={18} />
-        </button>
+          <AnimatePresence>
+            {tabs.map(tab => (
+              <Reorder.Item 
+                key={tab.id} 
+                value={tab}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ 
+                  opacity: 1, 
+                  y: 0,
+                  backgroundColor: tab.isActive 
+                    ? theme.primaryColor?.replace('bg-', '') || '#1f2937' 
+                    : theme.secondaryColor?.replace('bg-', '') || 'transparent',
+                  color: tab.isActive 
+                    ? theme.textColorPrimary?.replace('text-', '') || 'white'
+                    : theme.textColorSecondary?.replace('text-', '') || '#9ca3af',
+                  borderLeft: tab.isActive ? '4px solid #3b82f6' : '4px solid transparent',
+                  fontWeight: tab.isActive ? 600 : 400
+                }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ 
+                  type: "spring", 
+                  stiffness: 400, 
+                  damping: 30 
+                }}
+                className={`flex items-center w-full px-3 py-2 cursor-move ${theme.secondaryColor} ${tab.isActive ? 'shadow-md' : ''}`}
+                onClick={() => activateTab(tab.id)}
+              >
+                <span className="mr-2 text-xs">{tab.title}</span>
+                <motion.button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    closeTab(tab.id);
+                  }}
+                  className="hover:text-red-500 ml-auto"
+                  whileHover={{ scale: 1.2, rotate: 90 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <X size={14} />
+                </motion.button>
+              </Reorder.Item>
+            ))}
+          </AnimatePresence>
+        </Reorder.Group>
+        <motion.button 
+          onClick={addTab}
+          className={`p-2 w-full flex justify-center ${theme.textColorSecondary || 'text-gray-400'}`}
+          whileHover={{ 
+            backgroundColor: theme.secondaryHoverColor?.replace('bg-', '') || '#374151',
+            scale: 1.05 
+          }}
+          whileTap={{ scale: 0.95 }}
+          transition={{ duration: 0.2 }}
+        >
+          <motion.div
+            animate={{ rotate: 0 }}
+            whileHover={{ rotate: 90 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Plus size={18} />
+          </motion.div>
+        </motion.button>
       </div>
       
       {/* Tab Content */}

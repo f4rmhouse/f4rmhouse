@@ -18,9 +18,8 @@ export default function RemoteToolResponse({message, debug}:{message:string | un
     return text.match(urlRegex) || [];
   }
   
-  // Check if debug.content contains a URL, extract it, and set it as the current artifact
+  // Check if debug.kwargs.content contains a URL, extract it, and set it as the current artifact
   useEffect(() => {
-    console.log("DEBUG: ", debug.kwargs.content)
     if (debug?.kwargs.content && typeof debug.kwargs.content === 'string') {
       const urls = extractUrls(debug.kwargs.content);
       
@@ -29,15 +28,14 @@ export default function RemoteToolResponse({message, debug}:{message:string | un
         const url = urls[0];
         
         // Set the URL as the current artifact
-        console.log("DEBUG: ", url)
-        setCurrentArtifact(url);
+        addArtifact(url)
         
         // Dispatch a custom event to open the canvas
         const event = new CustomEvent('openCanvas', { detail: { url } });
         document.dispatchEvent(event);
       }
     }
-  }, [debug?.content])
+  }, [debug?.kwargs.content, addArtifact])
   return (
     <div className="">
       <div className="flex">

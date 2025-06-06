@@ -62,9 +62,9 @@ function createMCPTool({ uti, endpoint, title, endpoint_description, tool_descri
             });
             const baseUrl = process.env.NEXT_PUBLIC_APP_ENV === 'production' ? 'http://localhost:8000' : 'http://localhost:8000';
 
-            const url = new URL(`${baseUrl}/products/sse?uti=${uti}`)
-            //const url2 = new URL("http://127.0.0.1:8080/sse")
-            const transport = new SSEClientTransport(url);
+            // const url = new URL(`${baseUrl}/products/sse?uti=${uti}`)
+            const url2 = new URL("http://127.0.0.1:8080/sse")
+            const transport = new SSEClientTransport(url2);
             await client.connect(transport);
 
             try {

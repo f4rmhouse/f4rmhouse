@@ -56,7 +56,7 @@ export default function ModelSelector({ onModelSelect, selectedModel }: { onMode
   };
   
   if(loading) {
-    return(<div className="animate-pulse group cursor-pointer flex bg-neutral-700 rounded-md hover:bg-neutral-600 transition-all">
+    return(<div className="group cursor-pointer flex rounded-md hover:bg-neutral-600 transition-all">
       <label htmlFor="model-selector" className="text-xs m-auto">
         <Brain className='m-auto ml-2' size={15}/>
       </label>
@@ -83,19 +83,16 @@ export default function ModelSelector({ onModelSelect, selectedModel }: { onMode
   }
   
   return (
-    <div className={`group cursor-pointer flex ${theme.primaryColor} hover:${theme.primaryHoverColor} transition-all`}>
-      <label htmlFor="model-selector" className="text-xs m-auto">
-        <Brain className={`m-auto ml-2 ${theme.accentColor ? theme.accentColor.replace("bg", "text") : "text-blue-500"}`} size={15}/>
-      </label>
+    <div className={`m-1 rounded group cursor-pointer flex ${theme.primaryColor} hover:${theme.primaryHoverColor} transition-all`}>
       <select
         id="model-selector"
-        className={`transition-all rounded-r-md cursor-pointer ${theme.textColorSecondary} block w-full text-xs border-none bg-transparent`}
+        className={`transition-all rounded-md cursor-pointer ${theme.textColorSecondary} block text-xs border-none bg-transparent`}
         value={selectedModel?.id || availableModels[0].id}
         onChange={handleModelChange}
       >
         {availableModels.map((model) => (
           <option key={model.id} value={model.id}>
-            {model.id} ({model.provider})
+            {model.name}
           </option>
         ))}
       </select>
