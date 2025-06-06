@@ -74,10 +74,12 @@ export default function Canvas() {
         />
       ) : (
         <div className="flex h-full w-full">
-        <img
-          src={artifact}
-          className="m-auto rounded-md"
-        />
+          {artifact.length > 0 &&
+            <img
+              src={artifact}
+              className="m-auto rounded-md"
+            />
+          }
         </div>
       )}
     </div>
