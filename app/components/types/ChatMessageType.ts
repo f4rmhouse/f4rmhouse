@@ -3,7 +3,7 @@ type ChatMessageType = {
     id: string,
     content: string,
     tool_calls: any[],
-    role: "system"|"user"|"tool_response"|"tool_init"|"error",
+    role: "system"|"user"|"tool_response"|"tool_init"|"error"|"auth",
     timestamp: number 
 }
 

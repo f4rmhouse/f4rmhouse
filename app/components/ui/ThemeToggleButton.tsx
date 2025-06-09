@@ -127,7 +127,7 @@ const themePresets: Record<string, Theme> = {
   },
   vscode: {
     "primaryColor": "bg-[#1f1f1f] shadow-sm",
-    "secondaryColor": "bg-[#1f1f1f]",
+    "secondaryColor": "bg-neutral-800",
     "accentColor": "bg-[#282828]",
     "hoverColor": "bg-blue-600",
     "backgroundColor": "bg-[#181818]",
@@ -179,19 +179,19 @@ const themePresets: Record<string, Theme> = {
     "textColorSecondary": "text-neutral-800",
     "chatWindowStyle": "bg-white bg-opacity-10 backdrop-blur-xl"
   },
-  notion: {
+  Motion: {
     "primaryColor": "bg-[#f8f8f7]",
     "secondaryColor": "bg-[#f8f8f7]",
-    "accentColor": "bg-[#32302c]",
-    "hoverColor": "bg-[#32302c]",
+    "accentColor": "bg-black text-white",
+    "hoverColor": "bg-neutral-500",
     "backgroundColor": "bg-[#f8f8f7]",
     "backgroundImage": "",
-    "primaryHoverColor": "bg-[#32302c]",
-    "secondaryHoverColor": "bg-[#32302c]",
+    "primaryHoverColor": "bg-neutral-700",
+    "secondaryHoverColor": "bg-neutral-300",
     "textColorPrimary": "text-gray-800",
     "textColorSecondary": "text-gray-500",
-    "chatWindowStyle": "bg-white border",
-    "aiMessageStyle": "bg-gray-50 rounded-md p-2"
+    "chatWindowStyle": "bg-[#f8f8f7] border",
+    "aiMessageStyle": "bg-[#f8f8f7] rounded-md p-2"
   },
 };
 

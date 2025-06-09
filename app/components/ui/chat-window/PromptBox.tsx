@@ -28,6 +28,7 @@ import { PostDataType } from "./utils/types";
 import StreamProcessor from "./utils/StreamProcessor";
 import F4rmerType from "../../types/F4rmerType";
 import User from "@/app/microstore/User";
+import ChatAuthMessage from "../chat-messages/ChatAuthMessage";
 
 /**
  * PromptBox is the text input box at the bottom of the screen on /f4rmers/details page
@@ -189,6 +190,8 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
       model: selectedModel
     }
 
+    chatSession.push("auth", "system", "test", "test")
+
     // Send message
     const stream = await chatSession.send(postData)
     if(!stream) {
@@ -228,6 +231,8 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
                     return (<ChatToolMessage key={i} message={m.content} debug={chatSession.getDebug(m.id) ?? {message: "no extra information"}}/>)
                   case "error":
                     return (<ChatErrorMessage key={i} content={m.content}/>)
+                  case "auth":
+                    return (<ChatAuthMessage key={i} uti="uti" timestamp={m.timestamp}/>)
                 }
               })
           ) : (

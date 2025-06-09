@@ -15,7 +15,7 @@ export default class ChatSession {
         this.streaming = false
     } 
   
-    push = (f4role: "user" | "system" | "tool_response" | "tool_init" | "error", nextjsrole: "user" | "assistant" | "system" | "tool", message:string, debug?: Object) => {
+    push = (f4role: "user" | "system" | "tool_response" | "tool_init" | "error" | "auth", nextjsrole: "user" | "assistant" | "system" | "tool", message:string, debug?: Object) => {
       let id = this.messagesTypes.length.toString()
       this.messagesTypes.push({
         id: id, 
