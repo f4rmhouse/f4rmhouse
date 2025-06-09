@@ -31,8 +31,16 @@ export default class StreamProcessor {
       const vals = (chunk.replaceAll("][", "]<split>[").split("<split>"))
       vals.map((v, _) => {
         if(JSON.parse(v)[0].id[2] == "ToolMessage") {
-          chatSession.push("tool_response", "system", JSON.stringify(JSON.parse(v)[0].kwargs.content), JSON.parse(v)[0]);
-          chatSession.push("system", "system", "")
+          // Check if tool is asking for auth
+          if(JSON.parse(JSON.parse(v)[0].kwargs.content).code == 401) {
+            chatSession.push("auth", "system", "_unused", undefined, "pending")
+            chatSession.push("system", "system", "")
+          }
+          // Otherwise output tool response
+          else {
+            chatSession.push("tool_response", "system", JSON.stringify(JSON.parse(v)[0].kwargs.content), JSON.parse(v)[0]);
+            chatSession.push("system", "system", "")
+          }
         }
         else if (!chatSession.streaming) {
           chatSession.push("system", "system", "")

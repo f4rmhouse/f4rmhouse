@@ -15,7 +15,7 @@ export default class ChatSession {
         this.streaming = false
     } 
   
-    push = (f4role: "user" | "system" | "tool_response" | "tool_init" | "error" | "auth", nextjsrole: "user" | "assistant" | "system" | "tool", message:string, debug?: Object) => {
+    push = (f4role: "user" | "system" | "tool_response" | "tool_init" | "error" | "auth", nextjsrole: "user" | "assistant" | "system" | "tool", message:string, debug?: Object, status?: "pending" | "completed" | "cancelled") => {
       let id = this.messagesTypes.length.toString()
       this.messagesTypes.push({
         id: id, 
@@ -35,6 +35,10 @@ export default class ChatSession {
 
       if(debug) {
         this.langchainDebugMessages.set(String(id), debug)
+      }
+
+      if(status) {
+        this.messagesTypes[this.messagesTypes.length - 1].status = status
       }
   
       return this
@@ -107,5 +111,18 @@ export default class ChatSession {
     pushToken = (token: string) => {
       this.messages[this.messages.length - 1].content += token
       this.messagesTypes[this.messagesTypes.length - 1].content += token
+    }
+
+    updateStatus = (key: string, status: "pending" | "completed" | "cancelled") => {
+      console.log("Status: ", status)
+      // Create a new array with the updated message to ensure React detects the change
+      this.messagesTypes = this.messagesTypes.map((msg) => {
+        if (msg.id === key) {
+          return { ...msg, status: status };
+        }
+        return msg;
+      });
+      console.log("Updated status: ", this.messagesTypes.find((m) => m.id === key)?.status)
+      return this
     }
   }

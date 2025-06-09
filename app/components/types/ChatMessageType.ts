@@ -5,6 +5,7 @@ type ChatMessageType = {
     tool_calls: any[],
     role: "system"|"user"|"tool_response"|"tool_init"|"error"|"auth",
     timestamp: number 
+    status?: "pending" | "completed" | "cancelled"
 }
 
 export default ChatMessageType 

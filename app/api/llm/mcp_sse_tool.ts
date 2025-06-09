@@ -15,7 +15,6 @@ function createMCPTool({ uti, endpoint, title, endpoint_description, tool_descri
                 let name = p.parameter.name
                 let type = p.parameter.type
                 let desc = p.parameter.description
-                console.log(name, type, desc)
                 switch (type) {
                     case "str":
                     case "string":
@@ -60,7 +59,15 @@ function createMCPTool({ uti, endpoint, title, endpoint_description, tool_descri
                 name: "f4rmhouse-client",
                 version: "1.0.0"
             });
+            console.log("Client created")
             const baseUrl = process.env.NEXT_PUBLIC_APP_ENV === 'production' ? 'http://localhost:8000' : 'http://localhost:8000';
+            // Check if auth needed
+            // TODO: Add auth check
+            let askUserForAuth = true 
+            if(askUserForAuth) {
+                console.log("Auth is needed")
+                return {message: "Authentication needed. Inform user to authenticate using the trusted OAuth provider given in the previous dialog message to continue or to cancel the request.", code: 401}
+            }
 
             // const url = new URL(`${baseUrl}/products/sse?uti=${uti}`)
             const url2 = new URL("http://127.0.0.1:8080/sse")

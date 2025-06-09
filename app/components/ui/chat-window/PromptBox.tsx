@@ -67,7 +67,7 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
     chatSession.streaming = false
     setChatSession(chatSession)
   }, [loading])
-  
+
   // Add keyboard shortcut handlers
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -190,7 +190,7 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
       model: selectedModel
     }
 
-    chatSession.push("auth", "system", "test", "test")
+    // chatSession.push("auth", "system", "test", "test")
 
     // Send message
     const stream = await chatSession.send(postData)
@@ -216,7 +216,7 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
             :
             <></>
           }
-          {chatSession.messages.length > 0 ? (
+          {chatSession.messagesTypes.length > 0 ? (
             [...chatSession.messagesTypes]
               .reverse()
               .map((m, i) => {
@@ -232,7 +232,31 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
                   case "error":
                     return (<ChatErrorMessage key={i} content={m.content}/>)
                   case "auth":
-                    return (<ChatAuthMessage key={i} uti="uti" timestamp={m.timestamp}/>)
+                    return (<ChatAuthMessage 
+                      onCancel={(_) => {
+                        // Update the status and create a new reference
+                        const updatedSession = chatSession.updateStatus(m.id, "cancelled");
+                        // Force a re-render by updating latestMessage
+                        setLatestMessage(Date.now().toString());
+                        // Update the current session display
+                        setChatSession(updatedSession)
+                        setCurrentSession(updatedSession.getMessages())
+                      }} 
+                      onAuthenticate={(_) => {
+                        // Update the status and create a new reference
+                        const updatedSession = chatSession.updateStatus(m.id, "completed");
+                        // Force a re-render by updating latestMessage
+                        setLatestMessage(Date.now().toString());
+                        // Update the current session display
+                        setChatSession(updatedSession)
+                        setCurrentSession(updatedSession.getMessages())
+                      }} 
+                      key={i} 
+                      uti="uti" 
+                      timestamp={m.timestamp} 
+                      deactivated={m.status === "cancelled" || m.status === "completed"} 
+                      state={m.status ?? "pending"}
+                    />)
                 }
               })
           ) : (

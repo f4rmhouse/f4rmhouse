@@ -115,20 +115,8 @@ export async function POST(req: NextRequest) {
       toolbox = f4rmerData?.[0]?.tool_box ?? [];
     }
 
-    // toolbox = []
-
     // Process endpoints
     let endpoints: Endpoint[] = [];
-    // for (const tool of toolbox ?? []) {
-    //   const summary = await session.getSummary(tool.uti);
-    //   if (summary?.ips) {
-    //     //endpoints.push({
-    //     //  endpoints: Array.from(summary.endpoints),
-    //     //  descriptions: Array.from(summary.descriptions),
-    //     //  parameters: Array.from(summary.parameters)
-    //     //});
-    //   }
-    // }
 
     if(toolbox?.length) {
       toolbox?.map((tool: any) => {
@@ -146,29 +134,6 @@ export async function POST(req: NextRequest) {
       throw new LLMServiceError('[ERROR_NO_MODEL] You need to select a model to get a response', 400);
     }
     const model = ModelFactory.create(selectedModel);
-
-    // endpoints.push({
-    //   endpoints: ["create_new_dashboard"],
-    //   descriptions: [`
-    //     Create a new empty dashboard with specified dimensions.
-    
-    // This function initializes a new dashboard with the given number of rows and columns.
-    // Optionally, a custom layout can be provided to specify how cells should be arranged and sized.
-    
-    // Args:
-    //     num_rows (int): Number of rows in the dashboard grid
-    //     num_cols (int): Number of columns in the dashboard grid
-    //     layout (Optional[list]): Optional custom layout specification as a list of tuples
-    //                              in the format [(row, col, colspan, rowspan), ...]
-    //                              where each tuple defines a cell's position and dimensions
-    //     
-    // Returns:
-    //     str: The dashboard UUID for chaining operations
-    //     `],
-    //   parameters: ["num_rows::int::Number of rows in the dashboard grid", "num_cols::int::Number of columns in the dashboard grid", "layout::array::Optional custom layout specification as a list of tuples in the format [(row, col, colspan, rowspan), ...] where each tuple defines a cell's position and dimensions"]
-    // });
-
-    console.log("endpoints: ", endpoints)
 
     const tools = await ToolManager.createMCPTools(toolbox ?? [], endpoints, email);
     const toolNode = new ToolNode(tools);
