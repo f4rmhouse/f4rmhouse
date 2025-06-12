@@ -33,7 +33,7 @@ export default class StreamProcessor {
         if(JSON.parse(v)[0].id[2] == "ToolMessage") {
           // Check if tool is asking for auth
           if(JSON.parse(JSON.parse(v)[0].kwargs.content).code == 401) {
-            chatSession.push("auth", "system", "_unused", undefined, "pending")
+            chatSession.push("auth", "system", JSON.parse(JSON.parse(v)[0].kwargs.content).tool_identifier, undefined, "pending")
             chatSession.push("system", "system", "")
           }
           // Otherwise output tool response

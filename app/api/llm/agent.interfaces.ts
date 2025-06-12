@@ -6,7 +6,12 @@ export interface F4ToolParams {
     title: string;
     endpoint_description: string;
     tool_description: string;
-    parameters?: string[]
+    parameters?: string[];
+    authorization?: {
+        type: string;
+        redirect_url: string;
+        scope: string;
+    }
 }
 
 export interface F4ToolExecuteParams {

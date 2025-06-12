@@ -17,23 +17,22 @@ import config from "../../../f4.config";
 
 export default function SmallAppCard({app}: {app: AppCardType}) {
   return (
-    <div className={`rounded-lg p-4 hover:bg-neutral-800 transition-all cursor-pointer`}>
+    <div className={`rounded-lg p-1 hover:bg-neutral-800 transition-all cursor-pointer`}>
       <Link href={`/detail/${app.uti}`} className={`cursor-pointer`}>
         <div className="flex">
-          <img alt="action-thumbnail" className="h-10 rounded-full aspect-square object-cover" height={10} src={"https://f4-public.s3.eu-central-1.amazonaws.com/showcases/" + app.uti + "/thumbnail.jpg"}/>
-          <div className="mt-auto mb-auto ml-2">
+          <img alt="action-thumbnail" className="h-10 my-auto rounded-full aspect-square object-cover" height={10} src={"https://f4-public.s3.eu-central-1.amazonaws.com/showcases/" + app.uti + "/thumbnail.jpg"}/>
+          <div className="mt-auto mb-auto ml-4">
           <p className="text-[9px] mt-auto mb-auto text-neutral-400 rounded-full">{app.deploymentType?.replace("_", " ").toUpperCase()}</p>
             <div className="flex">
-              <p className="">{app.title}</p>
-              <p className={`text-xs mt-auto mb-auto ml-auto flex ${app.deployed ? "text-blue-500" : "text-gray-500"}`}> <Globe size={12}/></p>
+              <p className="text-sm pb-1">{app.title}</p>
             </div>
-            <p className="text-xs text-neutral-300">{app.description}</p>
+            <p className="text-xs text-neutral-400">{app.description}</p>
             <div className="flex gap-2">
             </div>
           </div>
           <div className="text-xs text-center p-1 ml-auto mt-auto mb-auto">
-            {app.price == "0.0" ?
-              <button>Free</button>
+            {app.price == "0.0" || app.price == "0"?
+              <button className="rounded-full p-1 pl-3 pr-3 ml-auto text-xs mb-auto mt-auto">Free</button>
               :
               `\$${app.price}/req`
             }

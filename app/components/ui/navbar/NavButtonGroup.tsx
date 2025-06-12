@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { auth, } from "../../../auth"
 import ProfileDropdown from "../button/ProfileDropdown"
-import { House, LogIn, MessageSquareText, Plus, Store } from "lucide-react"
+import { House, LogIn, MessageSquareText, Plus, SmilePlus, Store } from "lucide-react"
 import LogoutButton from "../button/LogoutButton"
 import IconButton from "../button/IconButton"
 
@@ -18,7 +18,7 @@ export default async function NavButtonGroup() {
     <div className="w-full md:block md:w-auto flex m-auto">
       {session ? 
         <div className="flex">
-          <IconButton name="Add f4rmer" href="/dashboard/f4rmers/create"><Plus className="m-auto hover:rotate-90 transition-all" size={15}/></IconButton>
+          <IconButton name="Create f4rmer" href="/dashboard/f4rmers/create"><SmilePlus className="m-auto hover:rotate-[45deg] transition-all" size={15}/></IconButton>
           <IconButton name="Store" href="/store"><Store className="m-auto" size={15}/></IconButton>
           <IconButton name="Home" href="/"><MessageSquareText className="m-auto" size={15}/></IconButton>
           <LogoutButton session={session}/>

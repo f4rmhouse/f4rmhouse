@@ -29,6 +29,7 @@ import StreamProcessor from "./utils/StreamProcessor";
 import F4rmerType from "../../types/F4rmerType";
 import User from "@/app/microstore/User";
 import ChatAuthMessage from "../chat-messages/ChatAuthMessage";
+import MCPAuthHandler from "../../../MCPAuthHandler";
 
 /**
  * PromptBox is the text input box at the bottom of the screen on /f4rmers/details page
@@ -244,7 +245,15 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
                       }} 
                       onAuthenticate={(_) => {
                         // Update the status and create a new reference
-                        const updatedSession = chatSession.updateStatus(m.id, "completed");
+                        let uti = m.content.split("_")[0]
+                        let endpoint = m.content.split("_").splice(1).join("_")
+                        let product = selectedAgent?.toolbox.filter(e => e.uti == uti)[0]
+                        let provider = MCPAuthHandler.oauth2(product?.endpoints.filter(e => e.name == endpoint)[0].authorization.provider)
+
+                        let url = provider.authorization_server + "?client_id=" + provider.client_id + "&redirect_uri=" + provider.redirect_uri + "&response_type=code&scope=read,write&state=" + "linear"
+                        window.open(url, '_blank')
+
+                        const updatedSession = chatSession.updateStatus(m.id, "pending");
                         // Force a re-render by updating latestMessage
                         setLatestMessage(Date.now().toString());
                         // Update the current session display
@@ -252,8 +261,8 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
                         setCurrentSession(updatedSession.getMessages())
                       }} 
                       key={i} 
-                      uti="uti" 
-                      timestamp={m.timestamp} 
+                      uti={m.content} 
+                      uri={m.content} 
                       deactivated={m.status === "cancelled" || m.status === "completed"} 
                       state={m.status ?? "pending"}
                     />)

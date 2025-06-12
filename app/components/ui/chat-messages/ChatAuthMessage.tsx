@@ -4,14 +4,14 @@ import { useEffect, useState } from "react";
 
 interface F4AuthMessageProps {
   uti: string;
-  timestamp: number;
   deactivated: boolean;
   state: string;
+  uri: string;
   onAuthenticate?: (uti: string) => void;
   onCancel?: (uti: string) => void;
 }
 
-export default function F4AuthMessage({uti, timestamp, deactivated, state, onAuthenticate, onCancel}: F4AuthMessageProps) {
+export default function F4AuthMessage({uti, deactivated, state, uri, onAuthenticate, onCancel}: F4AuthMessageProps) {
   const { theme } = useTheme();
   const [isHovering, setIsHovering] = useState(false);
   const [currentDeactivated, setCurrentDeactivated] = useState(deactivated)
@@ -31,7 +31,7 @@ export default function F4AuthMessage({uti, timestamp, deactivated, state, onAut
         :
         <>
         <p className="flex items-center gap-2"><Shield size={15} /> {uti} asks you to authenticate:</p>
-        <p className={`text-xs mt-1 mb-2 ${theme.textColorSecondary}`}>When you authenticate you will be redirected to a page that let's you choose the permissions that you want to grant the tool.</p>
+        <p className={`text-xs mt-1 mb-2 ${theme.textColorSecondary}`}>When you authenticate you will be redirected to a page that let's confirm the permissions needed by the tool.</p>
         <div className="flex gap-2">
           <button 
             onClick={() => {
@@ -53,8 +53,8 @@ export default function F4AuthMessage({uti, timestamp, deactivated, state, onAut
             onMouseLeave={() => setIsHovering(false)}
             className={`${theme.accentColor} hover:${theme.primaryHoverColor} rounded w-1/2 p-2 flex m-auto transition-all`}
             onClick={() => {
-              setCurrentDeactivated(true);
-              setCurrentStatus("completed");
+              // setCurrentDeactivated(true);
+              setCurrentStatus("pending");
               if (onAuthenticate) {
                 onAuthenticate(uti);
               }

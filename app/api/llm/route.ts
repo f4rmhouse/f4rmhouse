@@ -66,12 +66,13 @@ class ToolManager {
 
     return endpoints.map((endpoint, i) => {
       return createMCPTool({
-        uti: "dashboarder",
+        uti: endpoint.name.split("_")[0],
         endpoint: endpoint.name,
         title: `${endpoint.name}_${Math.random().toString(36).substring(2, 8)}`,
         endpoint_description: endpoint.description,
         tool_description: "This tool lets you create a dashboard from a JSON config object.",
-        parameters: endpoint.parameters
+        parameters: endpoint.parameters,
+        authorization: endpoint.authorization
       });
     });
 
@@ -121,7 +122,10 @@ export async function POST(req: NextRequest) {
     if(toolbox?.length) {
       toolbox?.map((tool: any) => {
         if(tool.endpoints) {
-          endpoints.push(...tool.endpoints)
+          tool.endpoints.map((endpoint: any) => {
+            endpoint.name = tool.uti + "_" + endpoint.name;
+          });
+          endpoints.push(...tool.endpoints);
         }
       })
     }
@@ -134,6 +138,7 @@ export async function POST(req: NextRequest) {
       throw new LLMServiceError('[ERROR_NO_MODEL] You need to select a model to get a response', 400);
     }
     const model = ModelFactory.create(selectedModel);
+
 
     const tools = await ToolManager.createMCPTools(toolbox ?? [], endpoints, email);
     const toolNode = new ToolNode(tools);

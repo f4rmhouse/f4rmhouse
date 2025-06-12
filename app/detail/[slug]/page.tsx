@@ -260,7 +260,7 @@ export default function DetailPage({ params }: { params: Params }) {
                         className="flex items-center justify-between text-base font-medium text-white mb-2 pb-1 border-b border-neutral-700 cursor-pointer"
                         onClick={() => setCollapsedTables(prev => ({ ...prev, [j]: !prev[j] }))}
                       >
-                        <p>{e.name}</p>
+                        <p className="flex">{e.name} <span className="my-auto ml-2 text-xs text-neutral-400 flex"> <Shield size={14} />{e.authorization.type}</span></p>
                         <button className="text-neutral-400 hover:text-white transition-colors">
                           {isCollapsed ? <ChevronDown size={18} /> : <ChevronUp size={18} />}
                         </button>
