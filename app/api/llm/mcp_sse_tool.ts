@@ -5,7 +5,7 @@ import { DynamicStructuredTool } from "@langchain/core/tools";
 import { OAuthClientProvider } from "@modelcontextprotocol/sdk/client/auth.js";
 import { z } from "zod";
 
-function createMCPTool({ uti, endpoint, title, endpoint_description, tool_description, parameters = [], authorization }: F4ToolParams) {
+function createMCPTool({ uti, endpoint, title, endpoint_description, tool_description, parameters = [], authorization, caller }: F4ToolParams) {
     //if (!parameters || !parameters.length) {
     //    throw new Error('No parameters defined for this tool');
     //}
@@ -64,12 +64,19 @@ function createMCPTool({ uti, endpoint, title, endpoint_description, tool_descri
             // Check if auth needed
             // TODO: Add auth check
             let askUserForAuth = true 
-            console.log("Authorization: ", uti)
-            // if(askUserForAuth && authorization) {
-            //     return {message: "Authentication needed. Inform user to authenticate using the trusted OAuth provider given in the previous dialog message to continue or to cancel the request.", tool_identifier: endpoint, code: 401}
-            // }
+            let accessToken = ""
+            if(askUserForAuth && authorization) {
+                let token = await caller.getToken(uti)
+                console.log(token)
+                if(token.Code == 404) {
+                    return {message: "Authentication needed. Inform user to authenticate using the trusted OAuth provider given in the previous dialog message to continue or to cancel the request.", tool_identifier: endpoint, code: 401}
+                }
+                else {
+                    accessToken = token.Token
+                }
+            }
 
-            const authToken = "Bearer thisIsAnAccessToken"
+            const authToken = "Bearer " + accessToken
 
             const fetchWithAuth = (url: string | URL, init?: RequestInit) => {
               const headers = new Headers(init?.headers);
@@ -78,8 +85,7 @@ function createMCPTool({ uti, endpoint, title, endpoint_description, tool_descri
             };
 
             const customHeaders = {
-                Authorization: "Bearer this is an access token",
-                "X-Custom-Header": "custom-value",
+                Authorization: authToken,
             };
 
             // const url = new URL(`${baseUrl}/products/sse?uti=${uti}`)

@@ -31,7 +31,7 @@ export default function F4AuthMessage({uti, deactivated, state, uri, onAuthentic
         :
         <>
         <p className="flex items-center gap-2"><Shield size={15} /> {uti} asks you to authenticate:</p>
-        <p className={`text-xs mt-1 mb-2 ${theme.textColorSecondary}`}>When you authenticate you will be redirected to a page that let's confirm the permissions needed by the tool.</p>
+        <p className={`text-xs mt-1 mb-2 ${theme.textColorSecondary}`}>When you authenticate you will be redirected to a page that let's you confirm the permissions needed by the tool. Note: MAKE SURE TO ONLY AUTHENTICATE WITH SERVERS THAT YOU TRUST!</p>
         <div className="flex gap-2">
           <button 
             onClick={() => {

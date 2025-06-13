@@ -1,3 +1,4 @@
+import User from "@/app/microstore/User";
 import { BaseMessage } from "@langchain/core/messages";
 
 export interface F4ToolParams {
@@ -12,6 +13,7 @@ export interface F4ToolParams {
         redirect_url: string;
         scope: string;
     }
+    caller: User
 }
 
 export interface F4ToolExecuteParams {
@@ -31,6 +33,8 @@ export interface RequestBody {
   email: string;
   toolbox?: any[];
   f4rmer?: string;
+  provider: string;
+  access_token: string;
 }
   
 export interface Endpoint {

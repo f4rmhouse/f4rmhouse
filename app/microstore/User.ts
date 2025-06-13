@@ -2,6 +2,7 @@ import axios, { AxiosError, AxiosResponse } from 'axios';
 import ReviewType from '../components/types/ReviewType';
 import UsageType from '../components/types/UsageType';
 import F4rmerType from '../components/types/F4rmerType';
+import TokenType from '../components/types/TokenType';
 
 /**
  * User is an abstraction of a general consumer of f4rmhouse products. A user can
@@ -364,6 +365,51 @@ class User {
     try {
       const response: AxiosResponse = await axios.delete(
         `${this.baseUrl}/user/review/interactions/delete?username=${username}`,
+        {
+          headers: { Authorization: `${this.token}`, "X-Username": this.username, "X-Provider": this.provider}
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching services:', error);
+      throw error;
+    }
+  }
+
+  async getToken(server: string): Promise<any> {
+    try {
+      const response: AxiosResponse = await axios.get(
+        `${this.baseUrl}/user/get/token?server=${server}`,
+        {
+          headers: { Authorization: `${this.token}`, "X-Username": this.username, "X-Provider": this.provider}
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching services:', error);
+      throw error;
+    }
+  }
+
+  async createToken(token: TokenType): Promise<any> {
+    try {
+      const response: AxiosResponse = await axios.post(
+        `${this.baseUrl}/user/create/token`,
+        token,
+        {
+          headers: { Authorization: `${this.token}`, "X-Username": this.username, "X-Provider": this.provider}
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching services:', error);
+      throw error;
+    }
+  }
+  async deleteToken(server: string): Promise<any> {
+    try {
+      const response: AxiosResponse = await axios.delete(
+        `${this.baseUrl}/user/delete/token?server=${server}`,
         {
           headers: { Authorization: `${this.token}`, "X-Username": this.username, "X-Provider": this.provider}
         }

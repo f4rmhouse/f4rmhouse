@@ -17,6 +17,7 @@ import { F4SessionStorage } from "@/app/microstore/Session";
 import { ModelConfig, Endpoint, RequestBody } from "./agent.interfaces";
 import { LLMServiceError } from "./agent.errors";
 import { ChatOllama } from "@langchain/ollama";
+import User from "@/app/microstore/User";
 
 class ModelFactory {
   static create(config: ModelConfig): BaseChatModel {
@@ -48,7 +49,7 @@ class ModelFactory {
 }
 
 class ToolManager {
-  static async createTools(toolbox: any[] | undefined, endpoints: Endpoint[], email: string) {
+  static async createTools(toolbox: any[] | undefined, endpoints: Endpoint[], caller: User) {
     if (!toolbox || !endpoints.length) return [];
     return endpoints.map((endpoint, i) => {
       let a_add = createF4Tool({
@@ -56,12 +57,13 @@ class ToolManager {
         endpoint: endpoints[i].endpoints[0],
         title: toolbox[i].uti,
         endpoint_description: endpoints[i].descriptions[0],
-        tool_description: toolbox[i].description
+        tool_description: toolbox[i].description,
+        caller: caller
       });
       return a_add;
     });
   }
-  static async createMCPTools(toolbox: any[] | undefined, endpoints: any[], email: string) {
+  static async createMCPTools(toolbox: any[] | undefined, endpoints: any[], caller: User) {
     if (!toolbox || !endpoints || !endpoints.length) return [];
 
     return endpoints.map((endpoint, i) => {
@@ -72,7 +74,8 @@ class ToolManager {
         endpoint_description: endpoint.description,
         tool_description: "This tool lets you create a dashboard from a JSON config object.",
         parameters: endpoint.parameters,
-        authorization: endpoint.authorization
+        authorization: endpoint.authorization,
+        caller: caller
       });
     });
 
@@ -105,9 +108,10 @@ AI:`;
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json() as RequestBody;
-    const { description, messages = [], model: selectedModel, email, toolbox: initialToolbox, f4rmer } = body;
+    const { description, messages = [], model: selectedModel, email, toolbox: initialToolbox, f4rmer, provider, access_token } = body;
     const prompt = PromptTemplate.fromTemplate(TEMPLATE);
     const session = new F4SessionStorage();
+    const caller = new User(email, provider, access_token);
     
     // Handle toolbox initialization
     let toolbox = initialToolbox;
@@ -140,7 +144,7 @@ export async function POST(req: NextRequest) {
     const model = ModelFactory.create(selectedModel);
 
 
-    const tools = await ToolManager.createMCPTools(toolbox ?? [], endpoints, email);
+    const tools = await ToolManager.createMCPTools(toolbox ?? [], endpoints, caller);
     const toolNode = new ToolNode(tools);
 
     if (!model.bindTools) {

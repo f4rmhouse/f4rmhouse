@@ -180,13 +180,15 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
       return
     }
 
+    console.log("mcp auth: ", session)
+
     let postData: PostDataType = {
       messages: chatSession.getNextJSMessages(), 
       description: selectedAgent.jobDescription,
       show_intermediate_steps: false,
       email: session.user.email,
       provider: session.provider,
-      token: session.access_token,
+      access_token: session.access_token,
       f4rmer: selectedAgent.title,
       model: selectedModel
     }
@@ -201,6 +203,12 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
     }
 
     await processStream(chatSession.getMessages().length, stream, MSStart) 
+  }
+
+  const getToken = async (uti:string) => {
+    let user = new User(session.user.email, session.provider, session.access_token)
+    let res = await user.getToken(uti)
+    return res
   }
 
   return (
