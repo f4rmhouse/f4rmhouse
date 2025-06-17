@@ -50,6 +50,7 @@ export default function ServerSummary({summary}: {summary: ServerSummaryType | u
         <span className="font-medium">Resource templates:</span> {summary.resourceTemplates?.length || 0}
       </div>
       <p>Version: {summary.version}</p>
+      <p>URI: {summary.uri}</p>
     </div>
   );
 }

@@ -161,7 +161,8 @@ class F4MCPClient {
       prompts: prompts,
       resources: resources,
       resourceTemplates: resourceTemplates,
-      serverCapabilities: serverCapabilities
+      serverCapabilities: serverCapabilities,
+      uri: this.metadata.get(uti)?.server.uri
     } as ServerSummaryType
   }
 
@@ -242,7 +243,9 @@ class F4MCPClient {
         await client.connect(transport);
       }
       else {
-        const url = new URL(serverURL)
+        // Encode the serverURL to safely use it as a URL parameter
+        const encodedServerURL = encodeURIComponent(serverURL);
+        const url = new URL(`http://localhost:3000/api/mcp/sse?server_uri=${encodedServerURL}`);
         const transport = new SSEClientTransport(url);
         await client.connect(transport);
         this.connections.set(uti, client);

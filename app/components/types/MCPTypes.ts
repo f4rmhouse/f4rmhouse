@@ -32,4 +32,5 @@ export type ServerSummaryType = {
   resources: Object[],
   resourceTemplates: Object[],
   serverCapabilities: Object[]
+  uri: string
 }

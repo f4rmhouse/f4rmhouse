@@ -249,9 +249,9 @@ export default function DetailPage({ params }: { params: Params }) {
               Tools 
             </h2>
             
-            {product.endpoints.length > 0 ? 
+            {0 > 0 ? 
               <div className="space-y-4">
-                {product.endpoints.map((e:any, j:number) => {
+                {[1,2].map((e:any, j:number) => {
                   // Default to collapsed unless explicitly set to false
                   const isCollapsed = collapsedTables[j] !== false;
                   return (

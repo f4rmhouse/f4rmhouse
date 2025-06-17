@@ -1,5 +1,12 @@
-export async function GET() {
-    const targetUrl = 'http://localhost:8080/sse'; // Your downstream SSE server
+export async function GET(request: Request) {
+    // Get the URL from the request
+    const { searchParams } = new URL(request.url);
+    
+    // Get the server_uri parameter and decode it
+    const serverUri = searchParams.get('server_uri');
+    const targetUrl = serverUri ? decodeURIComponent(serverUri) : 'http://localhost:8080/sse';
+    
+    console.log('Proxying SSE request to:', targetUrl);
   
     const response = await fetch(targetUrl, {
       method: 'GET',

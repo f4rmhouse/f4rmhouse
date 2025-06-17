@@ -18,7 +18,25 @@ type ProductType = {
   tags: string[],
   deployed: boolean,
   deployment_type: string
-  endpoints: any[]
+  server: Server
 }
+
+type Authorization = {
+  authorization_url: string 
+  token_url: string 
+  revocation_url: string 
+  redirect_url: string 
+}
+  
+type Server = {
+  transport: string        
+  uri: string        
+  authorization: Authorization 
+  auth_provider: string
+}
+  
+
+
+
 
 export default ProductType;

@@ -110,22 +110,18 @@ export default function RightSidebar() {
       let _isOnline = selectedAgent.toolbox.map(_ => false) 
       // Connect to each tool server
       const connectToTool = async (uti:string, index:number) => {
-        console.log("Connecting")
         try {
-          await client.connect(uti, "http://localhost:3000/api/mcp/sse")
+          const tool = selectedAgent.toolbox[index];
+          console.log("TOOL: ", tool.server)
+          await client.connect(uti, tool.server.uri + "/sse")
           _isOnline = _isOnline.map((item, i) => i === index? true : item)
-          console.log("Connected to tool " + uti)
-          console.log("updated: ", _isOnline)
         } catch (error) {
-          console.error(`Could not connect to tool ${uti}:`, error)
           _isOnline = _isOnline.map((item, i) => i === index? false : item)
         }
         setIsOnline(_isOnline)
       }
           
       selectedAgent?.toolbox.map((tool, index) => {connectToTool(tool.uti, index)})
-      console.log(_isOnline)
-      setIsOnline(_isOnline)
     }
   }, [selectedAgent])
 
@@ -186,6 +182,7 @@ export default function RightSidebar() {
                         )}
                       </div>
                     )}
+                    <button onClick={() => removeTool(tool.uti)}>remove</button>
                   </div>
                   :
                   <></>
