@@ -61,13 +61,16 @@ export function AgentProvider({ children }: { children: ReactNode }) {
         try {
           const parsedAgent = JSON.parse(savedAgent) as F4rmerType
           setSelectedAgentState(parsedAgent)
+          setClient(new F4MCPClient(parsedAgent.title, parsedAgent.toolbox))
         } catch (error) {
           console.error('Failed to parse saved agent:', error)
           setSelectedAgentState(defaultAgent)
+          setClient(new F4MCPClient(defaultAgent.title, defaultAgent.toolbox))
         }
       } else {
         // If no saved agent, use the default
         setSelectedAgentState(defaultAgent)
+        setClient(new F4MCPClient(defaultAgent.title, defaultAgent.toolbox))
       }
     }
   }, [])
