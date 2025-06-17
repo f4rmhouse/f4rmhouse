@@ -5,17 +5,18 @@
 
 "use client"
 import axios from 'axios';
-import F4rmerType from '../../types/F4rmerType';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useSession } from "next-auth/react";
 import User from '@/app/microstore/User';
 import ProductType from '../../types/ProductType';
-import { ChevronDown, ChevronRight, QrCode, Store as StoreIcon} from "lucide-react";
+import { Bot, ChevronRight, Hammer, QrCode, Server, Store as StoreIcon} from "lucide-react";
 import { Delete, PanelLeftClose, PanelRightClose, Repeat2, Wrench } from 'lucide-react';
-import Store from '@/app/microstore/Store';
 import { useTheme } from "../../../context/ThemeContext";
 import { useAgent } from "../../../context/AgentContext";
+import F4MCPClient from '@/app/microstore/F4MCPClient';
+import { ServerSummaryType } from '@/app/components/types/MCPTypes';
+import ServerSummary from './ServerSummary';
 
 export default function RightSidebar() {
   const { theme } = useTheme();
@@ -24,10 +25,17 @@ export default function RightSidebar() {
 
   const [qrImageURL, setQrImageURL] = useState<string>("")
   const [loading, setLoading] = useState<boolean>(false)
-  const [openList, setOpenList] = useState<any[]>(selectedAgent?.toolbox?.map(e => {}) || [])
-  const [toolHasBeenDisabledByCreator, setToolHasBeenDisabledByCreator] = useState<Map<string, boolean>>(new Map())
+  const [openList, setOpenList] = useState<boolean[]>(selectedAgent?.toolbox?.map(_ => false) || [])
+  const [isOnline, setIsOnline] = useState<boolean[]>(selectedAgent?.toolbox?.map(_ => false) || [])
+
+  const [summary, setSummary] = useState<Map<string, ServerSummaryType>>(new Map())
+
+  const [client, setClient] = useState<F4MCPClient | null>(null)
 
   const [visible, setVisible] = useState<boolean>(false)
+  
+  // Track ping times for each server
+  const [pingTimes, setPingTimes] = useState<{[key: string]: number}>({})
 
   const getQR = () => {
     setLoading(true)
@@ -58,29 +66,25 @@ export default function RightSidebar() {
     user.updateF4rmer(newF4rmer)
   }
 
-  const getToolSummary = (uti:string, index: number) => {
-    if (openList[index] && openList[index][0]) {
-      closeSummary(index)
-      return
-    }
-    const store = new Store();
-    store.getEndpoint(uti).then((e:any) => {
+  const toggleToolSummary = (index: number) => {
+    if (openList[index]) {
       setOpenList(openList.map((item, i) => 
-        i === index ? e : item
+        i === index ? false : item
       ));
-    })
-  }
-  const closeSummary = (index: number) => {
-    setOpenList(openList.map((item, i) => 
-      i=== index ? {} : item
-    ));
-  }
-
-  const getProduct = (uti:string) => {
-    const store = new Store();
-    store.getProduct(uti).then((e:any) => {
-      toolHasBeenDisabledByCreator.set(e.Message.uti, !e.Message.disabled)
-    })
+    }
+    else {
+      setOpenList(openList.map((item, i) => 
+        i === index ? true : item
+      ));
+      if(selectedAgent?.toolbox[index]){
+        // Handle connection with proper error handling
+        const tool = selectedAgent.toolbox[index];
+        client?.getStructuredJSON(tool.uti).then((data) => {
+          console.log(tool.uti, data)
+          setSummary(new Map(summary.set(tool.uti, data)))
+        })
+      }
+    }
   }
 
   // Add keyboard shortcut listener for Cmd+M to toggle right sidebar
@@ -102,53 +106,90 @@ export default function RightSidebar() {
     };
   }, []);
 
+  useEffect(() => {
+    if (selectedAgent) {
+      setOpenList(selectedAgent.toolbox.map(_ => false))
+      let _isOnline = selectedAgent.toolbox.map(_ => false) 
+      const newClient = new F4MCPClient("default f4rmer", [])
+      setClient(newClient)
+      // Connect to each tool server
+      const connectToTool = async (uti:string, index:number) => {
+        console.log("Connecting")
+        try {
+          await newClient.connect(uti, "http://localhost:3000/api/mcp/sse")
+          _isOnline = _isOnline.map((item, i) => i === index? true : item)
+          console.log("Connected to tool " + uti)
+          console.log("updated: ", _isOnline)
+        } catch (error) {
+          console.error(`Could not connect to tool ${uti}:`, error)
+          _isOnline = _isOnline.map((item, i) => i === index? false : item)
+        }
+        setIsOnline(_isOnline)
+      }
+          
+      selectedAgent?.toolbox.map((tool, index) => {connectToTool(tool.uti, index)})
+      console.log(_isOnline)
+      setIsOnline(_isOnline)
+    }
+  }, [selectedAgent])
+
   return (
     <div>
-    <div onMouseEnter={() => setVisible(true)} onMouseLeave={() => setVisible(false)} className={`p-2 fixed right-0 w-[50%] sm:w-[16%] h-[100vh] z-10 top-0 border-${theme.secondaryColor?.replace("bg-", "")} ${theme.chatWindowStyle} transition-transform duration-300 ease-in-out transform ${visible ? 'translate-x-0' : 'translate-x-full'}`}>
+    <div onMouseEnter={() => setVisible(true)} onMouseLeave={() => setVisible(false)} className={`p-2 fixed right-0 w-[50%] sm:w-[25%] mt-9 h-[92vh] z-10 top-0 border-${theme.secondaryColor?.replace("bg-", "")} ${theme.chatWindowStyle} transition-transform duration-300 ease-in-out rounded-md transform p-3 ${visible ? 'translate-x-0' : 'translate-x-full'}`}>
       <div className='h-[95%] flex flex-col'>
+        <p className={`pl-2 pb-2 flex text-base flex mb-2 ${theme.textColorPrimary}`}><div className="mr-2 bg-yellow-500 rounded-md p-1 text-yellow-900"><Bot size={20}/></div><span className='my-auto'>{selectedAgent?.title}</span></p>
+        <p className={`pl-2 text-base flex mb-2 ${theme.textColorPrimary} w-[100%]`}>MCP Servers</p>
         {selectedAgent?.toolbox ?
         <div className="space-y-1 max-h-[50vh] overflow-y-auto pr-1">
           {selectedAgent.toolbox.map((tool, index) => (
-            <div key={index}>
-              {toolHasBeenDisabledByCreator.get(tool.uti) ?
-                <div className={`transition-all w-full hover:${theme.primaryHoverColor} rounded-md`}>
-                  <p className={`text-sm hover:cursor-pointer ${theme.textColorSecondary} w-[90%] line-through`}>{tool.title}</p>
-                  <p className='text-xs hover:cursor-pointer text-red-500 w-[100%]'>This action has been disabled by the creator.</p>
-                </div>
-                :
-                <div onClick={() => getToolSummary(tool.uti, index)} className={`flex w-full p-2 hover:${theme.secondaryHoverColor} rounded-md`}>
-                  {openList[index] && openList[index][0] ?
-                    <ChevronDown size={20} className={`cursor-pointer transition-all m-auto ${theme.textColorPrimary}`}/>
-                    :
-                    <ChevronRight size={20} className={`cursor-pointer transition-all m-auto ${theme.textColorPrimary}`}/>
-                  }
-                  <p className={`text-sm hover:cursor-pointer ${theme.textColorPrimary} w-[90%]`}>{tool.title}</p>
-                  <Delete size={20} onClick={() => removeTool(tool.uti)} className='cursor-pointer transition-all hover:text-red-400 text-red-500 mr-2 m-auto'/>
-                </div>
-              }
-              <div>
-                {openList[index] && openList[index][0] ? 
-                  <div className={`text-sm ${theme.textColorSecondary} p-0 pr-2 pl-2 ${theme.secondaryColor}`}>
-                    <p><span className='text-blue-400'>uti</span>: <span className='text-pink-400'>{openList[index][0].uti}</span></p>
-                    <p><span className='text-blue-400'>endpoints</span>:</p> 
-                    <div>
-                      {
-                        openList[index][0].endpoints.map((e:string, endpointIndex:number) => {
-                          return(
-                            <div key={endpointIndex} className='pl-2'>
-                              <p className='text-blue-400'>{e}<span className='text-neutral-300 mr-5'>: </span></p>
-                              <div className='flex'>
-                                <p className='text-blue-400 pl-2 mr-1'>description<span className='text-neutral-300 mr-5'>: </span></p>
-                                <p className='text-pink-400'>{openList[index][0].descriptions[endpointIndex]} </p>
-                              </div>
-                              <p><span className='text-blue-400 pl-2'>parameters</span>: <span className='text-pink-400'>{openList[index][0].parameters[endpointIndex]}</span></p>
-                            </div>
-                            )
-                        })
-                      }
-                    </div>
-                    <p><span className='text-blue-400'>cluster</span>:</p>
-                    {openList[index][0].ips.map((e:string, j:number) => <p key={j} className='pl-2 text-pink-400'><span className='text-neutral-300 pr-1'>-</span>{e}</p>)}
+            <div key={index} className="pl-1 pb-2">
+              <div onClick={() => toggleToolSummary(index)} className={`flex w-full rounded-md}`}>
+                <img alt="action-thumbnail" className="ml-2 h-6 my-auto rounded-full aspect-square object-cover" height={15} src={"https://f4-public.s3.eu-central-1.amazonaws.com/showcases/" + tool.uti + "/thumbnail.jpg"}/>
+                <div className={`${isOnline[index] ? 'bg-green-500' : 'bg-red-500'} rounded-full p-1 mt-auto ml-[-7px] border-2 border-${theme.chatWindowStyle?.replace("bg-", "")}`}></div>
+                <p className={`ml-2 text-base hover:cursor-pointer ${theme.textColorPrimary} w-[90%]`}>{tool.title}</p>
+                <ChevronRight 
+                  size={20} 
+                  className={`cursor-pointer transition-all hover:text-red-400 ${theme.textColorPrimary} mr-2 m-auto transform transition-transform duration-200 ${openList[index] ? 'rotate-90' : ''}`}
+                />
+              </div>
+              <div className="">
+                <p>{openList[0]}</p>
+                {openList[index] ? 
+                  <div className={`flex flex-col text-sm ${theme.textColorSecondary} p-0 pr-2 pl-2 ${theme.secondaryColor}`}>
+                    <ServerSummary summary={summary.get(tool.uti)}/>
+                    {!isOnline[index] ? (
+                      <div className="text-xs text-red-400 mt-1 mb-2">
+                        <p>Connection error: Unable to connect to server</p>
+                        <button 
+                          className="text-xs bg-neutral-700 hover:bg-neutral-600 text-white px-2 py-1 rounded mt-1"
+                        >
+                          Retry connection
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-between w-full mt-1">
+                        <button 
+                          onClick={() => {
+                            client?.ping(tool.uti).then(result => {
+                              if (result && typeof result.pingTimeMs === 'number') {
+                                setPingTimes(prev => ({
+                                  ...prev,
+                                  [tool.uti]: result.pingTimeMs
+                                }));
+                              }
+                            });
+                          }} 
+                          className="transition-all text-xs bg-blue-500 bg-opacity-50 hover:bg-opacity-100 text-white font-bold px-2 py-1 rounded"
+                        >
+                          Ping
+                        </button>
+                        {pingTimes[tool.uti] !== undefined && (
+                          <span className="text-xs ml-2">
+                            {pingTimes[tool.uti].toFixed(2)}ms
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </div>
                   :
                   <></>
@@ -160,11 +201,11 @@ export default function RightSidebar() {
         :
         <p>No tools have been added yet</p>
         }
-        <div className='flex w-full'>
-        <Link href="/" className={`hover:${theme.textColorPrimary} border-2 hover:border-${theme.secondaryColor?.replace("bg-", "")} border-transparent rounded-md transition-all hover:${theme.hoverColor} cursor-pointer p-2 pl-3 flex ${theme.textColorSecondary} w-full text-sm gap-3`}><StoreIcon size={20}/>Browse tools</Link>
+        <div className='flex gap-2 w-full pt-2'>
+        <Link href="/" className={`hover:${theme.textColorPrimary} p-2 rounded-md transition-all hover:${theme.hoverColor} cursor-pointer flex ${theme.textColorSecondary} w-full text-base gap-3 my-auto`}><StoreIcon size={20}/>Browse servers</Link>
       </div>
         <div className=''>
-          <button className={`hover:${theme.textColorPrimary} border-2 hover:border-${theme.secondaryColor?.replace("bg-", "")} border-transparent rounded-md transition-all hover:${theme.hoverColor} cursor-pointer p-2 pl-3 flex ${theme.textColorSecondary} w-full text-sm gap-3`} onClick={() => getQR()}><QrCode size={20}/> Generate QR code</button>
+          <button className={`hover:${theme.textColorPrimary} p-2 rounded-md transition-all hover:${theme.hoverColor} cursor-pointer my-auto flex ${theme.textColorSecondary} w-full text-base gap-3`} onClick={() => getQR()}><QrCode size={20}/> Generate QR code</button>
           {
             qrImageURL.length > 0 ? 
             <div className='m-4'>

@@ -108,17 +108,17 @@ AI:`;
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json() as RequestBody;
-    const { description, messages = [], model: selectedModel, email, toolbox: initialToolbox, f4rmer, provider, access_token } = body;
+    const { description, messages = [], model: selectedModel, session, toolbox: initialToolbox, f4rmer} = body;
     const prompt = PromptTemplate.fromTemplate(TEMPLATE);
-    const session = new F4SessionStorage();
-    const caller = new User(email, provider, access_token);
+    const chat_session = new F4SessionStorage();
+    const caller = new User(session.user.email, session.provider, session.access_token);
     
     // Handle toolbox initialization
     let toolbox = initialToolbox;
-    if (!toolbox && f4rmer) {
-      const f4rmerData = await session.readF4rmer(f4rmer);
-      toolbox = f4rmerData?.[0]?.tool_box ?? [];
-    }
+    //if (!toolbox && f4rmer) {
+    //  const f4rmerData = await chat_session.readF4rmer(f4rmer);
+    //  toolbox = f4rmerData?.[0]?.tool_box ?? [];
+    //}
 
     // Process endpoints
     let endpoints: Endpoint[] = [];

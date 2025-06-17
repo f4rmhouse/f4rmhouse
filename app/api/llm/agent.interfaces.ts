@@ -1,3 +1,4 @@
+import F4Session from "@/app/components/types/F4Session";
 import User from "@/app/microstore/User";
 import { BaseMessage } from "@langchain/core/messages";
 
@@ -30,11 +31,9 @@ export interface RequestBody {
   description: string;
   messages: BaseMessage[];
   model: ModelConfig;
-  email: string;
+  session: F4Session;
   toolbox?: any[];
   f4rmer?: string;
-  provider: string;
-  access_token: string;
 }
   
 export interface Endpoint {

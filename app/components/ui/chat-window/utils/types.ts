@@ -1,12 +1,11 @@
+import F4Session from "@/app/components/types/F4Session";
 import { Message } from "ai/react";
 
 export type PostDataType = {
     messages: Message[];
     description: string;
     show_intermediate_steps: boolean;
-    email: string;
-    provider: string;
-    token: string;
+    session: F4Session;
     f4rmer: string;
     model: any; // TODO: Create proper model type
   }

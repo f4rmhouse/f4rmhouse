@@ -6,14 +6,13 @@ import type { FormEvent } from "react";
 import { useTheme } from "@/app/context/ThemeContext"
 import { useAgent } from "@/app/context/AgentContext";
 import F4Session from "../../types/F4Session";
-import ProductType from "../../types/ProductType";
 import ChatAIMessage from "../chat-messages/ChatAIMessage";
 import ChatToolMessage from "../chat-messages/ChatToolMessage";
 import ChatInitToolCallMessage from "../chat-messages/ChatInitToolCallMessage";
 import ChatMessageType from "../../types/ChatMessageType";
 import ChatUserMessage from "../chat-messages/ChatUserMessage";
 import ChatErrorMessage from "../chat-messages/ChatErrorMessage";
-import { ArrowLeft, ArrowLeftToLine, ArrowRight, ArrowRightToLine, CornerRightUp, Paperclip, Pencil, RotateCcw } from "lucide-react";
+import { ArrowLeft, ArrowRight, CornerRightUp, Paperclip, Pencil, RotateCcw } from "lucide-react";
 import F4rmerEditor from "./F4rmerEditor";
 import Link from "next/link";
 import Modal from "../modal/Modal";
@@ -44,7 +43,7 @@ import MCPAuthHandler from "../../../MCPAuthHandler";
  */
 export default function PromptBox({session, state, setState, f4rmers}: {session: F4Session, state: "canvas" | "chat" | "preview" | "edit", setState: (state: "canvas" | "chat" | "preview" | "edit") => void, f4rmers: F4rmerType[]}) {
   const { theme } = useTheme();
-  const { selectedAgent, setSelectedAgent, availableAgents, setAvailableAgents } = useAgent();
+  const { selectedAgent, setAvailableAgents } = useAgent();
   const messageContainerRef = useRef<HTMLDivElement | null>(null);
   const [promptForUserLogin, setPromptForUserLogin] = useState<boolean>(false)
   const [selectedModel, setSelectedModel] = useState<any>(config.models[Object.keys(config.models)[0]][0]);
@@ -180,15 +179,11 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
       return
     }
 
-    console.log("mcp auth: ", session)
-
     let postData: PostDataType = {
       messages: chatSession.getNextJSMessages(), 
       description: selectedAgent.jobDescription,
       show_intermediate_steps: false,
-      email: session.user.email,
-      provider: session.provider,
-      access_token: session.access_token,
+      session: session,
       f4rmer: selectedAgent.title,
       model: selectedModel
     }
@@ -205,16 +200,10 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
     await processStream(chatSession.getMessages().length, stream, MSStart) 
   }
 
-  const getToken = async (uti:string) => {
-    let user = new User(session.user.email, session.provider, session.access_token)
-    let res = await user.getToken(uti)
-    return res
-  }
-
   return (
     <div className="sm:flex overflow-hidden w-[100vw]">
       <div className={`flex transition-all ${state === "canvas" ? "m-0" : "m-auto"}`}>
-    <div className={`relative m-auto pt-0 md:pt-0 w-[100vw] h-[100vh] sm:h-[93vh] overflow-hidden ${state === "chat" || state === "edit" ? "sm:w-[16cm]" : "sm:w-[10cm]"} ${theme.chatWindowStyle ? theme.chatWindowStyle : ""}`}>
+    <div className={`relative m-auto mt-1 md:pt-0 w-[100vw] h-[100vh] sm:h-[93vh] overflow-hidden ${state === "chat" || state === "edit" ? "sm:w-[16cm]" : "sm:w-[10cm]"} ${theme.chatWindowStyle ? theme.chatWindowStyle : ""}`}>
       <div className="no-scrollbar flex flex-col w-full transition-all duration-500 overflow-y-auto flex-grow h-full">
         <div
           className={`p-2 no-scrollbar flex flex-col-reverse w-full gap-5 transition-all duration-500 overflow-y-scroll scrollb ${currentSession.length > 0 ? 'opacity-100' : 'opacity-0 h-0'}`}
