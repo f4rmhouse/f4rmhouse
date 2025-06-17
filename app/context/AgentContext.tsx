@@ -2,12 +2,14 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 import F4rmerType from '../components/types/F4rmerType'
+import F4MCPClient from '../microstore/F4MCPClient'
 
 type AgentContextType = {
   selectedAgent: F4rmerType | undefined
   setSelectedAgent: (agent: F4rmerType) => void
   availableAgents: F4rmerType[]
   setAvailableAgents: (agents: F4rmerType[]) => void
+  client: F4MCPClient
 }
 
 const AgentContext = createContext<AgentContextType | undefined>(undefined)
@@ -26,6 +28,7 @@ export function AgentProvider({ children }: { children: ReactNode }) {
   // Initialize agent state
   const [selectedAgent, setSelectedAgentState] = useState<F4rmerType | undefined>(undefined)
   const [availableAgents, setAvailableAgentsState] = useState<F4rmerType[]>([defaultAgent])
+  const [client, setClient] = useState<F4MCPClient>(new F4MCPClient("default f4rmer", []))
 
   // Wrapper for setSelectedAgent that also saves to localStorage
   const setSelectedAgent = (agent: F4rmerType) => {
@@ -33,6 +36,7 @@ export function AgentProvider({ children }: { children: ReactNode }) {
     if (typeof window !== 'undefined') {
       localStorage.setItem('f4rmhouse-selected-agent', JSON.stringify(agent))
     }
+    setClient(new F4MCPClient(agent.title, agent.toolbox))
   }
 
   // Wrapper for setAvailableAgents
@@ -73,7 +77,8 @@ export function AgentProvider({ children }: { children: ReactNode }) {
       selectedAgent: selectedAgent || defaultAgent, 
       setSelectedAgent, 
       availableAgents, 
-      setAvailableAgents 
+      setAvailableAgents,
+      client
     }}>
       {children}
     </AgentContext.Provider>

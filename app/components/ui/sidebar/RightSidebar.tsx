@@ -21,7 +21,7 @@ import ServerSummary from './ServerSummary';
 export default function RightSidebar() {
   const { theme } = useTheme();
   const { data: session, status } = useSession();
-  const { selectedAgent } = useAgent();
+  const { selectedAgent, client } = useAgent();
 
   const [qrImageURL, setQrImageURL] = useState<string>("")
   const [loading, setLoading] = useState<boolean>(false)
@@ -29,8 +29,6 @@ export default function RightSidebar() {
   const [isOnline, setIsOnline] = useState<boolean[]>(selectedAgent?.toolbox?.map(_ => false) || [])
 
   const [summary, setSummary] = useState<Map<string, ServerSummaryType>>(new Map())
-
-  const [client, setClient] = useState<F4MCPClient | null>(null)
 
   const [visible, setVisible] = useState<boolean>(false)
   
@@ -110,13 +108,11 @@ export default function RightSidebar() {
     if (selectedAgent) {
       setOpenList(selectedAgent.toolbox.map(_ => false))
       let _isOnline = selectedAgent.toolbox.map(_ => false) 
-      const newClient = new F4MCPClient("default f4rmer", [])
-      setClient(newClient)
       // Connect to each tool server
       const connectToTool = async (uti:string, index:number) => {
         console.log("Connecting")
         try {
-          await newClient.connect(uti, "http://localhost:3000/api/mcp/sse")
+          await client.connect(uti, "http://localhost:3000/api/mcp/sse")
           _isOnline = _isOnline.map((item, i) => i === index? true : item)
           console.log("Connected to tool " + uti)
           console.log("updated: ", _isOnline)
