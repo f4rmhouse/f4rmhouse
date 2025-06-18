@@ -14,6 +14,7 @@ export interface F4ToolParams {
     caller: User
     uri: string
     transport: string
+    mcp_type: string
 }
 
 export interface F4ToolExecuteParams {

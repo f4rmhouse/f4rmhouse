@@ -47,6 +47,9 @@ export default function ModelSelector({ onModelSelect, selectedModel }: { onMode
     if (config.models.groq) {
       models = models.concat(config.models.groq);
     }
+    if (config.models.google) {
+      models = models.concat(config.models.google);
+    }
     
     return models;
   };

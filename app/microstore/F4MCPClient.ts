@@ -2,7 +2,7 @@ import ProductType from "../components/types/ProductType";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import User from "./User";
 import { SSEClientTransport } from "@modelcontextprotocol/sdk/client/sse.js";
-import { InputSchema, Tool, ServerSummaryType, Prompt, MCPToolType } from "../components/types/MCPTypes";
+import { InputSchema, Tool, ServerSummaryType, Prompt, MCPToolType, MCPResourceType } from "../components/types/MCPTypes";
 
 /**
  * F4MCPClient is a client for interacting with Model Context Protocol (MCP) servers.
@@ -75,9 +75,22 @@ class F4MCPClient {
     let response = await this.connections.get(uti)?.listPrompts()
     if (response && response.prompts) {
       // Transform the response to match our Prompt type
+      let properties: any = {}
+      response.prompts.map((p:any) => {
+        p.arguments.map((pp:any) => {
+          properties[pp.name] = {type: "string", title: pp.name}
+        })
+      })
+      let inputSchema: InputSchema = {
+        type: "string",
+        required: response.prompts.map((p:any) => p.arguments.map((pp:any) => pp.required ? pp.name : null)).flat(),
+        properties: properties
+      } 
+
       return response.prompts.map((prompt: any) => ({
         name: prompt.name || '',
         description: prompt.description || '',
+        inputSchema: inputSchema,
         // Add any other required fields for the Prompt type
       })) as Prompt[]
     }
@@ -89,12 +102,17 @@ class F4MCPClient {
    * @param uti - Unique Tool Identifier for the server
    * @returns Promise resolving to the list of available resources
    */
-  async listResources(uti: string): Promise<Object[]> {
+  async listResources(uti: string): Promise<MCPResourceType[]> {
     const client = this.connections.get(uti);
     if (!client) return [];
     const response = await client.listResources();
     if (response) {
-      return response.resources;
+      console.log("RESOURCE: ", response.resources)
+      return response.resources.map((resource: any) => ({
+        uri: resource.uri,
+        name: resource.name,
+        mimeType: resource.mimeType
+      })) as MCPResourceType[];
     }
     return [];
   }

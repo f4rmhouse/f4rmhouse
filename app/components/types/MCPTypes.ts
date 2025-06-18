@@ -20,7 +20,12 @@ export type Tool = {
 export type Prompt = {
   name: string,
   description: string,
-  // Add any other fields that might be needed based on the actual data structure
+  inputSchema: InputSchema,
+}
+
+export type MCPPromptArgumentType = {
+  name: string,
+  required: boolean
 }
 
 export type ServerSummaryType = {
@@ -29,10 +34,16 @@ export type ServerSummaryType = {
   instructions:string 
   tools: Tool[],
   prompts: Prompt[],
-  resources: Object[],
+  resources: MCPResourceType[],
   resourceTemplates: Object[],
   serverCapabilities: Object[]
   uri: string
+}
+
+export type MCPResourceType = {
+  uri: string,
+  name: string,
+  mimeType: string
 }
 
 export type MCPOAuthType = {

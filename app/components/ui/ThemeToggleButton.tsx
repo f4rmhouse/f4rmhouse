@@ -182,7 +182,7 @@ const themePresets: Record<string, Theme> = {
   Motion: {
     "primaryColor": "bg-[#f8f8f7]",
     "secondaryColor": "bg-[#f8f8f7]",
-    "accentColor": "bg-black text-white",
+    "accentColor": "bg-neutral-800 text-white",
     "hoverColor": "bg-neutral-200",
     "backgroundColor": "bg-[#f8f8f7]",
     "backgroundImage": "",

@@ -52,7 +52,12 @@ const config: Config = {
         ],
         "groq": [
             {"id": "meta-llama/llama-4-maverick-17b-128e-instruct", "name": "Llama 4 Maverick", "provider": "groq"},
-            {"id": "qwen/qwen3-32b", "name": "Qwen 3.2 32B", "provider": "groq"}
+            {"id": "qwen/qwen3-32b", "name": "Qwen 3.2 32B", "provider": "groq"},
+            {"id": "deepseek-r1-distill-llama-70b", "name": "DeepSeek R1 70B", "provider": "groq"},
+            {"id": "llama3-70b-8192", "name": "Llama 3.7 70B 8192", "provider": "groq"}
+        ],
+        "google": [
+            {"id": "gemini-2.5-flash", "name": "Gemini 2.5 Flash", "provider": "google"}
         ],
         "local": [
             { "id": "llama3.2 ", "name": "Llama 3.2", "provider": "local"},

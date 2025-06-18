@@ -5,7 +5,7 @@ import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/
 import { DynamicStructuredTool } from "@langchain/core/tools";
 import { z } from "zod";
 
-function createMCPTool({ uti, endpoint, title, tool_description, parameters, authorization, caller, uri, transport}: F4ToolParams) {
+function createMCPTool({ uti, endpoint, title, tool_description, parameters, authorization, caller, uri, transport, mcp_type}: F4ToolParams) {
     //if (!parameters || !parameters.length) {
     //    throw new Error('No parameters defined for this tool');
     //}
@@ -68,7 +68,6 @@ function createMCPTool({ uti, endpoint, title, tool_description, parameters, aut
             // TODO: Add auth check
             let askUserForAuth = true 
             let accessToken = ""
-            console.log("Authorization: ", authorization)
             if(askUserForAuth) {
                 let token = await caller.getToken(uti)
                 if(token.Code == 404 || token.Token.length == 0) {
@@ -118,16 +117,35 @@ function createMCPTool({ uti, endpoint, title, tool_description, parameters, aut
 
             try {
                 // Validate that all required parameters are present
-                const result = await client.callTool({
-                    name: endpoint,
-                    arguments: args,
-                });
+                let result : any;
+                let content: any;
+                if(mcp_type == "tool") {
+                    result = await client.callTool({
+                        name: endpoint,
+                        arguments: args,
+                    }); 
+                    if (!result || !result.content) {
+                        throw new Error('Empty response');
+                    }
+    
+                    content = result.content;
+                }
+                if (mcp_type == "prompt") {
+                    console.log("Prompt: ", endpoint)
+                    console.log("Prompt args: ", args)
+                    result = await client.getPrompt({
+                        name: endpoint,
+                        arguments: args,
+                    });
+                    content = result.messages[0].content;
+                }
 
-                if (!result || !result.content) {
+                console.log("CONTENT: ", content)
+
+                if (!content) {
                     throw new Error('Empty response');
                 }
 
-                const content = result.content;
                 client.close()
                 return Array.isArray(content) ? content[0] : content;
             } finally {

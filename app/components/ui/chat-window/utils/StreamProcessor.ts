@@ -44,6 +44,10 @@ export default class StreamProcessor {
         }
         else if (!chatSession.streaming) {
           chatSession.push("system", "system", "")
+          if(JSON.parse(v)[0].kwargs.content.length > 0){
+            chatSession.pushToken(JSON.parse(v)[0].kwargs.content)
+            setLatestMessage((p: string) => p + JSON.parse(v)[0].kwargs.content)
+          }
           chatSession.streaming = true
         }
 

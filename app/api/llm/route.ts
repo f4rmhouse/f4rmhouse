@@ -18,8 +18,9 @@ import { ModelConfig, Endpoint, RequestBody } from "./agent.interfaces";
 import { LLMServiceError } from "./agent.errors";
 import { ChatOllama } from "@langchain/ollama";
 import {ChatGroq} from "@langchain/groq";
+import {ChatGoogleGenerativeAI} from "@langchain/google-genai";
 import User from "@/app/microstore/User";
-import { MCPToolType, Tool } from "@/app/components/types/MCPTypes";
+import { MCPToolType, Prompt, Tool } from "@/app/components/types/MCPTypes";
 
 class ModelFactory {
   static create(config: ModelConfig): BaseChatModel {
@@ -44,6 +45,14 @@ class ModelFactory {
           apiKey: process.env.GROQ_SECRET,
           maxRetries: 2,
         });
+      case "google":
+        return new ChatGoogleGenerativeAI({
+          model: id,
+          apiKey: process.env.GOOGLE_SECRET,
+          maxRetries: 2,
+          temperature: 0.8,
+          
+        });
       case 'local':
         return new ChatOllama({
           model: "llama3.2",
@@ -67,12 +76,28 @@ class ToolManager {
           endpoint: t.name,
           title: `${t.name}_${Math.random().toString(36).substring(2, 8)}`,
           endpoint_description: t.description,
-          tool_description: "This tool lets you create a dashboard from a JSON config object.",
+          tool_description: t.description,
           parameters: t.inputSchema,
           authorization: tool.authorization,
           caller: caller,
           uri: tool.uri,
-          transport: tool.transport
+          transport: tool.transport,
+          mcp_type: "tool"
+        }))
+      })
+      tool.prompts.map((p: Prompt) => {
+        f4tools.push(createMCPTool({
+          uti: tool.uti,
+          endpoint: p.name,
+          title: `${p.name}_${Math.random().toString(36).substring(2, 8)}`,
+          endpoint_description: p.description,
+          tool_description: p.description,
+          parameters: p.inputSchema,
+          authorization: tool.authorization,
+          caller: caller,
+          uri: tool.uri,
+          transport: tool.transport,
+          mcp_type: "prompt"
         }))
       })
     }
