@@ -47,7 +47,7 @@ export default function OAuthCallbackPage() {
             console.log(result)
 
             if(state && state.length > 0) {
-              createToken(result.tokens.access_token, state)
+              await createToken(result.tokens.access_token, state)
             }
             
             if (window.opener) {
@@ -79,7 +79,7 @@ export default function OAuthCallbackPage() {
 
   const createToken = async (access_code: string, server: string) => {
     // @ts-ignore
-    if(session && session.user && session.provider && session.access_token) {
+    if(access_code && session && session.user && session.provider && session.access_token) {
       // @ts-ignore
       let user = new User(String(session.user.email), String(session.provider), String(session.access_token))
       let token = {
@@ -88,6 +88,7 @@ export default function OAuthCallbackPage() {
         token: access_code,
         provider: server 
       }
+      console.log("t: ", token)
       user.createToken(token).then(e => console.log(e))
     }
   } 

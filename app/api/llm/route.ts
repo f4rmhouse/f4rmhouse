@@ -17,12 +17,14 @@ import { F4SessionStorage } from "@/app/microstore/Session";
 import { ModelConfig, Endpoint, RequestBody } from "./agent.interfaces";
 import { LLMServiceError } from "./agent.errors";
 import { ChatOllama } from "@langchain/ollama";
+import {ChatGroq} from "@langchain/groq";
 import User from "@/app/microstore/User";
+import { MCPToolType, Tool } from "@/app/components/types/MCPTypes";
 
 class ModelFactory {
   static create(config: ModelConfig): BaseChatModel {
     const { provider, id } = config;
-    
+
     switch (provider.toLowerCase()) {
       case 'openai':
         return new ChatOpenAI({
@@ -35,6 +37,12 @@ class ModelFactory {
           temperature: 0.8,
           model: id,
           anthropicApiKey: process.env.ANTHROPIC_SECRET
+        });
+      case 'groq':
+        return new ChatGroq({
+          model: id,
+          apiKey: process.env.GROQ_SECRET,
+          maxRetries: 2,
         });
       case 'local':
         return new ChatOllama({
@@ -49,36 +57,26 @@ class ModelFactory {
 }
 
 class ToolManager {
-  static async createTools(toolbox: any[] | undefined, endpoints: Endpoint[], caller: User) {
-    if (!toolbox || !endpoints.length) return [];
-    return endpoints.map((endpoint, i) => {
-      let a_add = createF4Tool({
-        uti: toolbox[i].uti,
-        endpoint: endpoints[i].endpoints[0],
-        title: toolbox[i].uti,
-        endpoint_description: endpoints[i].descriptions[0],
-        tool_description: toolbox[i].description,
-        caller: caller
-      });
-      return a_add;
-    });
-  }
-  static async createMCPTools(toolbox: any[] | undefined, endpoints: any[], caller: User) {
-    if (!toolbox || !endpoints || !endpoints.length) return [];
-
-    return endpoints.map((endpoint, i) => {
-      return createMCPTool({
-        uti: endpoint.name.split("_")[0],
-        endpoint: endpoint.name,
-        title: `${endpoint.name}_${Math.random().toString(36).substring(2, 8)}`,
-        endpoint_description: endpoint.description,
-        tool_description: "This tool lets you create a dashboard from a JSON config object.",
-        parameters: endpoint.parameters,
-        authorization: endpoint.authorization,
-        caller: caller
-      });
-    });
-
+  static createMCPTools(toolbox: MCPToolType[] | undefined, endpoints: any[], caller: User): any[] {
+    let f4tools: any[] = []
+    if (!toolbox) return f4tools;
+    for (const tool of toolbox) {
+      tool.tools.map((t: Tool) => {
+        f4tools.push(createMCPTool({
+          uti: tool.uti,
+          endpoint: t.name,
+          title: `${t.name}_${Math.random().toString(36).substring(2, 8)}`,
+          endpoint_description: t.description,
+          tool_description: "This tool lets you create a dashboard from a JSON config object.",
+          parameters: t.inputSchema,
+          authorization: tool.authorization,
+          caller: caller,
+          uri: tool.uri,
+          transport: tool.transport
+        }))
+      })
+    }
+    return f4tools
   }
   static createEmptyToolbox() {
     return [];
@@ -108,13 +106,13 @@ AI:`;
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json() as RequestBody;
-    const { description, messages = [], model: selectedModel, session, toolbox: initialToolbox, f4rmer} = body;
+    const { description, messages = [], model: selectedModel, session, toolbox: initialToolbox, tools} = body;
     const prompt = PromptTemplate.fromTemplate(TEMPLATE);
     const chat_session = new F4SessionStorage();
     const caller = new User(session.user.email, session.provider, session.access_token);
-    
+
     // Handle toolbox initialization
-    let toolbox = initialToolbox;
+    let toolbox = tools;
     //if (!toolbox && f4rmer) {
     //  const f4rmerData = await chat_session.readF4rmer(f4rmer);
     //  toolbox = f4rmerData?.[0]?.tool_box ?? [];
@@ -124,13 +122,13 @@ export async function POST(req: NextRequest) {
     let endpoints: Endpoint[] = [];
 
     if(toolbox?.length) {
-      toolbox?.map((tool: any) => {
-        if(tool.endpoints) {
-          tool.endpoints.map((endpoint: any) => {
-            endpoint.name = tool.uti + "_" + endpoint.name;
-          });
-          endpoints.push(...tool.endpoints);
-        }
+      toolbox?.map((tool: MCPToolType) => {
+        //if(tool.name) {
+        //  tool.endpoints.map((endpoint: any) => {
+        //    endpoint.name = tool.uti + "_" + endpoint.name;
+        //  });
+        //  endpoints.push(...tool.endpoints);
+        //}
       })
     }
     else {
@@ -144,13 +142,14 @@ export async function POST(req: NextRequest) {
     const model = ModelFactory.create(selectedModel);
 
 
-    const tools = await ToolManager.createMCPTools(toolbox ?? [], endpoints, caller);
-    const toolNode = new ToolNode(tools);
+    const mcpTools = ToolManager.createMCPTools(toolbox ?? [], endpoints, caller);
+    const emptyToolbox = ToolManager.createEmptyToolbox()
+    const toolNode = new ToolNode(mcpTools);
 
     if (!model.bindTools) {
       throw new LLMServiceError('Selected model does not support tools', 400);
     }
-    const newModel = model.bindTools(tools);
+    const newModel = model.bindTools(mcpTools);
 
     /**
      * Chat models stream message chunks rather than bytes, so this

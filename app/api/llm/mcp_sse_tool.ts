@@ -1,21 +1,21 @@
 import { F4ToolParams } from "./agent.interfaces"
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { SSEClientTransport } from "@modelcontextprotocol/sdk/client/sse.js";
+import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 import { DynamicStructuredTool } from "@langchain/core/tools";
-import { OAuthClientProvider } from "@modelcontextprotocol/sdk/client/auth.js";
 import { z } from "zod";
 
-function createMCPTool({ uti, endpoint, title, endpoint_description, tool_description, parameters = [], authorization, caller }: F4ToolParams) {
+function createMCPTool({ uti, endpoint, title, tool_description, parameters, authorization, caller, uri, transport}: F4ToolParams) {
     //if (!parameters || !parameters.length) {
     //    throw new Error('No parameters defined for this tool');
     //}
 
     const zodSchema = z.object(
         Object.fromEntries(
-            parameters.map((p:any) => {
-                let name = p.parameter.name
-                let type = p.parameter.type
-                let desc = p.parameter.description
+            Object.keys(parameters.properties).map((p:string) => {
+                let name = p
+                let type = parameters.properties[p].type
+                let desc = tool_description
                 switch (type) {
                     case "str":
                     case "string":
@@ -24,10 +24,12 @@ function createMCPTool({ uti, endpoint, title, endpoint_description, tool_descri
                             z.string().describe(desc)
                         ]
                     case "int":
+                    case "integer":
                         return [
                             name,
                             z.number().describe(desc)
                         ]
+                    case "bool":
                     case "boolean":
                         return [
                             name,
@@ -40,6 +42,7 @@ function createMCPTool({ uti, endpoint, title, endpoint_description, tool_descri
                             z.array(z.string()).describe(desc)
                         ]
                     case "object":
+                    case "obj":
                         return [
                             name,
                             z.object({}).describe(desc)
@@ -65,10 +68,10 @@ function createMCPTool({ uti, endpoint, title, endpoint_description, tool_descri
             // TODO: Add auth check
             let askUserForAuth = true 
             let accessToken = ""
-            if(askUserForAuth && authorization) {
+            console.log("Authorization: ", authorization)
+            if(askUserForAuth) {
                 let token = await caller.getToken(uti)
-                console.log(token)
-                if(token.Code == 404) {
+                if(token.Code == 404 || token.Token.length == 0) {
                     return {message: "Authentication needed. Inform user to authenticate using the trusted OAuth provider given in the previous dialog message to continue or to cancel the request.", tool_identifier: endpoint, code: 401}
                 }
                 else {
@@ -88,31 +91,43 @@ function createMCPTool({ uti, endpoint, title, endpoint_description, tool_descri
                 Authorization: authToken,
             };
 
-            // const url = new URL(`${baseUrl}/products/sse?uti=${uti}`)
-            const url2 = new URL("http://127.0.0.1:8080/sse")
-            const transport = new SSEClientTransport(url2, {
-                eventSourceInit: {
-                    fetch: fetchWithAuth,
-                },
-                requestInit: {
-                  headers: customHeaders,
-                },
-            });
-            await client.connect(transport);
+
+            let mcpStreamableHTTPtransport: StreamableHTTPClientTransport;
+            let mcpSSEtransport: SSEClientTransport;
+            if(transport == "sse") {
+                const url = new URL(uri + "/sse")
+                mcpSSEtransport = new SSEClientTransport(url, {
+                    eventSourceInit: {
+                        fetch: fetchWithAuth,
+                    },
+                    requestInit: {
+                    headers: customHeaders,
+                    },
+                });
+                await client.connect(mcpSSEtransport);
+            }
+            else {
+                const url = new URL(uri)
+                mcpStreamableHTTPtransport = new StreamableHTTPClientTransport(url, {
+                    requestInit: {
+                        headers: customHeaders,
+                    },
+                });
+                await client.connect(mcpStreamableHTTPtransport);
+            }
 
             try {
                 // Validate that all required parameters are present
                 const result = await client.callTool({
-                    name: endpoint.split("_").slice(1).join("_"),
+                    name: endpoint,
                     arguments: args,
                 });
 
                 if (!result || !result.content) {
-                    throw new Error('No content in response');
+                    throw new Error('Empty response');
                 }
 
                 const content = result.content;
-                console.log("CONTENT: ", content)
                 client.close()
                 return Array.isArray(content) ? content[0] : content;
             } finally {

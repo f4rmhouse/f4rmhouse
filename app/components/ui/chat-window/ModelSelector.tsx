@@ -43,6 +43,10 @@ export default function ModelSelector({ onModelSelect, selectedModel }: { onMode
     if (config.models.local) {
       models = models.concat(config.models.local);
     }
+
+    if (config.models.groq) {
+      models = models.concat(config.models.groq);
+    }
     
     return models;
   };

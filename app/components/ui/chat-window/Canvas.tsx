@@ -37,7 +37,6 @@ export default function Canvas() {
   }
 
   useEffect(() => {
-    console.log("artifacts: ", artifacts)
     if(artifacts.length > 0){
       setArtifact(artifacts[artifacts.length-1])
       const artifactType = getArtifactType(artifacts[artifacts.length-1]);

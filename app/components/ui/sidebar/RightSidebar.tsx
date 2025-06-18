@@ -10,7 +10,7 @@ import { useEffect, useState } from 'react';
 import { useSession } from "next-auth/react";
 import User from '@/app/microstore/User';
 import ProductType from '../../types/ProductType';
-import { Bot, ChevronRight, Hammer, QrCode, Server, Store as StoreIcon} from "lucide-react";
+import { BadgeCheck, Bot, BrainCircuit, ChevronRight, Hammer, HardDrive, QrCode, Server, Store as StoreIcon} from "lucide-react";
 import { Delete, PanelLeftClose, PanelRightClose, Repeat2, Wrench } from 'lucide-react';
 import { useTheme } from "../../../context/ThemeContext";
 import { useAgent } from "../../../context/AgentContext";
@@ -78,7 +78,6 @@ export default function RightSidebar() {
         // Handle connection with proper error handling
         const tool = selectedAgent.toolbox[index];
         client?.getStructuredJSON(tool.uti).then((data) => {
-          console.log(tool.uti, data)
           setSummary(new Map(summary.set(tool.uti, data)))
         })
       }
@@ -112,7 +111,6 @@ export default function RightSidebar() {
       const connectToTool = async (uti:string, index:number) => {
         try {
           const tool = selectedAgent.toolbox[index];
-          console.log("TOOL: ", tool.server)
           await client.connect(uti, tool.server.uri + "/sse")
           _isOnline = _isOnline.map((item, i) => i === index? true : item)
         } catch (error) {
@@ -195,9 +193,11 @@ export default function RightSidebar() {
         <p>No tools have been added yet</p>
         }
         <div className='flex gap-2 w-full pt-2'>
-        <Link href="/" className={`hover:${theme.textColorPrimary} p-2 rounded-md transition-all hover:${theme.hoverColor} cursor-pointer flex ${theme.textColorSecondary} w-full text-base gap-3 my-auto`}><StoreIcon size={20}/>Browse servers</Link>
+        <Link href="/" className={`hover:${theme.textColorPrimary} p-2 rounded-md transition-all hover:${theme.hoverColor} cursor-pointer flex ${theme.textColorSecondary} w-full text-base gap-3 my-auto`}><StoreIcon size={20}/><BadgeCheck className='ml-[-20px] rounded-full bg-blue-500 text-white' size={12}/> Browse verified servers</Link>
       </div>
         <div className=''>
+        <Link href="/" className={`hover:${theme.textColorPrimary} p-2 rounded-md transition-all hover:${theme.hoverColor} cursor-pointer flex ${theme.textColorSecondary} w-full text-base gap-3 my-auto`}><HardDrive size={20}/> Add local server</Link>
+        <Link href="/" className={`hover:${theme.textColorPrimary} p-2 rounded-md transition-all hover:${theme.hoverColor} cursor-pointer flex ${theme.textColorSecondary} w-full text-base gap-3 my-auto`}><BrainCircuit size={20}/> Add local model</Link>
           <button className={`hover:${theme.textColorPrimary} p-2 rounded-md transition-all hover:${theme.hoverColor} cursor-pointer my-auto flex ${theme.textColorSecondary} w-full text-base gap-3`} onClick={() => getQR()}><QrCode size={20}/> Generate QR code</button>
           {
             qrImageURL.length > 0 ? 

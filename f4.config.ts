@@ -39,7 +39,7 @@ interface Config {
 
 const config: Config = {
     "name": "f4rmhouse",
-    "version": "1.1.2-beta",
+    "version": "1.1.3-beta",
     "welcomeText": "{{username}} returns!",
     "models": {
         "openai": [
@@ -49,6 +49,10 @@ const config: Config = {
             { "id": "claude-sonnet-4-20250514", "name": "Claude 4 Sonnet", "provider": "anthropic"},
             { "id": "claude-3-7-sonnet-20250219", "name": "Claude 3.5 Sonnet", "provider": "anthropic"},
             { "id": "claude-3-5-haiku-20241022", "name": "Claude 3.7 Haiku", "provider": "anthropic"},
+        ],
+        "groq": [
+            {"id": "meta-llama/llama-4-maverick-17b-128e-instruct", "name": "Llama 4 Maverick", "provider": "groq"},
+            {"id": "qwen/qwen3-32b", "name": "Qwen 3.2 32B", "provider": "groq"}
         ],
         "local": [
             { "id": "llama3.2 ", "name": "Llama 3.2", "provider": "local"},

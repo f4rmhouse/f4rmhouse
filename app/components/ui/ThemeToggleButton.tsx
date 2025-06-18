@@ -84,7 +84,7 @@ const themePresets: Record<string, Theme> = {
     "secondaryHoverColor": "bg-[#876767]",
     "textColorPrimary": "text-white",
     "textColorSecondary": "text-gray-400",
-    "chatWindowStyle": "bg-[#212121] text-xs"
+    "chatWindowStyle": "bg-[#212121]"
   },
   sophie: {
     "primaryColor": "bg-[#30302e]",
@@ -183,15 +183,29 @@ const themePresets: Record<string, Theme> = {
     "primaryColor": "bg-[#f8f8f7]",
     "secondaryColor": "bg-[#f8f8f7]",
     "accentColor": "bg-black text-white",
-    "hoverColor": "bg-neutral-500",
+    "hoverColor": "bg-neutral-200",
     "backgroundColor": "bg-[#f8f8f7]",
     "backgroundImage": "",
-    "primaryHoverColor": "bg-neutral-700",
-    "secondaryHoverColor": "bg-neutral-300",
+    "primaryHoverColor": "bg-neutral-200",
+    "secondaryHoverColor": "bg-neutral-200",
     "textColorPrimary": "text-gray-800",
     "textColorSecondary": "text-gray-500",
     "chatWindowStyle": "bg-[#f8f8f7] border",
     "aiMessageStyle": "bg-[#f8f8f7] rounded-md p-2"
+  },
+  Boomberg: {
+    "primaryColor": "bg-[#121212]",
+    "secondaryColor": "bg-neutral-900",
+    "accentColor": "bg-neutral-800",
+    "hoverColor": "bg-[#2d2d2d]",
+    "backgroundColor": "bg-[#121212]",
+    "backgroundImage": "",
+    "primaryHoverColor": "bg-[#FF9A33]",
+    "secondaryHoverColor": "bg-[#2d2d2d]",
+    "textColorPrimary": "text-[#f9c204]",
+    "textColorSecondary": "text-gray-300",
+    "chatWindowStyle": "text-[#fabe01]",
+    "aiMessageStyle": "text-[#fabe01] rounded-md p-2"
   },
 };
 

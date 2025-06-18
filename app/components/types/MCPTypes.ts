@@ -13,7 +13,7 @@ export type InputSchema = {
 
 export type Tool = {
   name: string,
-  descriptions: string,
+  description: string,
   inputSchema: InputSchema,
 }
 
@@ -33,4 +33,23 @@ export type ServerSummaryType = {
   resourceTemplates: Object[],
   serverCapabilities: Object[]
   uri: string
+}
+
+export type MCPOAuthType = {
+  authorization_url: string
+  redirect_url: string
+  revocation_url: string
+  token_url: string
+}
+
+export type MCPToolType = {
+  tools: Tool[],
+  prompts: Prompt[],
+  resources: Object[],
+  instructions: string,
+  name: string,
+  uri: string,
+  uti:string,
+  authorization: MCPOAuthType
+  transport: string
 }

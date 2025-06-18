@@ -2,7 +2,7 @@ import ProductType from "../components/types/ProductType";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import User from "./User";
 import { SSEClientTransport } from "@modelcontextprotocol/sdk/client/sse.js";
-import { InputSchema, Tool, ServerSummaryType, Prompt } from "../components/types/MCPTypes";
+import { InputSchema, Tool, ServerSummaryType, Prompt, MCPToolType } from "../components/types/MCPTypes";
 
 /**
  * F4MCPClient is a client for interacting with Model Context Protocol (MCP) servers.
@@ -51,7 +51,7 @@ class F4MCPClient {
       // Map the SDK response to match our Tool type
       return response.tools.map((tool: any) => ({
         name: tool.name,
-        descriptions: tool.description || "", // Convert description to descriptions
+        description: tool.description || "", // Convert description to descriptions
         inputSchema: tool.inputSchema || {
           type: "",
           required: [],
@@ -170,21 +170,30 @@ class F4MCPClient {
    * Prepares a prompt by gathering structured JSON data from all registered products
    * @returns Promise resolving to an array of structured JSON data for all products
    */
-  async preparePrompt() : Promise<any[]>{
+  async preparePrompt() : Promise<MCPToolType[]>{
     let tools:any[] = []
     for (const uti of this.metadata.keys()) {
       try {
         const res = await this.getStructuredJSON(uti) 
-        tools.push({
-          tools: res.tools, 
-          prompts: res.prompts, 
-          resources: res.resources
-        })
+        console.log("Product data: ", this.metadata.get(uti))
+        if(res.tools.length > 0 || res.prompts.length > 0 || res.resources.length > 0){
+          tools.push({
+            tools: res.tools, 
+            prompts: res.prompts, 
+            resources: res.resources,
+            instructions: res.instructions,
+            name: res.name,
+            uri: res.uri,
+            uti: uti,
+            authorization: this.metadata.get(uti)?.server.authorization,
+            transport: this.metadata.get(uti)?.server.transport
+          })
+        }
       } catch (error) {
         console.error(`Error getting data for UTI ${uti}:`, error)
       }
     }
-    
+
     return tools
   }
 

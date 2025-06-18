@@ -43,7 +43,7 @@ import MCPAuthHandler from "../../../MCPAuthHandler";
  */
 export default function PromptBox({session, state, setState, f4rmers}: {session: F4Session, state: "canvas" | "chat" | "preview" | "edit", setState: (state: "canvas" | "chat" | "preview" | "edit") => void, f4rmers: F4rmerType[]}) {
   const { theme } = useTheme();
-  const { selectedAgent, setAvailableAgents } = useAgent();
+  const { selectedAgent, setAvailableAgents, client } = useAgent();
   const messageContainerRef = useRef<HTMLDivElement | null>(null);
   const [promptForUserLogin, setPromptForUserLogin] = useState<boolean>(false)
   const [selectedModel, setSelectedModel] = useState<any>(config.models[Object.keys(config.models)[0]][0]);
@@ -179,16 +179,18 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
       return
     }
 
+    let tools = await client.preparePrompt()
+    console.log("TOOLS: ", tools)
+
     let postData: PostDataType = {
       messages: chatSession.getNextJSMessages(), 
       description: selectedAgent.jobDescription,
       show_intermediate_steps: false,
       session: session,
       f4rmer: selectedAgent.title,
-      model: selectedModel
+      model: selectedModel,
+      tools: tools
     }
-
-    // chatSession.push("auth", "system", "test", "test")
 
     // Send message
     const stream = await chatSession.send(postData)
@@ -203,7 +205,7 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
   return (
     <div className="sm:flex overflow-hidden w-[100vw]">
       <div className={`flex transition-all ${state === "canvas" ? "m-0" : "m-auto"}`}>
-    <div className={`relative m-auto mt-1 md:pt-0 w-[100vw] h-[100vh] sm:h-[93vh] overflow-hidden ${state === "chat" || state === "edit" ? "sm:w-[16cm]" : "sm:w-[10cm]"} ${theme.chatWindowStyle ? theme.chatWindowStyle : ""}`}>
+    <div className={`relative m-auto mt-1 md:pt-0 w-[100vw] h-[100vh] sm:h-[93vh] overflow-hidden ${state === "chat" || state === "edit" ? "sm:w-[16cm]" : "sm:w-[10cm]"} rounded-md ${theme.chatWindowStyle ? theme.chatWindowStyle : ""}`}>
       <div className="no-scrollbar flex flex-col w-full transition-all duration-500 overflow-y-auto flex-grow h-full">
         <div
           className={`p-2 no-scrollbar flex flex-col-reverse w-full gap-5 transition-all duration-500 overflow-y-scroll scrollb ${currentSession.length > 0 ? 'opacity-100' : 'opacity-0 h-0'}`}
@@ -242,10 +244,7 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
                       }} 
                       onAuthenticate={(_) => {
                         // Update the status and create a new reference
-                        let uti = m.content.split("_")[0]
-                        let endpoint = m.content.split("_").splice(1).join("_")
-                        let product = selectedAgent?.toolbox.filter(e => e.uti == uti)[0]
-                        let provider = MCPAuthHandler.oauth2(product?.endpoints.filter(e => e.name == endpoint)[0].authorization.provider)
+                        let provider = MCPAuthHandler.oauth2("linear")
 
                         let url = provider.authorization_server + "?client_id=" + provider.client_id + "&redirect_uri=" + provider.redirect_uri + "&response_type=code&scope=read,write&state=" + "linear"
                         window.open(url, '_blank')
