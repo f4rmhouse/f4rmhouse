@@ -22,13 +22,15 @@ class F4MCPClient {
   /** User object for authentication purposes */
   private caller: User | null = null
 
+  private testing = false;
+
   /**
    * Creates a new F4MCPClient instance
    * @param name - Name identifier for this client
    * @param metadata - Array of product metadata objects
    * @param caller - User object for authentication
    */
-  constructor(name: string, metadata: ProductType[], caller?: User) {
+  constructor(name: string, metadata: ProductType[], caller?: User, testing:boolean=false) {
     this.name = name;
     this.metadata = new Map<string, ProductType>();
     metadata.map((product:ProductType) => 
@@ -38,6 +40,8 @@ class F4MCPClient {
     if(caller) {
       this.caller = caller;
     }
+
+    this.testing = testing;
   }
 
   /**
@@ -175,7 +179,6 @@ class F4MCPClient {
     for (const uti of this.metadata.keys()) {
       try {
         const res = await this.getStructuredJSON(uti) 
-        console.log("Product data: ", this.metadata.get(uti))
         if(res.tools.length > 0 || res.prompts.length > 0 || res.resources.length > 0){
           tools.push({
             tools: res.tools, 
@@ -254,7 +257,10 @@ class F4MCPClient {
       else {
         // Encode the serverURL to safely use it as a URL parameter
         const encodedServerURL = encodeURIComponent(serverURL);
-        const url = new URL(`http://localhost:3000/api/mcp/sse?server_uri=${encodedServerURL}`);
+        let url = new URL(`http://localhost:3000/api/mcp/sse?server_uri=${encodedServerURL}`);
+        if(this.testing) {
+          url = new URL("http://localhost:8080/sse");
+        }
         const transport = new SSEClientTransport(url);
         await client.connect(transport);
         this.connections.set(uti, client);
