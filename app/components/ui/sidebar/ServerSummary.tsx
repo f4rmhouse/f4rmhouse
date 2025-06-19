@@ -21,7 +21,6 @@ export default function ServerSummary({summary}: {summary: ServerSummaryType | u
   if (!summary || (!summary.tools.length && !summary.prompts.length && !summary.resources.length) ) {
     return (
       <div className="text-xs text-red-500 flex items-center gap-1 mt-1">
-        <AlertCircle size={12} />
       </div>
     );
   }

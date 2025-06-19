@@ -3,6 +3,7 @@ import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import User from "./User";
 import { SSEClientTransport } from "@modelcontextprotocol/sdk/client/sse.js";
 import { InputSchema, Tool, ServerSummaryType, Prompt, MCPToolType, MCPResourceType } from "../components/types/MCPTypes";
+import { MCPConnectionStatus } from "../components/types/MCPConnectionStatus";
 
 /**
  * F4MCPClient is a client for interacting with Model Context Protocol (MCP) servers.
@@ -225,7 +226,7 @@ class F4MCPClient {
    * @throws Error if connection fails
    * @returns Promise that resolves when the connection is established
    */
-  async connect(uti: string, serverURL: string): Promise<any> {
+  async connect(uti: string, serverURL: string): Promise<MCPConnectionStatus> {
     let accessToken = ""
 
     const client = new Client({
@@ -261,18 +262,29 @@ class F4MCPClient {
           const transport = new SSEClientTransport(url);
           await client.connect(transport);
           this.connections.set(uti, client);
+          console.info("No auth needed for this server. Proceed to connection.")
           return {status: "success"}
         }
         else if(res.status == 401) {
           if (this.metadata.get(uti)?.server.authorization.authorization_url) {
-            console.log("Discovery described in tool.yml")
+            console.info("Vendor has described auth metadata. Ask user to login")
+            return {status: "authenticate"}
           }
           else {
-            this._handleServerAuthDiscovery(serverURL, res)
+            let authMetadata = await this._handleAutomaticServerAuthDiscovery(serverURL, res)
+            if(authMetadata.status == 200) {
+              console.info("Found metadata endpoints on MCP server will ask user to login.") 
+              return {status: "authenticate", remoteMetadata: authMetadata.remoteMetadata, remoteAuthServerMetadata: authMetadata.remoteAuthServerMetadata}
+            }
+            else {
+              console.error("Could not find metadata endpoints on MCP server")
+              return {status: "error"}
+            }
           }
         }
         else {
           console.error("Unexpected status code:", res.status)
+          return {status: "error"}
         }
       }
     } catch(err) {
@@ -310,36 +322,35 @@ class F4MCPClient {
     await client.connect(transport); 
   }
 
-  async _handleServerAuthDiscovery(serverURL:string, res:Response) {
-    console.error("401 - Unauthorized, checking for metadata endpoint")
+  async _handleAutomaticServerAuthDiscovery(serverURL:string, res:Response): Promise<any> {
+    console.info("401 - Unauthorized and no discovery mechanism defined by vendor, checking for metadata endpoints on MCP server...")
     const rfc8415OauthServerPath = "/.well-known/oauth-authorization-server"
 
     let remoteMetaDataEndpoint = this._extractUrl(res.headers.get("www-authenticate") || "");
     let remoteAuthServerMetaDataEndpoint = serverURL.replace("/sse", rfc8415OauthServerPath)
-    let metadata= {status: 404, remoteMetadata: {}, remoteAuthServerMetadata: {}}
+    let authMetadata = {status: 404, remoteMetadata: {}, remoteAuthServerMetadata: {}}
 
     if(remoteMetaDataEndpoint) {
       let remoteMetaData = await this._fetchRFC9728MetaData(remoteMetaDataEndpoint)
       if(remoteMetaData.status == 200) {
-        metadata.remoteMetadata = await remoteMetaData.json()
-        metadata.status = 200
+        authMetadata.remoteMetadata = await remoteMetaData.json()
+        authMetadata.status = 200
       }
       else {
-        metadata.status = remoteMetaData.status
+        authMetadata.status = remoteMetaData.status
       }
     }
     if(remoteAuthServerMetaDataEndpoint) {
       let remoteAuthServerMetaData = await this._fetchRFC8414AuthServerMetaData(remoteAuthServerMetaDataEndpoint)
       if(remoteAuthServerMetaData.status == 200) {
-        metadata.remoteAuthServerMetadata = await remoteAuthServerMetaData.json()
-        metadata.status = 200
+        authMetadata.remoteAuthServerMetadata = await remoteAuthServerMetaData.json()
+        authMetadata.status = 200
       }
       else {
-        metadata.status = remoteAuthServerMetaData.status
+        authMetadata.status = remoteAuthServerMetaData.status
       }
     }
-    console.log(metadata)
-    return metadata
+    return authMetadata
   }
 
   async _fetchRFC9728MetaData(remoteMetaDataEndpoint:string): Promise<any> {

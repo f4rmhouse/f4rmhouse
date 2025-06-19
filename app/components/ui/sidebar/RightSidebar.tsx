@@ -10,13 +10,15 @@ import { useEffect, useState } from 'react';
 import { useSession } from "next-auth/react";
 import User from '@/app/microstore/User';
 import ProductType from '../../types/ProductType';
-import { BadgeCheck, Bot, BrainCircuit, ChevronRight, Hammer, HardDrive, QrCode, Server, Store as StoreIcon} from "lucide-react";
+import { BadgeCheck, Bot, BrainCircuit, ChevronRight, Hammer, HardDrive, LockKeyhole, QrCode, Server, Store as StoreIcon} from "lucide-react";
 import { Delete, PanelLeftClose, PanelRightClose, Repeat2, Wrench } from 'lucide-react';
 import { useTheme } from "../../../context/ThemeContext";
 import { useAgent } from "../../../context/AgentContext";
 import F4MCPClient from '@/app/microstore/F4MCPClient';
 import { ServerSummaryType } from '@/app/components/types/MCPTypes';
 import ServerSummary from './ServerSummary';
+import { MCPConnectionStatus } from '../../types/MCPConnectionStatus';
+import ConfirmModal from "../modal/ConfirmModal";
 
 export default function RightSidebar() {
   const { theme } = useTheme();
@@ -26,7 +28,7 @@ export default function RightSidebar() {
   const [qrImageURL, setQrImageURL] = useState<string>("")
   const [loading, setLoading] = useState<boolean>(false)
   const [openList, setOpenList] = useState<boolean[]>(selectedAgent?.toolbox?.map(_ => false) || [])
-  const [isOnline, setIsOnline] = useState<boolean[]>(selectedAgent?.toolbox?.map(_ => false) || [])
+  const [isOnline, setIsOnline] = useState<MCPConnectionStatus[]>(selectedAgent?.toolbox?.map(_ => ({ status: "error" })) || [])
 
   const [summary, setSummary] = useState<Map<string, ServerSummaryType>>(new Map())
 
@@ -34,6 +36,9 @@ export default function RightSidebar() {
   
   // Track ping times for each server
   const [pingTimes, setPingTimes] = useState<{[key: string]: number}>({})
+
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [loginToolIndex, setLoginToolIndex] = useState<number | null>(null);
 
   const getQR = () => {
     setLoading(true)
@@ -106,23 +111,23 @@ export default function RightSidebar() {
   useEffect(() => {
     if (selectedAgent) {
       setOpenList(selectedAgent.toolbox.map(_ => false))
-      let _isOnline = selectedAgent.toolbox.map(_ => false) 
+      let _isOnline = selectedAgent.toolbox.map((_): MCPConnectionStatus => ({ status: "error" })) 
+      let connectionStatus: MCPConnectionStatus
       // Connect to each tool server
       const connectToTool = async (uti:string, index:number) => {
         try {
           const tool = selectedAgent.toolbox[index];
-          console.log("uri: ", tool.server.uri)
           if(tool.server.uri.startsWith("http://") || tool.server.uri.startsWith("https://")) {
             if(tool.server.uri.endsWith("/sse")) {
-              await client.connect(uti, tool.server.uri)
+              connectionStatus = await client.connect(uti, tool.server.uri)
             }
             else {
-              await client.connect(uti, tool.server.uri + "/sse")
+              connectionStatus = await client.connect(uti, tool.server.uri + "/sse")
             }
-            _isOnline = _isOnline.map((item, i) => i === index? true : item)
+            _isOnline = _isOnline.map((item, i) => i === index? connectionStatus : item)
           }
         } catch (error) {
-          _isOnline = _isOnline.map((item, i) => i === index? false : item)
+          _isOnline = _isOnline.map((item, i) => i === index? { status: "error" } as MCPConnectionStatus : item)
         }
         setIsOnline(_isOnline)
       }
@@ -131,11 +136,23 @@ export default function RightSidebar() {
     }
   }, [selectedAgent])
 
+  const getStatusIndicator = (status: string) => {
+    switch(status) {
+      case "success":
+        return <div className={`bg-green-500 rounded-full p-1 mt-auto ml-[-7px] border-2 border-${theme.chatWindowStyle?.replace("bg-", "")}`}></div>
+      case "authenticate":
+        return <div className={`bg-black rounded-full mt-auto ml-[-7px] p-1`}><LockKeyhole className="text-white" size={10}/></div>
+      case "error":
+      default:
+        return <div className={`bg-red-500 rounded-full p-1 mt-auto ml-[-7px] border-2 border-${theme.chatWindowStyle?.replace("bg-", "")}`}></div>
+    }
+  }
+
   return (
     <div>
     <div onMouseEnter={() => setVisible(true)} onMouseLeave={() => setVisible(false)} className={`p-2 fixed right-0 w-[50%] sm:w-[25%] mt-9 h-[92vh] z-10 top-0 border-${theme.secondaryColor?.replace("bg-", "")} ${theme.chatWindowStyle} transition-transform duration-300 ease-in-out rounded-md transform p-3 ${visible ? 'translate-x-0' : 'translate-x-full'}`}>
       <div className='h-[95%] flex flex-col'>
-        <p className={`pl-2 pb-2 flex text-base flex mb-2 ${theme.textColorPrimary}`}><div className="mr-2 bg-yellow-500 rounded-md p-1 text-yellow-900"><Bot size={20}/></div><span className='my-auto'>{selectedAgent?.title}</span></p>
+        <p className={`pl-2 pb-2 flex text-base flex mb-2 ${theme.textColorPrimary}`}><span className="mr-2 bg-yellow-500 rounded-md p-1 text-yellow-900"><Bot size={20}/></span><span className='my-auto'>{selectedAgent?.title}</span></p>
         <p className={`pl-2 text-base flex mb-2 ${theme.textColorPrimary} w-[100%]`}>MCP Servers</p>
         {selectedAgent?.toolbox ?
         <div className="space-y-1 max-h-[50vh] overflow-y-auto pr-1">
@@ -143,7 +160,7 @@ export default function RightSidebar() {
             <div key={index} className="pl-1 pb-2">
               <div onClick={() => toggleToolSummary(index)} className={`flex w-full rounded-md}`}>
                 <img alt="action-thumbnail" className="ml-2 h-6 my-auto rounded-full aspect-square object-cover" height={15} src={"https://f4-public.s3.eu-central-1.amazonaws.com/showcases/" + tool.uti + "/thumbnail.jpg"}/>
-                <div className={`${isOnline[index] ? 'bg-green-500' : 'bg-red-500'} rounded-full p-1 mt-auto ml-[-7px] border-2 border-${theme.chatWindowStyle?.replace("bg-", "")}`}></div>
+                {isOnline[index] && getStatusIndicator(isOnline[index].status)}
                 <p className={`ml-2 text-base hover:cursor-pointer ${theme.textColorPrimary} w-[90%]`}>{tool.title}</p>
                 <ChevronRight 
                   size={20} 
@@ -155,13 +172,26 @@ export default function RightSidebar() {
                 {openList[index] ? 
                   <div className={`flex flex-col text-sm ${theme.textColorSecondary} p-0 pr-2 pl-2 ${theme.secondaryColor}`}>
                     <ServerSummary summary={summary.get(tool.uti)}/>
-                    {!isOnline[index] ? (
+                    {isOnline[index].status === "error" ? (
                       <div className="text-xs text-red-400 mt-1 mb-2">
                         <p>Connection error: Unable to connect to server</p>
                         <button 
                           className="text-xs bg-neutral-700 hover:bg-neutral-600 text-white px-2 py-1 rounded mt-1"
                         >
                           Retry connection
+                        </button>
+                      </div>
+                    ) : isOnline[index].status === "authenticate" ? (
+                      <div className="text-xs mt-1 mb-2">
+                        <p>Authentication required</p>
+                        <button 
+                          className="text-xs bg-black hover:bg-neutral-500 text-white px-2 py-1 rounded mt-1"
+                          onClick={() => {
+                            setLoginToolIndex(index);
+                            setShowConfirmModal(true);
+                          }}
+                        >
+                          Login
                         </button>
                       </div>
                     ) : (
@@ -231,6 +261,25 @@ export default function RightSidebar() {
     <div onMouseEnter={() => setVisible(true)} className="bg-transparent absolute sm:fixed top-16 right-0 w-[50px] h-[10vh] sm:h-[100vh] z-0">
       <button onClick={() => setVisible(p => !p)} className={`z-10 ml-4 ${theme.textColorPrimary ? theme.textColorPrimary : "text-white" }`}><PanelLeftClose /></button>
     </div>
+    {showConfirmModal && (
+      <ConfirmModal 
+        open={showConfirmModal}
+        setIsOpen={setShowConfirmModal}
+        title="Authentication Warning"
+        content="You are about to authenticate with an external MCP server. f4rmhouse can't enforce any security measures on the server side. Only autheticate to servers that you trust, and ALWAYS verify that the data sent by the LLM is information you are comfortable sharing with the server before sending it. All requests are encrypted end-to-end so no one other than the MCP server and yourself get access to it."
+        action={() => {
+          // Handle the actual login logic here
+          if (loginToolIndex !== null && selectedAgent) {
+            const tool = selectedAgent.toolbox[loginToolIndex];
+            console.log('Proceeding with authentication for:', tool.title);
+            console.log(isOnline[loginToolIndex])
+            // Add your authentication logic here
+          }
+          setShowConfirmModal(false);
+          setLoginToolIndex(null);
+        }}
+      />
+    )}
     </div>
   )
 }
