@@ -225,7 +225,7 @@ class F4MCPClient {
    * @throws Error if connection fails
    * @returns Promise that resolves when the connection is established
    */
-  async connect(uti: string, serverURL: string) {
+  async connect(uti: string, serverURL: string): Promise<any> {
     let accessToken = ""
 
     const client = new Client({
@@ -245,48 +245,117 @@ class F4MCPClient {
 
     try {
       if (accessToken) {
-        const authToken = "Bearer " + accessToken
-        /**
-         * Helper function to add authorization headers to fetch requests
-         * @param url - URL to fetch
-         * @param init - Request initialization options
-         * @returns Promise from fetch with authorization headers added
-         */
-        const fetchWithAuth = (url: string | URL, init?: RequestInit) => {
-          const headers = new Headers(init?.headers);
-          headers.set("Authorization", authToken);
-          return fetch(url.toString(), { ...init, headers });
-        };
-
-        const customHeaders = {
-            Authorization: authToken,
-        };
-        const url = new URL(serverURL)
-        const transport = new SSEClientTransport(url, {
-            eventSourceInit: {
-                fetch: fetchWithAuth,
-            },
-            requestInit: {
-              headers: customHeaders,
-            },
-        });
-        await client.connect(transport);
+        await this._connectToClientWithAuthToken(serverURL, accessToken, client)
+        return {status: "success"}
       }
       else {
         // Encode the serverURL to safely use it as a URL parameter
         const encodedServerURL = encodeURIComponent(serverURL);
+        console.log(encodedServerURL)
         let url = new URL(`http://localhost:3000/api/mcp/sse?server_uri=${encodedServerURL}`);
         if(this.testing) {
           url = new URL("http://localhost:8080/sse");
         }
-        const transport = new SSEClientTransport(url);
-        await client.connect(transport);
-        this.connections.set(uti, client);
+        let res = await fetch(url)
+        if(res.status == 200) {
+          const transport = new SSEClientTransport(url);
+          await client.connect(transport);
+          this.connections.set(uti, client);
+          return {status: "success"}
+        }
+        else if(res.status == 401) {
+          if (this.metadata.get(uti)?.server.authorization.authorization_url) {
+            console.log("Discovery described in tool.yml")
+          }
+          else {
+            this._handleServerAuthDiscovery(serverURL, res)
+          }
+        }
+        else {
+          console.error("Unexpected status code:", res.status)
+        }
       }
     } catch(err) {
       this.connections.delete(uti)
       throw new Error(`Could not connect to ${uti}: ` + String(err))
     }
+  }
+
+  async _connectToClientWithAuthToken(serverURL: string, accessToken: string, client: Client) {
+    const authToken = "Bearer " + accessToken
+    /**
+     * Helper function to add authorization headers to fetch requests
+     * @param url - URL to fetch
+     * @param init - Request initialization options
+     * @returns Promise from fetch with authorization headers added
+     */
+    const fetchWithAuth = (url: string | URL, init?: RequestInit) => {
+      const headers = new Headers(init?.headers);
+      headers.set("Authorization", authToken);
+      return fetch(url.toString(), { ...init, headers });
+    };
+
+    const customHeaders = {
+        Authorization: authToken,
+    };
+    const url = new URL(serverURL)
+    const transport = new SSEClientTransport(url, {
+        eventSourceInit: {
+            fetch: fetchWithAuth,
+        },
+        requestInit: {
+          headers: customHeaders,
+        },
+    });
+    await client.connect(transport); 
+  }
+
+  async _handleServerAuthDiscovery(serverURL:string, res:Response) {
+    console.error("401 - Unauthorized, checking for metadata endpoint")
+    const rfc8415OauthServerPath = "/.well-known/oauth-authorization-server"
+
+    let remoteMetaDataEndpoint = this._extractUrl(res.headers.get("www-authenticate") || "");
+    let remoteAuthServerMetaDataEndpoint = serverURL.replace("/sse", rfc8415OauthServerPath)
+    let metadata= {status: 404, remoteMetadata: {}, remoteAuthServerMetadata: {}}
+
+    if(remoteMetaDataEndpoint) {
+      let remoteMetaData = await this._fetchRFC9728MetaData(remoteMetaDataEndpoint)
+      if(remoteMetaData.status == 200) {
+        metadata.remoteMetadata = await remoteMetaData.json()
+        metadata.status = 200
+      }
+      else {
+        metadata.status = remoteMetaData.status
+      }
+    }
+    if(remoteAuthServerMetaDataEndpoint) {
+      let remoteAuthServerMetaData = await this._fetchRFC8414AuthServerMetaData(remoteAuthServerMetaDataEndpoint)
+      if(remoteAuthServerMetaData.status == 200) {
+        metadata.remoteAuthServerMetadata = await remoteAuthServerMetaData.json()
+        metadata.status = 200
+      }
+      else {
+        metadata.status = remoteAuthServerMetaData.status
+      }
+    }
+    console.log(metadata)
+    return metadata
+  }
+
+  async _fetchRFC9728MetaData(remoteMetaDataEndpoint:string): Promise<any> {
+    const encodedURL = "http://localhost:3000/api/mcp/automatic/discovery?server_uri=" +encodeURIComponent(remoteMetaDataEndpoint);
+    return await fetch(encodedURL)
+  }
+
+  async _fetchRFC8414AuthServerMetaData(remoteAuthServerMetaDataEndpoint:string): Promise<any> {
+    const encodedURL = "http://localhost:3000/api/mcp/automatic/discovery?server_uri=" + encodeURIComponent(remoteAuthServerMetaDataEndpoint);
+    return await fetch(encodedURL)
+  }
+
+  _extractUrl(input: string): string | null{
+    const regex = /resource_metadata="([^"]+)"/;
+    const match = input.match(regex);
+    return match && match[1];
   }
 
   /**

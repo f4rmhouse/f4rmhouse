@@ -111,8 +111,16 @@ export default function RightSidebar() {
       const connectToTool = async (uti:string, index:number) => {
         try {
           const tool = selectedAgent.toolbox[index];
-          await client.connect(uti, tool.server.uri + "/sse")
-          _isOnline = _isOnline.map((item, i) => i === index? true : item)
+          console.log("uri: ", tool.server.uri)
+          if(tool.server.uri.startsWith("http://") || tool.server.uri.startsWith("https://")) {
+            if(tool.server.uri.endsWith("/sse")) {
+              await client.connect(uti, tool.server.uri)
+            }
+            else {
+              await client.connect(uti, tool.server.uri + "/sse")
+            }
+            _isOnline = _isOnline.map((item, i) => i === index? true : item)
+          }
         } catch (error) {
           _isOnline = _isOnline.map((item, i) => i === index? false : item)
         }
