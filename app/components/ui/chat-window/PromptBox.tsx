@@ -43,7 +43,7 @@ import MCPAuthHandler from "../../../MCPAuthHandler";
  */
 export default function PromptBox({session, state, setState, f4rmers}: {session: F4Session, state: "canvas" | "chat" | "preview" | "edit", setState: (state: "canvas" | "chat" | "preview" | "edit") => void, f4rmers: F4rmerType[]}) {
   const { theme } = useTheme();
-  const { selectedAgent, setAvailableAgents, client } = useAgent();
+  const { selectedAgent, setSelectedAgent, setAvailableAgents, client } = useAgent();
   const messageContainerRef = useRef<HTMLDivElement | null>(null);
   const [promptForUserLogin, setPromptForUserLogin] = useState<boolean>(false)
   const [selectedModel, setSelectedModel] = useState<any>(config.models[Object.keys(config.models)[0]][0]);
@@ -180,7 +180,6 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
     }
 
     let tools = await client.preparePrompt()
-    console.log("TOOLS: ", tools)
 
     let postData: PostDataType = {
       messages: chatSession.getNextJSMessages(), 
@@ -332,6 +331,8 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
         // Handle saving the updated f4rmer
         let user = new User(session.user.email, session.provider, session.access_token)
         user.updateF4rmer(updatedF4rmer).then(e => {
+          // Update the agent in the context as well
+          setSelectedAgent(updatedF4rmer);
           alert("Your f4rmer was updated successfully!")
           setState("chat")
         }).catch(e => {
