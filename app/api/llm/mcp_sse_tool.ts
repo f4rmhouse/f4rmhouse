@@ -10,7 +10,18 @@ function createMCPTool({ uti, endpoint, title, tool_description, parameters, aut
     //    throw new Error('No parameters defined for this tool');
     //}
 
-    const zodSchema = z.object(
+    //{tool.inputSchema.properties ? 
+    //    Object.keys(tool.inputSchema.properties).map(e => (
+    //      <p className="pl-8" key={e}>{e}: {(tool.inputSchema.properties[e] as any).type}</p>
+    //    ))
+    //  :
+    //    <p>JSON Schema: {JSON.stringify(tool.inputSchema.properties)}</p>
+    //  }
+
+    let zodSchema;
+
+    if(parameters.properties) {
+        zodSchema = z.object(
         Object.fromEntries(
             Object.keys(parameters.properties).map((p:string) => {
                 let name = p
@@ -25,6 +36,7 @@ function createMCPTool({ uti, endpoint, title, tool_description, parameters, aut
                         ]
                     case "int":
                     case "integer":
+                    case "number":
                         return [
                             name,
                             z.number().describe(desc)
@@ -56,6 +68,7 @@ function createMCPTool({ uti, endpoint, title, tool_description, parameters, aut
             })
         )
     )
+    }
 
     async function execute(args: Record<string, string>) {
         try {
@@ -93,8 +106,10 @@ function createMCPTool({ uti, endpoint, title, tool_description, parameters, aut
 
             let mcpStreamableHTTPtransport: StreamableHTTPClientTransport;
             let mcpSSEtransport: SSEClientTransport;
+            console.log("transport: ", transport)
+            console.log("uri: ", uri)
             if(transport == "sse") {
-                const url = new URL(uri + "/sse")
+                const url = new URL(uri)
                 mcpSSEtransport = new SSEClientTransport(url, {
                     eventSourceInit: {
                         fetch: fetchWithAuth,
