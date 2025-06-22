@@ -53,6 +53,12 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
   const [loading, setLoading] = useState<boolean>(false)
   const [latestMessage, setLatestMessage] = useState<string>("")
 
+  const [welcomeMessage, setWelcomeMessage] = useState<string>()
+
+  useEffect(() => {
+    setWelcomeMessage(config.welcomeText[Math.floor(Math.random() * config.welcomeText.length)].replace("{{username}}", session.user.name === "undefined" ? "anon" : session.user.name.split(" ")[0]))
+  }, [session])
+
   useEffect(() => {
     if(f4rmers && f4rmers.length > 0) {
       setAvailableAgents(f4rmers)
@@ -269,7 +275,7 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
         </div>
         <div className={`mt-auto sticky transition-all ${state === "canvas" ? "w-[98%]" : "w-[99%]"} ml-1 mr-2 ${chatSession.getMessages().length > 0 ? "bottom-[10%] sm:bottom-0 pb-1" : "bottom-[calc(40vh)]"}`}>
             <div className={`${chatSession.getMessages().length === 0 ? "opacity-100" : "opacity-0"} pb-1`}>
-              <h1 className={`text-2xl ${theme.textColorPrimary ? theme.textColorPrimary : "text-white"}`}>{config.welcomeText.replace("{{username}}", session.user.name === "undefined" ? "anon" : session.user.name.split(" ")[0])}</h1>
+              <h1 className={`flex text-2xl ${theme.textColorPrimary ? theme.textColorPrimary : "text-white"}`}>{welcomeMessage} <img className="my-auto w-10" src={"https://media.tenor.com/R7JF4cuIjogAAAAj/spongebob-spongebob-meme.gif"} /></h1>
             </div>
           <UserInput onSubmit={sendMessage} onChange={handleInputChange} value={input}>
             <div className="flex p-0">

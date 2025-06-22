@@ -4,6 +4,7 @@ import User from "./User";
 import { SSEClientTransport } from "@modelcontextprotocol/sdk/client/sse.js";
 import { InputSchema, Tool, ServerSummaryType, Prompt, MCPToolType, MCPResourceType } from "../components/types/MCPTypes";
 import { MCPConnectionStatus } from "../components/types/MCPConnectionStatus";
+import MCPAuthHandler from "../MCPAuthHandler";
 
 /**
  * F4MCPClient is a client for interacting with Model Context Protocol (MCP) servers.
@@ -45,6 +46,10 @@ class F4MCPClient {
     this.testing = testing;
   }
 
+  setUser(user:User) {
+    this.caller = user
+  }
+
   /**
    * Lists available tools from an MCP server
    * @param uti - Unique Tool Identifier for the server
@@ -54,6 +59,7 @@ class F4MCPClient {
     let response = await this.connections.get(uti)?.listTools()
     if(response && response.tools){
       // Map the SDK response to match our Tool type
+      console.log("tools: ", response)
       return response.tools.map((tool: any) => ({
         name: tool.name,
         description: tool.description || "", // Convert description to descriptions
@@ -76,6 +82,7 @@ class F4MCPClient {
     let response = await this.connections.get(uti)?.listPrompts()
     if (response && response.prompts) {
       // Transform the response to match our Prompt type
+      console.log("tools: ", response)
       let properties: any = {}
       response.prompts.map((p:any) => {
         p.arguments.map((pp:any) => {
@@ -169,12 +176,18 @@ class F4MCPClient {
    */
   async getStructuredJSON(uti: string): Promise<ServerSummaryType> {
     let tools = await this.listTools(uti)
-    let prompts = await this.listPrompts(uti)
-    let resources = await this.listResources(uti)
-    let resourceTemplates = await this.listResourceTemplates(uti)
+    let prompts: Prompt[] = []
+    // let prompts = await this.listPrompts(uti)
+    // let resources = await this.listResources(uti)
+    let resources: MCPResourceType[] = []
+    // let resourceTemplates = await this.listResourceTemplates(uti)
+    let resourceTemplates: Object[] = []
     let serverCapabilities = await this.getServerCapabilities(uti)
+    // let serverCapabilities: Object[] = []
     let instructions = await this.getServerInstructions(uti)
+    // let instructions: string = ""
     let version = await this.getServerVersion(uti)
+    // let version: {name: string, version: string} = {name: "", version: ""}
 
     return {
       name: version.name,
@@ -236,6 +249,7 @@ class F4MCPClient {
 
     if(this.caller) {
       let token = await this.caller.getToken(uti)
+      console.log("TOKEN: ", token)
       if(token.Code == 404) {
         accessToken = ""
       }
@@ -246,41 +260,25 @@ class F4MCPClient {
 
     try {
       if (accessToken) {
-        await this._connectToClientWithAuthToken(serverURL, accessToken, client)
+        console.log("Connect with auth")
+        await this._connectToClientWithAuthToken(uti, serverURL, accessToken, client)
         return {status: "success"}
       }
       else {
         // Encode the serverURL to safely use it as a URL parameter
         const encodedServerURL = encodeURIComponent(serverURL);
-        console.log(encodedServerURL)
         let url = new URL(`http://localhost:3000/api/mcp/sse?server_uri=${encodedServerURL}`);
         if(this.testing) {
           url = new URL("http://localhost:8080/sse");
         }
         let res = await fetch(url)
         if(res.status == 200) {
-          const transport = new SSEClientTransport(url);
-          await client.connect(transport);
-          this.connections.set(uti, client);
-          console.info("No auth needed for this server. Proceed to connection.")
+          await this._connectWithMCPServerWithoutAuth(uti, url, client)
           return {status: "success"}
         }
         else if(res.status == 401) {
-          if (this.metadata.get(uti)?.server.authorization.authorization_url) {
-            console.info("Vendor has described auth metadata. Ask user to login")
-            return {status: "authenticate"}
-          }
-          else {
-            let authMetadata = await this._handleAutomaticServerAuthDiscovery(serverURL, res)
-            if(authMetadata.status == 200) {
-              console.info("Found metadata endpoints on MCP server will ask user to login.") 
-              return {status: "authenticate", remoteMetadata: authMetadata.remoteMetadata, remoteAuthServerMetadata: authMetadata.remoteAuthServerMetadata}
-            }
-            else {
-              console.error("Could not find metadata endpoints on MCP server")
-              return {status: "error"}
-            }
-          }
+          await this._initiateMCPAuthentication(uti, serverURL, res)
+          return {status: "authenticate"}
         }
         else {
           console.error("Unexpected status code:", res.status)
@@ -293,7 +291,32 @@ class F4MCPClient {
     }
   }
 
-  async _connectToClientWithAuthToken(serverURL: string, accessToken: string, client: Client) {
+  async _connectWithMCPServerWithoutAuth(uti: string, url: URL, client: Client) {
+    console.info("No auth needed for this server. Proceed to connection.")
+    const transport = new SSEClientTransport(url);
+    await client.connect(transport);
+    this.connections.set(uti, client);
+  }
+
+  async _initiateMCPAuthentication(uti: string, serverURL: string, initialResponseFromServer: Response) {
+    if (this.metadata.get(uti)?.server.authorization.authorization_url) {
+      console.info("Vendor has described auth metadata. Ask user to login")
+      return {status: "authenticate"}
+    }
+    else {
+      let authMetadata = await this._handleAutomaticServerAuthDiscovery(serverURL, initialResponseFromServer)
+      if(authMetadata.status == 200) {
+        console.info("Found metadata endpoints on MCP server will ask user to login.") 
+        return {status: "authenticate", remoteMetadata: authMetadata.remoteMetadata, remoteAuthServerMetadata: authMetadata.remoteAuthServerMetadata}
+      }
+      else {
+        console.error("Could not find metadata endpoints on MCP server")
+        return {status: "error"}
+      }
+    }
+  }
+
+  async _connectToClientWithAuthToken(uti: string, serverURL: string, accessToken: string, client: Client) {
     const authToken = "Bearer " + accessToken
     /**
      * Helper function to add authorization headers to fetch requests
@@ -310,7 +333,14 @@ class F4MCPClient {
     const customHeaders = {
         Authorization: authToken,
     };
-    const url = new URL(serverURL)
+    
+    // Use the SSE proxy to avoid CORS issues
+    const encodedURL = "http://localhost:8000/products/sse?server_uri=" + encodeURIComponent(serverURL);
+    console.log("Using SSE proxy URL: ", encodedURL)
+    let url = new URL("https://mcp.linear.app/sse");
+
+    console.log("URL: ", url)
+    
     const transport = new SSEClientTransport(url, {
         eventSourceInit: {
             fetch: fetchWithAuth,
@@ -319,7 +349,13 @@ class F4MCPClient {
           headers: customHeaders,
         },
     });
-    await client.connect(transport); 
+    try {
+      await client.connect(transport);
+      this.connections.set(uti, client);
+    }
+    catch(err) {
+      console.error(err)
+    }
   }
 
   async _handleAutomaticServerAuthDiscovery(serverURL:string, res:Response): Promise<any> {
@@ -340,6 +376,12 @@ class F4MCPClient {
         authMetadata.status = remoteMetaData.status
       }
     }
+
+    else if (remoteMetaDataEndpoint == null) {
+      let authServer = MCPAuthHandler.oauth2("linear")
+      authMetadata.remoteMetadata = {authorization_servers: [authServer.authorization_server]}
+    }
+
     if(remoteAuthServerMetaDataEndpoint) {
       let remoteAuthServerMetaData = await this._fetchRFC8414AuthServerMetaData(remoteAuthServerMetaDataEndpoint)
       if(remoteAuthServerMetaData.status == 200) {

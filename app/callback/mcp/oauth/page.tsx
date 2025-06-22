@@ -9,6 +9,7 @@ export default function OAuthCallbackPage() {
   const searchParams = useSearchParams();
   const [authStatus, setAuthStatus] = useState('Processing authorization...');
   const [error, setError] = useState('');
+  const [countdown, setCountdown] = useState<number | null>(null);
   const { data: session } = useSession();
 
   useEffect(() => {
@@ -32,10 +33,33 @@ export default function OAuthCallbackPage() {
           
           // Exchange the code for tokens using our API endpoint
           try {
+            // Get PKCE code_verifier from localStorage
+            const codeVerifier = localStorage.getItem('pkce_code_verifier');
+            
+            // Use state parameter to identify which client and get the correct client_id
+            const clientIdentifier = state; // state contains the client ID
+            const storageKey = `oauth_client_id_${clientIdentifier}`;
+            const client_id = localStorage.getItem(storageKey);
+            
+            console.log('Retrieved PKCE code_verifier:', codeVerifier);
+            console.log('Client identifier from state:', clientIdentifier);
+            console.log('Storage key:', storageKey);
+            console.log('Retrieved client_id:', client_id);
+            
+            if (!client_id) {
+              setError(`No client_id found for ${clientIdentifier} - registration may have failed`);
+              return;
+            }
+            
             const tokenResponse = await fetch('/api/oauth/token', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ code, provider: state })
+              body: JSON.stringify({ 
+                code, 
+                provider: "mcp",
+                code_verifier: codeVerifier,
+                client_id: client_id
+              })
             });
             
             const result = await tokenResponse.json();
@@ -44,7 +68,7 @@ export default function OAuthCallbackPage() {
               throw new Error(result.error || 'Failed to exchange token');
             }
 
-            console.log(result)
+            console.log("RESULT: ", result)
 
             if(state && state.length > 0) {
               await createToken(result.tokens.access_token, state)
@@ -65,8 +89,19 @@ export default function OAuthCallbackPage() {
           if (window.opener) {
             window.opener.postMessage({ type: 'OAUTH_SUCCESS' }, window.location.origin);
           }
-          // Close the current tab after a short delay to show the success message
-          setTimeout(() => window.close(), 4000);
+          
+          // Start countdown timer
+          setCountdown(5);
+          const timer = setInterval(() => {
+            setCountdown((prev) => {
+              if (prev === null || prev <= 1) {
+                clearInterval(timer);
+                window.close();
+                return null;
+              }
+              return prev - 1;
+            });
+          }, 100000);
         } catch (err) {
           console.error('OAuth callback error:', err);
           setError('Failed to process authorization');
@@ -107,7 +142,15 @@ export default function OAuthCallbackPage() {
           </div>
         ) : (
           <div className="text-center">
-            <p className="text-xl mb-4">{authStatus}</p>
+            <p className="text-xl mb-4">
+              {authStatus}
+              {authStatus === 'Authorization successful!' && ' 🎉'}
+            </p>
+            {countdown !== null && (
+              <p className="text-sm text-gray-600 mt-2">
+                This tab will close in {countdown}s
+              </p>
+            )}
             <div className="animate-pulse mt-4">
               <div className="h-2 bg-slate-200 rounded"></div>
               <div className="h-2 bg-slate-200 rounded mt-2"></div>

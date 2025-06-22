@@ -150,7 +150,7 @@ const themePresets: Record<string, Theme> = {
     "textColorPrimary": "text-[#53534f]",
     "textColorSecondary": "text-[#53534f]",
     "chatWindowStyle": "bg-white border-2 border-[#808bd2] font-w95fa",
-    "aiMessageStyle": "bg-[#f0f6fa] text-[#6f7192] shadow border-2 border-[#a4b4d3] font-w95fa"
+    "aiMessageStyle": "bg-[#f0f6fa] text-[#6f7192] shadow border-2 border-[#a4b4d3] font-w95fa p-2"
   },
   telegraph: {
     "primaryColor": "bg-white text-black",

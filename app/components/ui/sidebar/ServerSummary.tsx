@@ -42,9 +42,13 @@ export default function ServerSummary({summary}: {summary: ServerSummaryType | u
               <p className="pl-4 font-bold">{tool.name}</p>
               <p className="pl-4">{tool.description}</p>
               <p className="font-bold pl-4">Parameters</p>
-              {Object.keys(tool.inputSchema.properties).map(e => (
-                <p className="pl-8" key={e}>{e}: {(tool.inputSchema.properties[e] as any).type}</p>
-              ))}
+              {tool.inputSchema.properties ? 
+                Object.keys(tool.inputSchema.properties).map(e => (
+                  <p className="pl-8" key={e}>{e}: {(tool.inputSchema.properties[e] as any).type}</p>
+                ))
+              :
+                <p>JSON Schema: {JSON.stringify(tool.inputSchema.properties)}</p>
+              }
             </div>
           ))
         }

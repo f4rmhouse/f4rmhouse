@@ -19,6 +19,7 @@ import { ServerSummaryType } from '@/app/components/types/MCPTypes';
 import ServerSummary from './ServerSummary';
 import { MCPConnectionStatus } from '../../types/MCPConnectionStatus';
 import ConfirmModal from "../modal/ConfirmModal";
+import MCPAuthHandler, { OAuthClient } from '@/app/MCPAuthHandler';
 
 export default function RightSidebar() {
   const { theme } = useTheme();
@@ -83,6 +84,7 @@ export default function RightSidebar() {
         // Handle connection with proper error handling
         const tool = selectedAgent.toolbox[index];
         client?.getStructuredJSON(tool.uti).then((data) => {
+          console.log("structured json: ", data)
           setSummary(new Map(summary.set(tool.uti, data)))
         })
       }
@@ -109,7 +111,7 @@ export default function RightSidebar() {
   }, []);
 
   useEffect(() => {
-    if (selectedAgent) {
+    if (selectedAgent && session) {
       setOpenList(selectedAgent.toolbox.map(_ => false))
       let _isOnline = selectedAgent.toolbox.map((_): MCPConnectionStatus => ({ status: "error" })) 
       let connectionStatus: MCPConnectionStatus
@@ -118,10 +120,14 @@ export default function RightSidebar() {
         try {
           const tool = selectedAgent.toolbox[index];
           if(tool.server.uri.startsWith("http://") || tool.server.uri.startsWith("https://")) {
+            // @ts-expect-error
+            let user = new User(session?.user.email, session?.provider, session?.access_token) 
             if(tool.server.uri.endsWith("/sse")) {
+              client.setUser(user)
               connectionStatus = await client.connect(uti, tool.server.uri)
             }
             else {
+              client.setUser(user)
               connectionStatus = await client.connect(uti, tool.server.uri + "/sse")
             }
             _isOnline = _isOnline.map((item, i) => i === index? connectionStatus : item)
@@ -134,18 +140,48 @@ export default function RightSidebar() {
           
       selectedAgent?.toolbox.map((tool, index) => {connectToTool(tool.uti, index)})
     }
-  }, [selectedAgent])
+  }, [selectedAgent, session])
 
   const getStatusIndicator = (status: string) => {
     switch(status) {
       case "success":
-        return <div className={`bg-green-500 rounded-full p-1 mt-auto ml-[-7px] border-2 border-${theme.chatWindowStyle?.replace("bg-", "")}`}></div>
+        return <div className={`bg-green-500 rounded-full p-1 mt-auto ml-[-7px] border-2 border-${theme.secondaryColor?.replace("bg-", "")}`}></div>
       case "authenticate":
         return <div className={`bg-black rounded-full mt-auto ml-[-7px] p-1`}><LockKeyhole className="text-white" size={10}/></div>
       case "error":
       default:
         return <div className={`bg-red-500 rounded-full p-1 mt-auto ml-[-7px] border-2 border-${theme.chatWindowStyle?.replace("bg-", "")}`}></div>
     }
+  }
+
+  const registerClient = async (uti: string, registerEndpoint: string, serverMetadata?: any) => {
+    let redirect_uri = "http://localhost:3000/callback/mcp/oauth"
+    
+    const codeVerifier = MCPAuthHandler.generateCodeVerifier();
+    const codeChallenge = await MCPAuthHandler.generateCodeChallenge(codeVerifier);
+    
+    // Store code verifier for token exchange
+    localStorage.setItem('pkce_code_verifier', codeVerifier);
+    
+    // Base client configuration following RFC 7591
+    let oauthClientParams: OauthClientType = {
+      id: uti,
+      client_name: "MCP Client Application",
+      redirect_uris: [redirect_uri],
+      grant_types: ["authorization_code"],
+      response_types: ["code"],
+      scope: "email",
+      token_endpoint_auth_method: "none",
+      application_type: "native"
+    };
+
+    // Adapt based on server metadata if available
+    const authHandler = new OAuthClient(oauthClientParams, serverMetadata);
+    const encodedURL = "http://localhost:3000/api/mcp/automatic/discovery?server_uri=" + encodeURIComponent(registerEndpoint);
+    authHandler.create(codeChallenge)
+    const authUrl = await authHandler.register(encodedURL)
+    window.open(authUrl, '_blank')
+
   }
 
   return (
@@ -267,12 +303,21 @@ export default function RightSidebar() {
         setIsOpen={setShowConfirmModal}
         title="Authentication Warning"
         content="You are about to authenticate with an external MCP server. f4rmhouse can't enforce any security measures on the server side. Only autheticate to servers that you trust, and ALWAYS verify that the data sent by the LLM is information you are comfortable sharing with the server before sending it. All requests are encrypted end-to-end so no one other than the MCP server and yourself get access to it."
-        action={() => {
+        action={async () => {
           // Handle the actual login logic here
           if (loginToolIndex !== null && selectedAgent) {
             const tool = selectedAgent.toolbox[loginToolIndex];
             console.log('Proceeding with authentication for:', tool.title);
             console.log(isOnline[loginToolIndex])
+            let clientRegistrationURL = isOnline[loginToolIndex].remoteAuthServerMetadata?.registration_endpoint
+            let authServer = isOnline[loginToolIndex].remoteMetadata?.authorization_servers[0]
+            console.log(authServer)
+
+            registerClient(tool.uti, clientRegistrationURL, isOnline[loginToolIndex].remoteAuthServerMetadata)
+
+            // await registerClient(clientRegistrationURL)
+            //window.open(authServer, '_blank')
+
             // Add your authentication logic here
           }
           setShowConfirmModal(false);

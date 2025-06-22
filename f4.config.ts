@@ -30,7 +30,7 @@ export interface Theme {
 interface Config {
     name: string;
     version: string;
-    welcomeText: string;
+    welcomeText: string[];
     models: ProviderConfig;
     theme: Theme;
     defaultState: "canvas" | "chat";
@@ -40,7 +40,7 @@ interface Config {
 const config: Config = {
     "name": "f4rmhouse",
     "version": "1.1.3-beta",
-    "welcomeText": "{{username}} returns!",
+    "welcomeText": ["{{username}} returns!" ,"> anon joins the chat!", "ASIC speed. OMGGGGGGG", "Try out the open source models. They're super fast!", "AI slop. At the speed of thought.", "Ask me about roko's basilisk.", "maybe just one more bigfoot vlog...", "did you know you have to ASK chatgpt NOT to collect your data? 😂😂", "You haven't automated your hedge fund yet?? 😂🫵", "Security is always 1st but spongebob dancing is a close 2nd"],
     "models": {
         "openai": [
             { "id": "gpt-4o-mini", "name": "GPT-4o", "provider": "openai"},
