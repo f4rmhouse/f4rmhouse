@@ -46,6 +46,10 @@ class F4MCPClient {
     this.testing = testing;
   }
 
+  /**
+   * Sets the user for authentication purposes
+   * @param user - User object containing authentication credentials
+   */
   setUser(user:User) {
     this.caller = user
   }
@@ -154,18 +158,24 @@ class F4MCPClient {
     return capabilities ? [capabilities] : [];
   }
 
-  async getServerInstructions(uti: string): Promise<string>{
-    const client = this.connections.get(uti);
-    if (!client) return "";
-    const instructions = await client.getInstructions();
-    return instructions || "";
+  /**
+   * Gets server instructions/documentation from an MCP server
+   * @param uti - Unique Tool Identifier for the server
+   * @returns Promise resolving to the server instructions as a string
+   */
+  async getServerInstructions(uti: string): Promise<string> {
+    let response = await this.connections.get(uti)?.getInstructions()
+    return response || ""
   }
 
-  async getServerVersion(uti: string): Promise<{name: string, version: string}>{
-    const client = this.connections.get(uti);
-    if (!client) return {name: "", version: ""};
-    const version = await client.getServerVersion();
-    return version || {name: "", version: ""};
+  /**
+   * Gets the version information of an MCP server
+   * @param uti - Unique Tool Identifier for the server
+   * @returns Promise resolving to an object containing server name and version
+   */
+  async getServerVersion(uti: string): Promise<{name: string, version: string}> {
+    let response = await this.connections.get(uti)?.getServerVersion()
+    return response || {name: "", version: ""}
   }
 
   /**
@@ -233,20 +243,22 @@ class F4MCPClient {
   }
 
   /**
-   * Establishes a connection to an MCP server
+   * Establishes a connection to an MCP server with authentication handling
    * @param uti - Unique Tool Identifier for the server
    * @param serverURL - URL of the MCP server to connect to
-   * @throws Error if connection fails
-   * @returns Promise that resolves when the connection is established
+   * @returns Promise resolving to connection status object
+   * @throws Error if connection fails or server is unreachable
    */
   async connect(uti: string, serverURL: string): Promise<MCPConnectionStatus> {
     let accessToken = ""
 
+    // Create a new MCP client instance for this connection
     const client = new Client({
       name: "f4rmhouse-client",
       version: "1.0.0"
     })
 
+    // Check if we have authentication credentials for this server
     if(this.caller) {
       let token = await this.caller.getToken(uti)
       console.log("TOKEN: ", token)
@@ -261,10 +273,12 @@ class F4MCPClient {
     try {
       if (accessToken) {
         console.log("Connect with auth")
+        // Connect using existing authentication token
         await this._connectToClientWithAuthToken(uti, serverURL, accessToken, client)
         return {status: "success"}
       }
       else {
+        // Attempt connection without authentication first
         // Encode the serverURL to safely use it as a URL parameter
         const encodedServerURL = encodeURIComponent(serverURL);
         let url = new URL(`http://localhost:3000/api/mcp/sse?server_uri=${encodedServerURL}`);
@@ -273,10 +287,12 @@ class F4MCPClient {
         }
         let res = await fetch(url)
         if(res.status == 200) {
+          // Server allows unauthenticated access
           await this._connectWithMCPServerWithoutAuth(uti, url, client)
           return {status: "success"}
         }
         else if(res.status == 401) {
+          // Server requires authentication - initiate OAuth flow
           await this._initiateMCPAuthentication(uti, serverURL, res)
           return {status: "authenticate"}
         }
@@ -285,12 +301,18 @@ class F4MCPClient {
           return {status: "error"}
         }
       }
-    } catch(err) {
-      this.connections.delete(uti)
-      throw new Error(`Could not connect to ${uti}: ` + String(err))
+    } catch (error) {
+      console.error("Connection error:", error);
+      throw error;
     }
   }
 
+  /**
+   * Connects to an MCP server that doesn't require authentication
+   * @param uti - Unique Tool Identifier for the server
+   * @param url - URL object for the server connection
+   * @param client - MCP Client instance to use for the connection
+   */
   async _connectWithMCPServerWithoutAuth(uti: string, url: URL, client: Client) {
     console.info("No auth needed for this server. Proceed to connection.")
     const transport = new SSEClientTransport(url);
@@ -298,24 +320,64 @@ class F4MCPClient {
     this.connections.set(uti, client);
   }
 
+  /**
+   * Initiates the OAuth authentication flow for an MCP server
+   * @param uti - Unique Tool Identifier for the server
+   * @param serverURL - URL of the MCP server
+   * @param initialResponseFromServer - Initial 401 response from the server
+   * @returns Promise resolving to authentication status and metadata
+   */
   async _initiateMCPAuthentication(uti: string, serverURL: string, initialResponseFromServer: Response) {
     if (this.metadata.get(uti)?.server.authorization.authorization_url) {
       console.info("Vendor has described auth metadata. Ask user to login")
       return {status: "authenticate"}
     }
     else {
-      let authMetadata = await this._handleAutomaticServerAuthDiscovery(serverURL, initialResponseFromServer)
-      if(authMetadata.status == 200) {
-        console.info("Found metadata endpoints on MCP server will ask user to login.") 
-        return {status: "authenticate", remoteMetadata: authMetadata.remoteMetadata, remoteAuthServerMetadata: authMetadata.remoteAuthServerMetadata}
+      // Attempt automatic discovery of OAuth endpoints
+      let remoteMetaDataEndpoint = this._extractUrl(initialResponseFromServer.headers.get("www-authenticate") || "");
+      // Construct RFC 8414 compliant metadata endpoint
+      let remoteAuthServerMetaDataEndpoint = serverURL.replace("/sse", "/.well-known/oauth-authorization-server")
+      let authMetadata = {status: 404, remoteMetadata: {}, remoteAuthServerMetadata: {}}
+
+      // Try to fetch RFC 9728 metadata if endpoint is provided
+      if(remoteMetaDataEndpoint) {
+        let remoteMetaData = await this._fetchRFC9728MetaData(remoteMetaDataEndpoint)
+        if(remoteMetaData.status == 200) {
+          authMetadata.remoteMetadata = await remoteMetaData.json()
+          authMetadata.status = 200
+        }
+        else {
+          authMetadata.status = remoteMetaData.status
+        }
       }
-      else {
-        console.error("Could not find metadata endpoints on MCP server")
-        return {status: "error"}
+      // Fallback to hardcoded Linear auth server configuration
+      else if (remoteMetaDataEndpoint == null) {
+        let authServer = MCPAuthHandler.oauth2("linear")
+        authMetadata.remoteMetadata = {authorization_servers: [authServer.authorization_server]}
       }
+
+      // Try to fetch RFC 8414 authorization server metadata
+      if(remoteAuthServerMetaDataEndpoint) {
+        let remoteAuthServerMetaData = await this._fetchRFC8414AuthServerMetaData(remoteAuthServerMetaDataEndpoint)
+        if(remoteAuthServerMetaData.status == 200) {
+          authMetadata.remoteAuthServerMetadata = await remoteAuthServerMetaData.json()
+          authMetadata.status = 200
+        }
+        else {
+          authMetadata.status = remoteAuthServerMetaData.status
+        }
+      }
+      return authMetadata
     }
   }
 
+  /**
+   * Connects to an MCP server using an existing authentication token
+   * @param uti - Unique Tool Identifier for the server
+   * @param serverURL - URL of the MCP server
+   * @param accessToken - Existing authentication token
+   * @param client - MCP Client instance to use for the connection
+   */
   async _connectToClientWithAuthToken(uti: string, serverURL: string, accessToken: string, client: Client) {
     const authToken = "Bearer " + accessToken
     /**
@@ -358,14 +420,23 @@ class F4MCPClient {
     }
   }
 
+  /**
+   * Handles automatic discovery of OAuth server metadata according to RFC 9728 and RFC 8414
+   * @param serverURL - URL of the MCP server
+   * @param res - Response object from the initial server request
+   * @returns Promise resolving to authentication metadata object
+   */
   async _handleAutomaticServerAuthDiscovery(serverURL:string, res:Response): Promise<any> {
-    console.info("401 - Unauthorized and no discovery mechanism defined by vendor, checking for metadata endpoints on MCP server...")
+    // RFC 8414 defines the standard path for OAuth authorization server metadata
     const rfc8415OauthServerPath = "/.well-known/oauth-authorization-server"
 
+    // Extract metadata endpoint from WWW-Authenticate header (RFC 9728)
     let remoteMetaDataEndpoint = this._extractUrl(res.headers.get("www-authenticate") || "");
+    // Construct RFC 8414 compliant metadata endpoint
     let remoteAuthServerMetaDataEndpoint = serverURL.replace("/sse", rfc8415OauthServerPath)
     let authMetadata = {status: 404, remoteMetadata: {}, remoteAuthServerMetadata: {}}
 
+    // Try to fetch RFC 9728 metadata if endpoint is provided
     if(remoteMetaDataEndpoint) {
       let remoteMetaData = await this._fetchRFC9728MetaData(remoteMetaDataEndpoint)
       if(remoteMetaData.status == 200) {
@@ -376,12 +447,13 @@ class F4MCPClient {
         authMetadata.status = remoteMetaData.status
       }
     }
-
+    // Fallback to hardcoded Linear auth server configuration
     else if (remoteMetaDataEndpoint == null) {
       let authServer = MCPAuthHandler.oauth2("linear")
       authMetadata.remoteMetadata = {authorization_servers: [authServer.authorization_server]}
     }
 
+    // Try to fetch RFC 8414 authorization server metadata
     if(remoteAuthServerMetaDataEndpoint) {
       let remoteAuthServerMetaData = await this._fetchRFC8414AuthServerMetaData(remoteAuthServerMetaDataEndpoint)
       if(remoteAuthServerMetaData.status == 200) {
@@ -395,16 +467,31 @@ class F4MCPClient {
     return authMetadata
   }
 
+  /**
+   * Fetches OAuth metadata according to RFC 9728 specification
+   * @param remoteMetaDataEndpoint - URL of the metadata endpoint
+   * @returns Promise resolving to the fetch response
+   */
   async _fetchRFC9728MetaData(remoteMetaDataEndpoint:string): Promise<any> {
     const encodedURL = "http://localhost:3000/api/mcp/automatic/discovery?server_uri=" +encodeURIComponent(remoteMetaDataEndpoint);
     return await fetch(encodedURL)
   }
 
+  /**
+   * Fetches OAuth authorization server metadata according to RFC 8414 specification
+   * @param remoteAuthServerMetaDataEndpoint - URL of the authorization server metadata endpoint
+   * @returns Promise resolving to the fetch response
+   */
   async _fetchRFC8414AuthServerMetaData(remoteAuthServerMetaDataEndpoint:string): Promise<any> {
     const encodedURL = "http://localhost:3000/api/mcp/automatic/discovery?server_uri=" + encodeURIComponent(remoteAuthServerMetaDataEndpoint);
     return await fetch(encodedURL)
   }
 
+  /**
+   * Extracts URL from resource_metadata attribute in WWW-Authenticate header
+   * @param input - String containing the WWW-Authenticate header value
+   * @returns Extracted URL string or null if not found
+   */
   _extractUrl(input: string): string | null{
     const regex = /resource_metadata="([^"]+)"/;
     const match = input.match(regex);
@@ -471,6 +558,10 @@ class F4MCPClient {
     
   }
 
+  /**
+   * Returns the map of active connections for debugging/monitoring purposes
+   * @returns Map of UTI strings to Client instances
+   */
   getConnections() {
     return this.connections
   }
