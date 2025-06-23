@@ -347,7 +347,6 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
         })
       }}
     />
-
     </div>
   )
 }

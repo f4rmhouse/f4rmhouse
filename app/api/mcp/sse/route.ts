@@ -25,7 +25,7 @@ export async function GET(request: Request) {
     console.log("Proxy Headers: ", proxyHeaders);
 
     try {
-      const response = await fetch("https://mcp.linear.app/sse", {
+      const response = await fetch(targetUrl, {
         headers: proxyHeaders,
       });
 

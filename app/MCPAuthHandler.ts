@@ -28,15 +28,15 @@ export default class MCPAuthHandler {
             return {
               redirect_uri: "http://localhost:3000/auth/github", 
               token_url: "https://github.com/login/oauth/access_token",
-              authorization_server: "https://linear.app/oauth/authorize",
-              client_id: ""
+              authorization_server: "https://github.com/login/oauth/authorize",
+              client_id: "Ov23lisEYupHgMBdiir5" // This is public so no need to encrypt
             }
           case "linear":
             return {
               redirect_uri: "http://localhost:3000/auth/linear", 
               token_url: "https://api.linear.app/oauth/token",
               client_secret: process.env.LINEAR_CLIENT_SECRET,
-              authroization_server: "https://mcp.linear.app/authorize",
+              authorization_server: "https://mcp.linear.app/authorize",
               client_id: ""
             }
           default:
@@ -262,5 +262,11 @@ export class OAuthClient {
       }
       throw error;
     }
+  }
+  
+  getAuthorizationURL(uti: string, provider: string, redirectUri: string, scope: string) {
+    let url = MCPAuthHandler.oauth2(provider).authorization_server
+    let client_id = MCPAuthHandler.oauth2(provider).client_id
+    return url + "?client_id=" + client_id + "&response_type=code&redirect_uri=" + encodeURIComponent(redirectUri) + "&scope=" + encodeURIComponent(scope) + "&state=" + uti;
   }
 }

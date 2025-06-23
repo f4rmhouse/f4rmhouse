@@ -39,7 +39,7 @@ export default function OAuthCallbackPage() {
             // Use state parameter to identify which client and get the correct client_id
             const clientIdentifier = state; // state contains the client ID
             const storageKey = `oauth_client_id_${clientIdentifier}`;
-            const client_id = localStorage.getItem(storageKey);
+            let client_id = localStorage.getItem(storageKey);
             
             console.log('Retrieved PKCE code_verifier:', codeVerifier);
             console.log('Client identifier from state:', clientIdentifier);
@@ -47,8 +47,7 @@ export default function OAuthCallbackPage() {
             console.log('Retrieved client_id:', client_id);
             
             if (!client_id) {
-              setError(`No client_id found for ${clientIdentifier} - registration may have failed`);
-              return;
+              client_id = "Ov23lisEYupHgMBdiir5"
             }
             
             const tokenResponse = await fetch('/api/oauth/token', {
@@ -58,7 +57,8 @@ export default function OAuthCallbackPage() {
                 code, 
                 provider: "mcp",
                 code_verifier: codeVerifier,
-                client_id: client_id
+                client_id: client_id,
+                token_url: "https://github.com/login/oauth/access_token"
               })
             });
             

@@ -51,7 +51,6 @@ class ModelFactory {
           apiKey: process.env.GOOGLE_SECRET,
           maxRetries: 2,
           temperature: 0.8,
-          
         });
       case 'local':
         return new ChatOllama({
@@ -74,7 +73,7 @@ class ToolManager {
         f4tools.push(createMCPTool({
           uti: tool.uti,
           endpoint: t.name,
-          title: `${t.name}_${Math.random().toString(36).substring(2, 8)}`,
+          title: `${t.name}`,
           endpoint_description: t.description,
           tool_description: t.description,
           parameters: t.inputSchema,

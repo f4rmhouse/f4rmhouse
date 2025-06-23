@@ -2,6 +2,7 @@ import ProductType from "../components/types/ProductType";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import User from "./User";
 import { SSEClientTransport } from "@modelcontextprotocol/sdk/client/sse.js";
+import { StreamableHTTPClientTransport} from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 import { InputSchema, Tool, ServerSummaryType, Prompt, MCPToolType, MCPResourceType } from "../components/types/MCPTypes";
 import { MCPConnectionStatus } from "../components/types/MCPConnectionStatus";
 import MCPAuthHandler from "../MCPAuthHandler";
@@ -249,7 +250,7 @@ class F4MCPClient {
    * @returns Promise resolving to connection status object
    * @throws Error if connection fails or server is unreachable
    */
-  async connect(uti: string, serverURL: string): Promise<MCPConnectionStatus> {
+  async connect(uti: string, serverURL: string, transport: string): Promise<MCPConnectionStatus> {
     let accessToken = ""
 
     // Create a new MCP client instance for this connection
@@ -274,27 +275,41 @@ class F4MCPClient {
       if (accessToken) {
         console.log("Connect with auth")
         // Connect using existing authentication token
-        await this._connectToClientWithAuthToken(uti, serverURL, accessToken, client)
+        await this._connectToClientWithAuthToken(uti, serverURL, accessToken, client, transport)
         return {status: "success"}
       }
       else {
         // Attempt connection without authentication first
         // Encode the serverURL to safely use it as a URL parameter
         const encodedServerURL = encodeURIComponent(serverURL);
-        let url = new URL(`http://localhost:3000/api/mcp/sse?server_uri=${encodedServerURL}`);
+
+        let url = new URL(`http://localhost:3000/api/mcp?server_uri=${encodedServerURL}`)
+        let t = new StreamableHTTPClientTransport(new URL(serverURL))
+        // let r = await client.connect(t)
+
+        // console.log("R: ", r)
+
+        if(transport == "sse") {
+          url = new URL(`http://localhost:3000/api/mcp/sse?server_uri=${encodedServerURL}`)
+        }
+
         if(this.testing) {
           url = new URL("http://localhost:8080/sse");
         }
+
+
         let res = await fetch(url)
         if(res.status == 200) {
           // Server allows unauthenticated access
-          await this._connectWithMCPServerWithoutAuth(uti, url, client)
+          await this._connectWithMCPServerWithoutAuth(uti, url, client, transport)
           return {status: "success"}
         }
         else if(res.status == 401) {
           // Server requires authentication - initiate OAuth flow
-          await this._initiateMCPAuthentication(uti, serverURL, res)
-          return {status: "authenticate"}
+          console.log("401 status")
+          console.log("Headers: ", res.headers)
+          let result = await this._initiateMCPAuthentication(uti, serverURL, res)
+          return result
         }
         else {
           console.error("Unexpected status code:", res.status)
@@ -313,11 +328,9 @@ class F4MCPClient {
    * @param url - URL object for the server connection
    * @param client - MCP Client instance to use for the connection
    */
-  async _connectWithMCPServerWithoutAuth(uti: string, url: URL, client: Client) {
+  async _connectWithMCPServerWithoutAuth(uti: string, url: URL, client: Client, transport: string) {
     console.info("No auth needed for this server. Proceed to connection.")
-    const transport = new SSEClientTransport(url);
-    await client.connect(transport);
-    this.connections.set(uti, client);
+    await this._handleConnection(transport, url, {}, client, uti, null)
   }
 
   /**
@@ -327,7 +340,7 @@ class F4MCPClient {
    * @param initialResponseFromServer - Initial 401 response from the server
    * @returns Promise resolving to authentication status and metadata
    */
-  async _initiateMCPAuthentication(uti: string, serverURL: string, initialResponseFromServer: Response) {
+  async _initiateMCPAuthentication(uti: string, serverURL: string, initialResponseFromServer: Response) : Promise<MCPConnectionStatus> {
     if (this.metadata.get(uti)?.server.authorization.authorization_url) {
       console.info("Vendor has described auth metadata. Ask user to login")
       return {status: "authenticate"}
@@ -336,15 +349,17 @@ class F4MCPClient {
       // Attempt automatic discovery of OAuth endpoints
       let remoteMetaDataEndpoint = this._extractUrl(initialResponseFromServer.headers.get("www-authenticate") || "");
       // Construct RFC 8414 compliant metadata endpoint
-      let remoteAuthServerMetaDataEndpoint = serverURL.replace("/sse", "/.well-known/oauth-authorization-server")
-      let authMetadata = {status: 404, remoteMetadata: {}, remoteAuthServerMetadata: {}}
+      let remoteAuthServerMetaDataEndpoint = serverURL.replace("/sse", "").replace("/mcp", "") + ".well-known/oauth-authorization-server"
+      let authMetadata: MCPConnectionStatus = {status: "error", remoteMetadata: {}, remoteAuthServerMetadata: {}}
+
+      console.log("Remote metadata endpoint", remoteAuthServerMetaDataEndpoint)
 
       // Try to fetch RFC 9728 metadata if endpoint is provided
       if(remoteMetaDataEndpoint) {
         let remoteMetaData = await this._fetchRFC9728MetaData(remoteMetaDataEndpoint)
         if(remoteMetaData.status == 200) {
           authMetadata.remoteMetadata = await remoteMetaData.json()
-          authMetadata.status = 200
+          authMetadata.status = "authenticate"
         }
         else {
           authMetadata.status = remoteMetaData.status
@@ -361,10 +376,13 @@ class F4MCPClient {
         let remoteAuthServerMetaData = await this._fetchRFC8414AuthServerMetaData(remoteAuthServerMetaDataEndpoint)
         if(remoteAuthServerMetaData.status == 200) {
           authMetadata.remoteAuthServerMetadata = await remoteAuthServerMetaData.json()
-          authMetadata.status = 200
+          authMetadata.status = "authenticate"
+        }
+        if(remoteAuthServerMetaData.status == 404) {
+          authMetadata.status = "authenticate"
         }
         else {
-          authMetadata.status = remoteAuthServerMetaData.status
+          authMetadata.status = "error"
         }
       }
       return authMetadata
@@ -378,7 +396,7 @@ class F4MCPClient {
    * @param accessToken - Existing authentication token
    * @param client - MCP Client instance to use for the connection
    */
-  async _connectToClientWithAuthToken(uti: string, serverURL: string, accessToken: string, client: Client) {
+  async _connectToClientWithAuthToken(uti: string, serverURL: string, accessToken: string, client: Client, transport: string) {
     const authToken = "Bearer " + accessToken
     /**
      * Helper function to add authorization headers to fetch requests
@@ -392,32 +410,59 @@ class F4MCPClient {
       return fetch(url.toString(), { ...init, headers });
     };
 
-    const customHeaders = {
-        Authorization: authToken,
+    let customHeaders = {
+      headers: {
+        "Authorization": authToken
+      }
     };
+    // if(transport == "sse") {
+    //   customHeaders = {
+    //     Authorization: authToken,
+    //   };
+    // }
     
     // Use the SSE proxy to avoid CORS issues
-    const encodedURL = "http://localhost:8000/products/sse?server_uri=" + encodeURIComponent(serverURL);
+    let encodedURL = "http://localhost:3000/api/mcp/streamable?server_uri=" + encodeURIComponent(serverURL);
     console.log("Using SSE proxy URL: ", encodedURL)
-    let url = new URL("https://mcp.linear.app/sse");
+    let url = new URL(encodedURL);
 
     console.log("URL: ", url)
-    
-    const transport = new SSEClientTransport(url, {
-        eventSourceInit: {
-            fetch: fetchWithAuth,
-        },
-        requestInit: {
-          headers: customHeaders,
-        },
-    });
-    try {
-      await client.connect(transport);
-      this.connections.set(uti, client);
+    await this._handleConnection(transport, url, customHeaders, client, uti, fetchWithAuth)
+  }
+
+  async _handleConnection(transport: string, url: URL, customHeaders: any, client: Client, uti: string, fetchWithAuth: any) {
+    if (transport == "streamable_http") {
+      console.log("Transport: ", transport)
+      let t = new StreamableHTTPClientTransport(url, {
+        requestInit: customHeaders
+      });
+      try {
+        await client.connect(t);
+        let tools = await client.listTools()
+        console.log("TOOLS: ", tools)
+        this.connections.set(uti, client);
+      }
+      catch(err) {
+        console.error(err)
+      }
     }
-    catch(err) {
-      console.error(err)
-    }
+    else {
+      let t = new SSEClientTransport(url, {
+          eventSourceInit: {
+              fetch: fetchWithAuth,
+          },
+          requestInit: {
+            headers: customHeaders,
+          },
+      });
+      try {
+        await client.connect(t);
+        this.connections.set(uti, client);
+      }
+      catch(err) {
+        console.error(err)
+      }
+    } 
   }
 
   /**

@@ -122,13 +122,13 @@ export default function RightSidebar() {
           if(tool.server.uri.startsWith("http://") || tool.server.uri.startsWith("https://")) {
             // @ts-expect-error
             let user = new User(session?.user.email, session?.provider, session?.access_token) 
-            if(tool.server.uri.endsWith("/sse")) {
+            if(!tool.server.uri.endsWith("/sse") && tool.server.transport == "sse") {
               client.setUser(user)
-              connectionStatus = await client.connect(uti, tool.server.uri)
+              connectionStatus = await client.connect(uti, tool.server.uri + "/sse", tool.server.transport)
             }
             else {
               client.setUser(user)
-              connectionStatus = await client.connect(uti, tool.server.uri + "/sse")
+              connectionStatus = await client.connect(uti, tool.server.uri, tool.server.transport)
             }
             _isOnline = _isOnline.map((item, i) => i === index? connectionStatus : item)
           }
@@ -182,6 +182,23 @@ export default function RightSidebar() {
     const authUrl = await authHandler.register(encodedURL)
     window.open(authUrl, '_blank')
 
+  }
+
+  const authenticateUser = async (tool: ProductType, serverMetadata?: any) => {
+    let oauthClientParams: OauthClientType = {
+      id: tool.uti,
+      client_name: "MCP Client Application",
+      redirect_uris: ["http://localhost:3000/callback/mcp/oauth"],
+      grant_types: ["authorization_code"],
+      response_types: ["code"],
+      scope: "email",
+      token_endpoint_auth_method: "none",
+      application_type: "native"
+    }; 
+
+    const authHandler = new OAuthClient(oauthClientParams, serverMetadata);
+    const authUrl = authHandler.getAuthorizationURL(tool.uti, "github", oauthClientParams.redirect_uris[0], oauthClientParams.scope)
+    window.open(authUrl, '_blank')
   }
 
   return (
@@ -310,15 +327,14 @@ export default function RightSidebar() {
             console.log('Proceeding with authentication for:', tool.title);
             console.log(isOnline[loginToolIndex])
             let clientRegistrationURL = isOnline[loginToolIndex].remoteAuthServerMetadata?.registration_endpoint
-            let authServer = isOnline[loginToolIndex].remoteMetadata?.authorization_servers[0]
-            console.log(authServer)
 
-            registerClient(tool.uti, clientRegistrationURL, isOnline[loginToolIndex].remoteAuthServerMetadata)
-
-            // await registerClient(clientRegistrationURL)
-            //window.open(authServer, '_blank')
-
-            // Add your authentication logic here
+            console.log("isOnline", isOnline[loginToolIndex])
+            if(clientRegistrationURL) {
+              registerClient(tool.uti, clientRegistrationURL, isOnline[loginToolIndex].remoteAuthServerMetadata)
+            }
+            else {
+              authenticateUser(tool, isOnline[loginToolIndex].remoteAuthServerMetadata)
+            }
           }
           setShowConfirmModal(false);
           setLoginToolIndex(null);

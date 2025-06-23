@@ -70,6 +70,10 @@ function createMCPTool({ uti, endpoint, title, tool_description, parameters, aut
     )
     }
 
+    else {
+        zodSchema = z.object({})
+    }
+
     async function execute(args: Record<string, string>) {
         try {
             const client = new Client({
@@ -106,8 +110,6 @@ function createMCPTool({ uti, endpoint, title, tool_description, parameters, aut
 
             let mcpStreamableHTTPtransport: StreamableHTTPClientTransport;
             let mcpSSEtransport: SSEClientTransport;
-            console.log("transport: ", transport)
-            console.log("uri: ", uri)
             if(transport == "sse") {
                 const url = new URL(uri)
                 mcpSSEtransport = new SSEClientTransport(url, {
