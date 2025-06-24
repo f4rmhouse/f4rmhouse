@@ -29,7 +29,7 @@ export default function RightSidebar() {
   const [qrImageURL, setQrImageURL] = useState<string>("")
   const [loading, setLoading] = useState<boolean>(false)
   const [openList, setOpenList] = useState<boolean[]>(selectedAgent?.toolbox?.map(_ => false) || [])
-  const [isOnline, setIsOnline] = useState<MCPConnectionStatus[]>(selectedAgent?.toolbox?.map(_ => ({ status: "error" })) || [])
+  const [isOnline, setIsOnline] = useState<MCPConnectionStatus[]>(selectedAgent?.toolbox?.map(_ => ({ status: "connecting" })) || [])
 
   const [summary, setSummary] = useState<Map<string, ServerSummaryType>>(new Map())
 
@@ -40,6 +40,7 @@ export default function RightSidebar() {
 
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [loginToolIndex, setLoginToolIndex] = useState<number | null>(null);
+  const [isConnecting, setIsConnecting] = useState<boolean>(false)
 
   const getQR = () => {
     setLoading(true)
@@ -84,7 +85,6 @@ export default function RightSidebar() {
         // Handle connection with proper error handling
         const tool = selectedAgent.toolbox[index];
         client?.getStructuredJSON(tool.uti).then((data) => {
-          console.log("structured json: ", data)
           setSummary(new Map(summary.set(tool.uti, data)))
         })
       }
@@ -111,7 +111,8 @@ export default function RightSidebar() {
   }, []);
 
   useEffect(() => {
-    if (selectedAgent && session) {
+    if (selectedAgent && session && !isConnecting) {
+      setIsConnecting(true)
       setOpenList(selectedAgent.toolbox.map(_ => false))
       let _isOnline = selectedAgent.toolbox.map((_): MCPConnectionStatus => ({ status: "error" })) 
       let connectionStatus: MCPConnectionStatus
@@ -119,7 +120,7 @@ export default function RightSidebar() {
       const connectToTool = async (uti:string, index:number) => {
         try {
           const tool = selectedAgent.toolbox[index];
-          if(tool.server.uri.startsWith("http://") || tool.server.uri.startsWith("https://")) {
+          if(!(_isOnline[index].status == "connecting") && (tool.server.uri.startsWith("http://") || tool.server.uri.startsWith("https://"))) {
             // @ts-expect-error
             let user = new User(session?.user.email, session?.provider, session?.access_token) 
             if(!tool.server.uri.endsWith("/sse") && tool.server.transport == "sse") {
@@ -131,14 +132,16 @@ export default function RightSidebar() {
               connectionStatus = await client.connect(uti, tool.server.uri, tool.server.transport)
             }
             _isOnline = _isOnline.map((item, i) => i === index? connectionStatus : item)
+            setIsConnecting(false)
           }
         } catch (error) {
           _isOnline = _isOnline.map((item, i) => i === index? { status: "error" } as MCPConnectionStatus : item)
+          setIsConnecting(false)
         }
         setIsOnline(_isOnline)
       }
           
-      selectedAgent?.toolbox.map((tool, index) => {connectToTool(tool.uti, index)})
+      connectToTool("github_official", 0)
     }
   }, [selectedAgent, session])
 
@@ -148,6 +151,8 @@ export default function RightSidebar() {
         return <div className={`bg-green-500 rounded-full p-1 mt-auto ml-[-7px] border-2 border-${theme.secondaryColor?.replace("bg-", "")}`}></div>
       case "authenticate":
         return <div className={`bg-black rounded-full mt-auto ml-[-7px] p-1`}><LockKeyhole className="text-white" size={10}/></div>
+      case "connecting":
+        return <div className={`bg-blue-500 rounded-full p-1 mt-auto ml-[-7px] border-2 border-${theme.secondaryColor?.replace("bg-", "")} animate-pulse`}></div>
       case "error":
       default:
         return <div className={`bg-red-500 rounded-full p-1 mt-auto ml-[-7px] border-2 border-${theme.chatWindowStyle?.replace("bg-", "")}`}></div>
@@ -233,6 +238,11 @@ export default function RightSidebar() {
                         >
                           Retry connection
                         </button>
+                      </div>
+                    ) : isOnline[index].status === "connecting" ? (
+                      <div className="text-xs text-blue-400 mt-1 mb-2 flex items-center">
+                        <div className="animate-ping rounded-full h-3 w-3 border-b-2 border-blue-400 mr-2"></div>
+                        <p>Connecting to server...</p>
                       </div>
                     ) : isOnline[index].status === "authenticate" ? (
                       <div className="text-xs mt-1 mb-2">
@@ -324,11 +334,8 @@ export default function RightSidebar() {
           // Handle the actual login logic here
           if (loginToolIndex !== null && selectedAgent) {
             const tool = selectedAgent.toolbox[loginToolIndex];
-            console.log('Proceeding with authentication for:', tool.title);
-            console.log(isOnline[loginToolIndex])
             let clientRegistrationURL = isOnline[loginToolIndex].remoteAuthServerMetadata?.registration_endpoint
 
-            console.log("isOnline", isOnline[loginToolIndex])
             if(clientRegistrationURL) {
               registerClient(tool.uti, clientRegistrationURL, isOnline[loginToolIndex].remoteAuthServerMetadata)
             }

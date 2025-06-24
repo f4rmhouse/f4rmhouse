@@ -64,7 +64,6 @@ class F4MCPClient {
     let response = await this.connections.get(uti)?.listTools()
     if(response && response.tools){
       // Map the SDK response to match our Tool type
-      console.log("tools: ", response)
       return response.tools.map((tool: any) => ({
         name: tool.name,
         description: tool.description || "", // Convert description to descriptions
@@ -87,7 +86,6 @@ class F4MCPClient {
     let response = await this.connections.get(uti)?.listPrompts()
     if (response && response.prompts) {
       // Transform the response to match our Prompt type
-      console.log("tools: ", response)
       let properties: any = {}
       response.prompts.map((p:any) => {
         p.arguments.map((pp:any) => {
@@ -120,7 +118,6 @@ class F4MCPClient {
     if (!client) return [];
     const response = await client.listResources();
     if (response) {
-      console.log("RESOURCE: ", response.resources)
       return response.resources.map((resource: any) => ({
         uri: resource.uri,
         name: resource.name,
@@ -262,7 +259,6 @@ class F4MCPClient {
     // Check if we have authentication credentials for this server
     if(this.caller) {
       let token = await this.caller.getToken(uti)
-      console.log("TOKEN: ", token)
       if(token.Code == 404) {
         accessToken = ""
       }
@@ -273,7 +269,6 @@ class F4MCPClient {
 
     try {
       if (accessToken) {
-        console.log("Connect with auth")
         // Connect using existing authentication token
         await this._connectToClientWithAuthToken(uti, serverURL, accessToken, client, transport)
         return {status: "success"}
@@ -306,8 +301,6 @@ class F4MCPClient {
         }
         else if(res.status == 401) {
           // Server requires authentication - initiate OAuth flow
-          console.log("401 status")
-          console.log("Headers: ", res.headers)
           let result = await this._initiateMCPAuthentication(uti, serverURL, res)
           return result
         }
@@ -351,8 +344,6 @@ class F4MCPClient {
       // Construct RFC 8414 compliant metadata endpoint
       let remoteAuthServerMetaDataEndpoint = serverURL.replace("/sse", "").replace("/mcp", "") + ".well-known/oauth-authorization-server"
       let authMetadata: MCPConnectionStatus = {status: "error", remoteMetadata: {}, remoteAuthServerMetadata: {}}
-
-      console.log("Remote metadata endpoint", remoteAuthServerMetaDataEndpoint)
 
       // Try to fetch RFC 9728 metadata if endpoint is provided
       if(remoteMetaDataEndpoint) {
@@ -423,23 +414,18 @@ class F4MCPClient {
     
     // Use the SSE proxy to avoid CORS issues
     let encodedURL = "http://localhost:3000/api/mcp/streamable?server_uri=" + encodeURIComponent(serverURL);
-    console.log("Using SSE proxy URL: ", encodedURL)
     let url = new URL(encodedURL);
 
-    console.log("URL: ", url)
     await this._handleConnection(transport, url, customHeaders, client, uti, fetchWithAuth)
   }
 
   async _handleConnection(transport: string, url: URL, customHeaders: any, client: Client, uti: string, fetchWithAuth: any) {
     if (transport == "streamable_http") {
-      console.log("Transport: ", transport)
       let t = new StreamableHTTPClientTransport(url, {
         requestInit: customHeaders
       });
       try {
         await client.connect(t);
-        let tools = await client.listTools()
-        console.log("TOOLS: ", tools)
         this.connections.set(uti, client);
       }
       catch(err) {

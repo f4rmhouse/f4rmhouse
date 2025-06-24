@@ -194,7 +194,6 @@ export class OAuthClient {
   async register(encodedURL: string) {
     try {
       console.log("Attempting registration with payload:", this.getPayloadForRegistration());
-      console.log("encoded_URL: ", encodedURL)
       
       // Send dynamic client registration request (RFC 7591)
       const registrationResult = await axios.post(encodedURL, this.getPayloadForRegistration(), {
@@ -203,12 +202,9 @@ export class OAuthClient {
         }
       });
 
-      console.log("REGISTRATION SUCCESS:", registrationResult.data);
-      
       // Store client_id with unique key based on client identifier
       const storageKey = `oauth_client_id_${this.id}`;
       localStorage.setItem(storageKey, registrationResult.data.client_id);
-      console.log(`Stored client_id in localStorage with key ${storageKey}:`, registrationResult.data.client_id);
       
       let encoded_redirect = encodeURIComponent(this.redirect_uris[0])
       const finalScope = encodeURIComponent(this.scope);
@@ -230,14 +226,9 @@ export class OAuthClient {
       
       return authUrl;
     } catch (error) {
-      console.error("Registration failed:", error);
       if (axios.isAxiosError(error)) {
-        console.error("Response data:", error.response?.data);
-        console.error("Response status:", error.response?.status);
-        
         // Fallback strategy: try minimal registration payload
         if (error.response?.status === 422) {
-          console.log("Trying with minimal payload...");
           const minimalClient = {
             client_name: "MCP Client Application",
             redirect_uris: ["http://localhost:3000/callback/mcp/oauth"]
@@ -247,13 +238,10 @@ export class OAuthClient {
             const retryResult = await axios.post(encodedURL, minimalClient, {
               headers: { 'Content-Type': 'application/json' }
             });
-            console.log("MINIMAL REGISTRATION SUCCESS:", retryResult.data);
             
             // Store client_id for minimal registration with unique key
             const minimalStorageKey = `oauth_client_id_${this.id}`;
             localStorage.setItem(minimalStorageKey, retryResult.data.client_id);
-            console.log(`Stored minimal client_id in localStorage with key ${minimalStorageKey}:`, retryResult.data.client_id);
-            
             return retryResult.data;
           } catch (retryError) {
             console.error("Minimal registration also failed:", retryError);
