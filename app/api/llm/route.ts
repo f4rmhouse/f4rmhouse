@@ -21,6 +21,7 @@ import {ChatGroq} from "@langchain/groq";
 import {ChatGoogleGenerativeAI} from "@langchain/google-genai";
 import User from "@/app/microstore/User";
 import { MCPToolType, Prompt, Tool } from "@/app/components/types/MCPTypes";
+import { ToolPermission } from "@/app/components/types/ToolPermissionType";
 
 class ModelFactory {
   static create(config: ModelConfig): BaseChatModel {
@@ -65,7 +66,7 @@ class ModelFactory {
 }
 
 class ToolManager {
-  static createMCPTools(toolbox: MCPToolType[] | undefined, endpoints: any[], caller: User): any[] {
+  static createMCPTools(toolbox: MCPToolType[] | undefined, endpoints: any[], caller: User, allowList: ToolPermission[]): any[] {
     let f4tools: any[] = []
     if (!toolbox) return f4tools;
     for (const tool of toolbox) {
@@ -81,7 +82,8 @@ class ToolManager {
           caller: caller,
           uri: tool.uri,
           transport: tool.transport,
-          mcp_type: "tool"
+          mcp_type: "tool",
+          allowList: allowList
         }))
       })
       tool.prompts.map((p: Prompt) => {
@@ -96,7 +98,8 @@ class ToolManager {
           caller: caller,
           uri: tool.uri,
           transport: tool.transport,
-          mcp_type: "prompt"
+          mcp_type: "prompt",
+          allowList: allowList
         }))
       })
     }
@@ -130,10 +133,12 @@ AI:`;
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json() as RequestBody;
-    const { description, messages = [], model: selectedModel, session, toolbox: initialToolbox, tools} = body;
+    const { description, messages = [], model: selectedModel, session, toolbox: initialToolbox, tools, allowList} = body;
     const prompt = PromptTemplate.fromTemplate(TEMPLATE);
     const chat_session = new F4SessionStorage();
     const caller = new User(session.user.email, session.provider, session.access_token);
+
+    console.log("ALLOW LIST: ", allowList)
 
     // Handle toolbox initialization
     let toolbox = tools;
@@ -146,14 +151,7 @@ export async function POST(req: NextRequest) {
     let endpoints: Endpoint[] = [];
 
     if(toolbox?.length) {
-      toolbox?.map((tool: MCPToolType) => {
-        //if(tool.name) {
-        //  tool.endpoints.map((endpoint: any) => {
-        //    endpoint.name = tool.uti + "_" + endpoint.name;
-        //  });
-        //  endpoints.push(...tool.endpoints);
-        //}
-      })
+      toolbox?.map((tool: MCPToolType) => {})
     }
     else {
       endpoints = []
@@ -166,7 +164,7 @@ export async function POST(req: NextRequest) {
     const model = ModelFactory.create(selectedModel);
 
 
-    const mcpTools = ToolManager.createMCPTools(toolbox ?? [], endpoints, caller);
+    const mcpTools = ToolManager.createMCPTools(toolbox ?? [], endpoints, caller, allowList);
     const emptyToolbox = ToolManager.createEmptyToolbox()
     const toolNode = new ToolNode(mcpTools);
 

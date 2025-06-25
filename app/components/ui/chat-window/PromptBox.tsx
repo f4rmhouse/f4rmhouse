@@ -27,8 +27,9 @@ import { PostDataType } from "./utils/types";
 import StreamProcessor from "./utils/StreamProcessor";
 import F4rmerType from "../../types/F4rmerType";
 import User from "@/app/microstore/User";
-import ChatAuthMessage from "../chat-messages/ChatAuthMessage";
+import ChatConfirmMessage from "../chat-messages/ChatConfirmMessage";
 import MCPAuthHandler from "../../../MCPAuthHandler";
+import { ToolPermission } from "../../types/ToolPermissionType";
 
 /**
  * PromptBox is the text input box at the bottom of the screen on /f4rmers/details page
@@ -194,7 +195,8 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
       session: session,
       f4rmer: selectedAgent.title,
       model: selectedModel,
-      tools: tools
+      tools: tools,
+      allowList: []
     }
 
     // Send message
@@ -237,7 +239,7 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
                   case "error":
                     return (<ChatErrorMessage key={i} content={m.content}/>)
                   case "auth":
-                    return (<ChatAuthMessage 
+                    return (<ChatConfirmMessage 
                       onCancel={(_) => {
                         // Update the status and create a new reference
                         const updatedSession = chatSession.updateStatus(m.id, "cancelled");
@@ -247,14 +249,53 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
                         setChatSession(updatedSession)
                         setCurrentSession(updatedSession.getMessages())
                       }} 
-                      onAuthenticate={(_) => {
-                        // Update the status and create a new reference
-                        let provider = MCPAuthHandler.oauth2("linear")
+                      onAuthenticate={async (_) => {
+                        alert("OK sending message!")
+                        // window.open(url, '_blank')
 
-                        let url = provider.authorization_server + "?client_id=" + provider.client_id + "&redirect_uri=" + provider.redirect_uri + "&response_type=code&scope=read,write&state=" + "linear"
-                        window.open(url, '_blank')
+                        console.log("Client allow list: ", [chatSession.getDebug(m.id)])
 
-                        const updatedSession = chatSession.updateStatus(m.id, "pending");
+                        let tools = await client.preparePrompt()
+
+                        if(selectedModel == null){
+                          alert("Please select a model to use.")
+                          return
+                        }
+                        if(selectedAgent == null || selectedAgent.title == ""){
+                          alert("Please select an agent to use.")
+                          return
+                        }
+
+                        let MSStart = new Date().getTime()
+                        setLoading(true)
+                        let permission: ToolPermission[] = []
+                        if(chatSession.getDebug(m.id) != undefined){
+                          let p = chatSession.getDebug(m.id) as ToolPermission
+                          permission = [p]
+                        }
+                       
+
+                        let postData: PostDataType = {
+                          messages: chatSession.getNextJSMessages(), 
+                          description: selectedAgent.jobDescription,
+                          show_intermediate_steps: false,
+                          session: session,
+                          f4rmer: selectedAgent.title,
+                          model: selectedModel,
+                          tools: tools,
+                          allowList: permission
+                        }
+
+                        // Send message
+                        const stream = await chatSession.send(postData)
+                        if(!stream) {
+                          alert("There was a server error while sending your request. This is completely our, fault we will do better in the future.")
+                          return
+                        }
+
+                        await processStream(chatSession.getMessages().length, stream, MSStart) 
+
+                        const updatedSession = chatSession.updateStatus(m.id, "completed");
                         // Force a re-render by updating latestMessage
                         setLatestMessage(Date.now().toString());
                         // Update the current session display
@@ -266,6 +307,7 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
                       uri={m.content} 
                       deactivated={m.status === "cancelled" || m.status === "completed"} 
                       state={m.status ?? "pending"}
+                      debug= {chatSession.getDebug(m.id)?? {}}
                     />)
                 }
               })

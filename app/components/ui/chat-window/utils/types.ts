@@ -1,6 +1,7 @@
 import F4Session from "@/app/components/types/F4Session";
 import { MCPToolType } from "@/app/components/types/MCPTypes";
 import { Message } from "ai/react";
+import { ToolPermission } from "@/app/components/types/ToolPermissionType";
 
 export type PostDataType = {
     messages: Message[];
@@ -10,4 +11,5 @@ export type PostDataType = {
     f4rmer: string;
     model: any; // TODO: Create proper model type
     tools: MCPToolType[]
+    allowList: ToolPermission[]
   }

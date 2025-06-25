@@ -5,18 +5,7 @@ import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/
 import { DynamicStructuredTool } from "@langchain/core/tools";
 import { z } from "zod";
 
-function createMCPTool({ uti, endpoint, title, tool_description, parameters, authorization, caller, uri, transport, mcp_type}: F4ToolParams) {
-    //if (!parameters || !parameters.length) {
-    //    throw new Error('No parameters defined for this tool');
-    //}
-
-    //{tool.inputSchema.properties ? 
-    //    Object.keys(tool.inputSchema.properties).map(e => (
-    //      <p className="pl-8" key={e}>{e}: {(tool.inputSchema.properties[e] as any).type}</p>
-    //    ))
-    //  :
-    //    <p>JSON Schema: {JSON.stringify(tool.inputSchema.properties)}</p>
-    //  }
+function createMCPTool({ uti, endpoint, title, tool_description, parameters, authorization, caller, uri, transport, mcp_type, allowList}: F4ToolParams) {
 
     let zodSchema;
 
@@ -87,10 +76,17 @@ function createMCPTool({ uti, endpoint, title, tool_description, parameters, aut
             // Check if auth needed
             // TODO: Add auth check
             let askUserForConfirmation = true 
+
+            allowList.map(e => {
+                if(e.name == endpoint) {
+                    askUserForConfirmation = false
+                }
+            })
+
             let accessToken = {Code: 0, Token: ""}
             if(askUserForConfirmation) {
                 return {
-                    message: "Confirmation needed. Inform user to authenticate using the trusted OAuth provider given in the previous dialog message to continue or to cancel the request.", 
+                    message: "Confirmation needed. Inform user to confirm or cancel the request so that personal or confidential data isn't sent to the server.", 
                     tool_identifier: endpoint, 
                     code: 401, 
                     data: {

@@ -2,6 +2,7 @@ import F4Session from "@/app/components/types/F4Session";
 import { InputSchema, MCPOAuthType, MCPToolType } from "@/app/components/types/MCPTypes";
 import User from "@/app/microstore/User";
 import { BaseMessage } from "@langchain/core/messages";
+import { ToolPermission } from "@/app/components/types/ToolPermissionType";
 
 export interface F4ToolParams {
     uti: string;
@@ -15,6 +16,7 @@ export interface F4ToolParams {
     uri: string
     transport: string
     mcp_type: string
+    allowList: ToolPermission[]
 }
 
 export interface F4ToolExecuteParams {
@@ -35,6 +37,7 @@ export interface RequestBody {
   toolbox?: any[];
   f4rmer?: string;
   tools: MCPToolType[]
+  allowList: ToolPermission[]
 }
   
 export interface Endpoint {
