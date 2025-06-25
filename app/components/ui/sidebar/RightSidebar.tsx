@@ -141,7 +141,7 @@ export default function RightSidebar() {
         setIsOnline(_isOnline)
       }
           
-      connectToTool("github_official", 0)
+      selectedAgent.toolbox.map((tool, index) => connectToTool(tool.uti, index))
     }
   }, [selectedAgent, session])
 
@@ -241,7 +241,7 @@ export default function RightSidebar() {
                       </div>
                     ) : isOnline[index].status === "connecting" ? (
                       <div className="text-xs text-blue-400 mt-1 mb-2 flex items-center">
-                        <div className="animate-ping rounded-full h-3 w-3 border-b-2 border-blue-400 mr-2"></div>
+                        <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-blue-400 mr-2"></div>
                         <p>Connecting to server...</p>
                       </div>
                     ) : isOnline[index].status === "authenticate" ? (

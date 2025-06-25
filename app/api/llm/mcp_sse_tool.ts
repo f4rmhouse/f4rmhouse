@@ -78,21 +78,31 @@ function createMCPTool({ uti, endpoint, title, tool_description, parameters, aut
         try {
             const client = new Client({
                 name: "f4rmhouse-client",
-                version: "1.0.0"
+                version: "1.0.0",
+                notificationHandler: (notification:any) => {
+                    console.log("Notification: ", notification)
+                }
             });
             const baseUrl = process.env.NEXT_PUBLIC_APP_ENV === 'production' ? 'http://localhost:8000' : 'http://localhost:8000';
             // Check if auth needed
             // TODO: Add auth check
-            let askUserForAuth = true 
-            let accessToken = ""
-            if(askUserForAuth) {
-                let token = await caller.getToken(uti)
-                if(token.Code == 404 || token.Token.length == 0) {
-                    return {message: "Authentication needed. Inform user to authenticate using the trusted OAuth provider given in the previous dialog message to continue or to cancel the request.", tool_identifier: endpoint, code: 401}
+            let askUserForConfirmation = true 
+            let accessToken = {Code: 0, Token: ""}
+            if(askUserForConfirmation) {
+                return {
+                    message: "Confirmation needed. Inform user to authenticate using the trusted OAuth provider given in the previous dialog message to continue or to cancel the request.", 
+                    tool_identifier: endpoint, 
+                    code: 401, 
+                    data: {
+                        name: endpoint,
+                        arguments: args,
+                    }
                 }
-                else {
-                    accessToken = token.Token
-                }
+            }
+
+            let token = await caller.getToken(uti) 
+            if(token.Code == 200|| token.Token.length > 0) {
+                accessToken = token.Token
             }
 
             const authToken = "Bearer " + accessToken

@@ -6,6 +6,7 @@ import { StreamableHTTPClientTransport} from "@modelcontextprotocol/sdk/client/s
 import { InputSchema, Tool, ServerSummaryType, Prompt, MCPToolType, MCPResourceType } from "../components/types/MCPTypes";
 import { MCPConnectionStatus } from "../components/types/MCPConnectionStatus";
 import MCPAuthHandler from "../MCPAuthHandler";
+import Store from "./Store";
 
 /**
  * F4MCPClient is a client for interacting with Model Context Protocol (MCP) servers.
@@ -83,19 +84,20 @@ class F4MCPClient {
    * @returns Promise resolving to the list of available prompts
    */
   async listPrompts(uti: string): Promise<Prompt[]> {
-    let response = await this.connections.get(uti)?.listPrompts()
-    if (response && response.prompts) {
-      // Transform the response to match our Prompt type
-      let properties: any = {}
-      response.prompts.map((p:any) => {
-        p.arguments.map((pp:any) => {
-          properties[pp.name] = {type: "string", title: pp.name}
+    try {
+      let response = await this.connections.get(uti)?.listPrompts()
+      if (response && response.prompts) {
+        // Transform the response to match our Prompt type
+        let properties: any = {}
+        response.prompts.map((p:any) => {
+          p.arguments.map((pp:any) => {
+            properties[pp.name] = {type: "string", title: pp.name}
+          })
         })
-      })
-      let inputSchema: InputSchema = {
-        type: "string",
-        required: response.prompts.map((p:any) => p.arguments.map((pp:any) => pp.required ? pp.name : null)).flat(),
-        properties: properties
+        let inputSchema: InputSchema = {
+          type: "string",
+          required: response.prompts.map((p:any) => p.arguments.map((pp:any) => pp.required ? pp.name : null)).flat(),
+          properties: properties
       } 
 
       return response.prompts.map((prompt: any) => ({
@@ -105,7 +107,13 @@ class F4MCPClient {
         // Add any other required fields for the Prompt type
       })) as Prompt[]
     }
+    
+    // Return empty array if no response or no prompts
     return []
+    } catch (error) {
+      console.log("Error listing prompts:", error)
+      return []
+    }
   }
 
   /**
@@ -114,17 +122,22 @@ class F4MCPClient {
    * @returns Promise resolving to the list of available resources
    */
   async listResources(uti: string): Promise<MCPResourceType[]> {
-    const client = this.connections.get(uti);
-    if (!client) return [];
-    const response = await client.listResources();
-    if (response) {
-      return response.resources.map((resource: any) => ({
-        uri: resource.uri,
-        name: resource.name,
-        mimeType: resource.mimeType
-      })) as MCPResourceType[];
+    try {
+      const client = this.connections.get(uti);
+      if (!client) return [];
+      const response = await client.listResources();
+      if (response) {
+        return response.resources.map((resource: any) => ({
+          uri: resource.uri,
+          name: resource.name,
+          mimeType: resource.mimeType
+        })) as MCPResourceType[];
+      }
+      return [];
+    } catch (error) {
+      console.log("Error listing resources:", error)
+      return []
     }
-    return [];
   }
 
   /**
@@ -133,13 +146,18 @@ class F4MCPClient {
    * @returns Object containing the list of available resource templates
    */
   async listResourceTemplates(uti: string): Promise<Object[]> {
-    const client = this.connections.get(uti)
-    if (!client) return [];
-    const response = await client.listResourceTemplates()
-    if (response) {
-      return response.resourceTemplates;
+    try {
+      const client = this.connections.get(uti)
+      if (!client) return [];
+      const response = await client.listResourceTemplates()
+      if (response) {
+        return response.resourceTemplates;
+      }
+      return []
+    } catch (error) {
+      console.log("Error listing resource templates:", error)
+      return []
     }
-    return []
   }
 
   /**
@@ -184,16 +202,11 @@ class F4MCPClient {
    */
   async getStructuredJSON(uti: string): Promise<ServerSummaryType> {
     let tools = await this.listTools(uti)
-    let prompts: Prompt[] = []
-    // let prompts = await this.listPrompts(uti)
-    // let resources = await this.listResources(uti)
-    let resources: MCPResourceType[] = []
-    // let resourceTemplates = await this.listResourceTemplates(uti)
-    let resourceTemplates: Object[] = []
+    let prompts = await this.listPrompts(uti)
+    let resources = await this.listResources(uti)
+    let resourceTemplates = await this.listResourceTemplates(uti)
     let serverCapabilities = await this.getServerCapabilities(uti)
-    // let serverCapabilities: Object[] = []
     let instructions = await this.getServerInstructions(uti)
-    // let instructions: string = ""
     let version = await this.getServerVersion(uti)
     // let version: {name: string, version: string} = {name: "", version: ""}
 
@@ -278,11 +291,7 @@ class F4MCPClient {
         // Encode the serverURL to safely use it as a URL parameter
         const encodedServerURL = encodeURIComponent(serverURL);
 
-        let url = new URL(`http://localhost:3000/api/mcp?server_uri=${encodedServerURL}`)
-        let t = new StreamableHTTPClientTransport(new URL(serverURL))
-        // let r = await client.connect(t)
-
-        // console.log("R: ", r)
+        let url = new URL(`http://localhost:3000/api/mcp/streamable?server_uri=${encodedServerURL}`)
 
         if(transport == "sse") {
           url = new URL(`http://localhost:3000/api/mcp/sse?server_uri=${encodedServerURL}`)
@@ -292,11 +301,11 @@ class F4MCPClient {
           url = new URL("http://localhost:8080/sse");
         }
 
-
         let res = await fetch(url)
-        if(res.status == 200) {
+
+        if(res.status == 200 || res.status == 404) {
           // Server allows unauthenticated access
-          await this._connectWithMCPServerWithoutAuth(uti, url, client, transport)
+          await this._connectWithMCPServerWithoutAuth(uti, serverURL, client, transport)
           return {status: "success"}
         }
         else if(res.status == 401) {
@@ -321,8 +330,15 @@ class F4MCPClient {
    * @param url - URL object for the server connection
    * @param client - MCP Client instance to use for the connection
    */
-  async _connectWithMCPServerWithoutAuth(uti: string, url: URL, client: Client, transport: string) {
+  async _connectWithMCPServerWithoutAuth(uti: string, serverURL: string, client: Client, transport: string) {
     console.info("No auth needed for this server. Proceed to connection.")
+
+    let encodedURL = "http://localhost:3000/api/mcp/streamable?server_uri=" + encodeURIComponent(serverURL);
+    if(transport == "sse") {
+      encodedURL = serverURL;
+    }
+    let url = new URL(encodedURL);
+
     await this._handleConnection(transport, url, {}, client, uti, null)
   }
 
@@ -342,7 +358,13 @@ class F4MCPClient {
       // Attempt automatic discovery of OAuth endpoints
       let remoteMetaDataEndpoint = this._extractUrl(initialResponseFromServer.headers.get("www-authenticate") || "");
       // Construct RFC 8414 compliant metadata endpoint
-      let remoteAuthServerMetaDataEndpoint = serverURL.replace("/sse", "").replace("/mcp", "") + ".well-known/oauth-authorization-server"
+      let remoteAuthServerMetaDataEndpoint = ""
+      if(serverURL.includes("/sse")) {
+        remoteAuthServerMetaDataEndpoint = serverURL.replace("sse", "") + ".well-known/oauth-authorization-server"
+      }
+      else {
+        remoteAuthServerMetaDataEndpoint = serverURL.replace("/mcp", "") + ".well-known/oauth-authorization-server"
+      }
       let authMetadata: MCPConnectionStatus = {status: "error", remoteMetadata: {}, remoteAuthServerMetadata: {}}
 
       // Try to fetch RFC 9728 metadata if endpoint is provided
@@ -356,10 +378,12 @@ class F4MCPClient {
           authMetadata.status = remoteMetaData.status
         }
       }
-      // Fallback to hardcoded Linear auth server configuration
-      else if (remoteMetaDataEndpoint == null) {
-        let authServer = MCPAuthHandler.oauth2("linear")
-        authMetadata.remoteMetadata = {authorization_servers: [authServer.authorization_server]}
+      if (remoteMetaDataEndpoint == null) {
+        let store = new Store()
+        let product = await store.getProduct(uti)
+        let provider = product.Message.server.auth_provider
+        let authServer = MCPAuthHandler.oauth2(provider).authorization_server
+        authMetadata.remoteMetadata = {authorization_servers: [authServer]}
       }
 
       // Try to fetch RFC 8414 authorization server metadata
@@ -367,9 +391,19 @@ class F4MCPClient {
         let remoteAuthServerMetaData = await this._fetchRFC8414AuthServerMetaData(remoteAuthServerMetaDataEndpoint)
         if(remoteAuthServerMetaData.status == 200) {
           authMetadata.remoteAuthServerMetadata = await remoteAuthServerMetaData.json()
+          localStorage.setItem(`token_url_${uti}`, authMetadata.remoteAuthServerMetadata.token_endpoint)
           authMetadata.status = "authenticate"
         }
-        if(remoteAuthServerMetaData.status == 404) {
+        else if(remoteAuthServerMetaData.status == 404) {
+          let store = new Store()
+          let product = await store.getProduct(uti)
+          let provider = product.Message.server.auth_provider
+          let auth = MCPAuthHandler.oauth2(provider)
+          authMetadata.remoteAuthServerMetadata = {
+            authorization_endpoint: auth.authorization_server, 
+            token_endpoint: auth.token_url
+          }
+          localStorage.setItem(`token_url_${uti}`, authMetadata.remoteAuthServerMetadata.token_endpoint)
           authMetadata.status = "authenticate"
         }
         else {
@@ -412,8 +446,11 @@ class F4MCPClient {
     //   };
     // }
     
-    // Use the SSE proxy to avoid CORS issues
+    // Avoid CORS in issues streamable http by using proxy
     let encodedURL = "http://localhost:3000/api/mcp/streamable?server_uri=" + encodeURIComponent(serverURL);
+    if(transport == "sse") {
+      encodedURL = serverURL;
+    }
     let url = new URL(encodedURL);
 
     await this._handleConnection(transport, url, customHeaders, client, uti, fetchWithAuth)
@@ -421,9 +458,7 @@ class F4MCPClient {
 
   async _handleConnection(transport: string, url: URL, customHeaders: any, client: Client, uti: string, fetchWithAuth: any) {
     if (transport == "streamable_http") {
-      let t = new StreamableHTTPClientTransport(url, {
-        requestInit: customHeaders
-      });
+      let t = new StreamableHTTPClientTransport(url, {requestInit: customHeaders});
       try {
         await client.connect(t);
         this.connections.set(uti, client);
@@ -433,13 +468,11 @@ class F4MCPClient {
       }
     }
     else {
-      let t = new SSEClientTransport(url, {
+      let t = new SSEClientTransport(new URL("https://mcp.deepwiki.com/sse"), {
           eventSourceInit: {
               fetch: fetchWithAuth,
           },
-          requestInit: {
-            headers: customHeaders,
-          },
+          requestInit: customHeaders
       });
       try {
         await client.connect(t);

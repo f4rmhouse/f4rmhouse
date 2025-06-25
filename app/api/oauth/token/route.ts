@@ -10,13 +10,22 @@ export async function POST(request: NextRequest) {
       code: code,
       client_id: client_id,
       redirect_uri: "http://localhost:3000/callback/mcp/oauth",
-      grant_type: "authorization_code",
-      client_secret: "b6bfefa35a41f4bc170b128bbbdd856a5b9180ac"
+      grant_type: "authorization_code"
     };
 
     // Add PKCE code_verifier if provided
     if (code_verifier) {
       body.code_verifier = code_verifier;
+    }
+    else {
+      const envVarName = `GITHUB_CLIENT_SECRET`;
+      const client_secret = process.env[envVarName];
+
+      if (!client_secret) {
+        console.error(`Client secret not found for provider: ${provider}. Expected environment variable: ${envVarName}`);
+        
+      }
+      body.client_secret = client_secret
     }
 
     // Make token exchange request to provider
@@ -32,8 +41,6 @@ export async function POST(request: NextRequest) {
     // Get token response
     const tokens = await response.json();
 
-    console.log("Token: ", tokens)
-    
     // Return tokens to client
     return NextResponse.json({ success: true, tokens });
   } catch (error) {

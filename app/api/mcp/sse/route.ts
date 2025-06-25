@@ -6,8 +6,6 @@ export async function GET(request: Request) {
     const serverUri = searchParams.get('server_uri');
     const targetUrl = serverUri ? decodeURIComponent(serverUri) : 'http://localhost:8080/sse';
     
-    console.log('Proxying SSE request to:', targetUrl);
-  
     // Extract authorization header from incoming request
     const authHeader = request.headers.get('Authorization');
     
@@ -19,10 +17,7 @@ export async function GET(request: Request) {
     // Add authorization header if present
     if (authHeader) {
       proxyHeaders.Authorization = authHeader;
-      console.log('Forwarding Authorization header to:', targetUrl);
     }
-
-    console.log("Proxy Headers: ", proxyHeaders);
 
     try {
       const response = await fetch(targetUrl, {
@@ -33,9 +28,6 @@ export async function GET(request: Request) {
         return new Response('No upstream stream', { status: 502 });
       }
       
-      console.log("Response status:", response.status);
-      console.log("Response headers:", Object.fromEntries(response.headers.entries()));
-
       if (!response.ok) {
         return new Response(`Upstream error: ${response.status} ${response.statusText}`, { 
           status: response.status 

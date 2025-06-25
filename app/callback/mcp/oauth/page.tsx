@@ -1,9 +1,10 @@
 "use client"
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import MCPAuthHandler from '@/app/MCPAuthHandler';
 import { useSession } from 'next-auth/react';
 import User from '@/app/microstore/User';
+import Store from '@/app/microstore/Store';
+import MCPAuthHandler from '@/app/MCPAuthHandler';
 
 export default function OAuthCallbackPage() {
   const searchParams = useSearchParams();
@@ -34,20 +35,23 @@ export default function OAuthCallbackPage() {
           // Exchange the code for tokens using our API endpoint
           try {
             // Get PKCE code_verifier from localStorage
-            const codeVerifier = localStorage.getItem('pkce_code_verifier');
+            let codeVerifier = localStorage.getItem('pkce_code_verifier');
             
             // Use state parameter to identify which client and get the correct client_id
             const clientIdentifier = state; // state contains the client ID
+
             const storageKey = `oauth_client_id_${clientIdentifier}`;
             let client_id = localStorage.getItem(storageKey);
+            let token_url = localStorage.getItem(`token_url_${clientIdentifier}`)
             
-            console.log('Retrieved PKCE code_verifier:', codeVerifier);
-            console.log('Client identifier from state:', clientIdentifier);
-            console.log('Storage key:', storageKey);
-            console.log('Retrieved client_id:', client_id);
-            
-            if (!client_id) {
-              client_id = "Ov23lisEYupHgMBdiir5"
+            if (!client_id && clientIdentifier) {
+              let store = new Store()
+              let product = await store.getProduct(clientIdentifier)
+              let provider = product.Message.server.auth_provider
+              let auth = MCPAuthHandler.oauth2(provider)
+              client_id = auth.client_id
+              // Make code verifier empty so that backend reads client_secret from ENV
+              codeVerifier = ""
             }
             
             const tokenResponse = await fetch('/api/oauth/token', {
@@ -55,10 +59,10 @@ export default function OAuthCallbackPage() {
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ 
                 code, 
-                provider: "mcp",
+                provider: clientIdentifier,
                 code_verifier: codeVerifier,
                 client_id: client_id,
-                token_url: "https://github.com/login/oauth/access_token"
+                token_url: token_url
               })
             });
             
@@ -67,8 +71,6 @@ export default function OAuthCallbackPage() {
             if (!result.success) {
               throw new Error(result.error || 'Failed to exchange token');
             }
-
-            console.log("RESULT: ", result)
 
             if(state && state.length > 0) {
               await createToken(result.tokens.access_token, state)
@@ -123,7 +125,6 @@ export default function OAuthCallbackPage() {
         token: access_code,
         provider: server 
       }
-      console.log("t: ", token)
       user.createToken(token).then(e => console.log(e))
     }
   } 

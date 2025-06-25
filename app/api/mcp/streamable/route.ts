@@ -15,14 +15,14 @@ export async function POST(request: Request) {
     } catch (e) {
       console.error("Body is not valid JSON:", e);
     }
-  
+
     // Extract authorization header from incoming request
     const authHeader = request.headers.get('Authorization');
     
     // Build headers for the proxied request
     const proxyHeaders: Record<string, string> = {
-      Accept: 'application/json, text/event-stream',
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      "Accept": "application/json, text/event-stream",
     };
     
     // Add authorization header if present
@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     }
 
     try {
-      const response = await fetch("https://api.githubcopilot.com/mcp", {
+      const response = await fetch(targetUrl, {
         method: 'POST',
         headers: proxyHeaders,
         body: bodyText,
@@ -56,6 +56,7 @@ export async function POST(request: Request) {
       try {
         if(responseText.length > 0) {
           responseJson = JSON.parse(responseText);
+
         }
       } catch (e) {
         console.log("Response body is not valid JSON:", e);
@@ -65,7 +66,10 @@ export async function POST(request: Request) {
       return new Response(responseText, {
         status: response.status,
         statusText: response.statusText,
-        headers: response.headers
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json, text/event-stream",
+        }
       });
 
     } catch (error) {
@@ -90,8 +94,6 @@ export async function GET(request: Request) {
       Accept: 'text/event-stream',
     };
 
-    console.log("Proxy GET: ", targetUrl);
-    
     // Add authorization header if present
     if (authHeader) {
       proxyHeaders.Authorization = authHeader;
@@ -101,8 +103,6 @@ export async function GET(request: Request) {
       const response = await fetch(targetUrl, {
         headers: proxyHeaders,
       });
-
-      console.log("GET status: ", response.status);
 
       if (!response.body) {
         return new Response('No upstream stream', { status: 502 });
@@ -116,20 +116,8 @@ export async function GET(request: Request) {
         return new Response('Unauthorized', { status: 401, headers: response.headers });
       }
 
-      // Read and log the response body for debugging
-      const responseText = await response.text();
-      console.log("GET: Response body as text:", responseText);
-      
-      let responseJson = null;
-      try {
-        responseJson = JSON.parse(responseText);
-        console.log("GET: Response body as JSON:", responseJson);
-      } catch (e) {
-        console.log("Response body is not valid JSON:", e);
-      }
-
       // Proxy the response stream with proper SSE headers
-      return new Response(responseText, {
+      return new Response(response.body, {
         status: response.status,
         statusText: response.statusText,
         headers: {
