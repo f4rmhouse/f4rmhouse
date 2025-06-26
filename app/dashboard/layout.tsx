@@ -45,9 +45,6 @@ export default async function DashboardLayout({children,}: Readonly<{children: R
   return (
     <SessionProvider session={session}>
       <div className="flex">
-        <div className="relative col-span-2">
-          <Sidebar username={String(session?.user?.name)} img={String(session?.user?.image)}/>
-        </div>
         <KeyboardHandlerWrapper />
         <div>
           <div className="flex md:mt-0">

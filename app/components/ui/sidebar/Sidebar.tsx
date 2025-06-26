@@ -49,7 +49,10 @@ export default function SearchBar({username, img}:{username:string, img:string})
 
   return (
     <div className="z-10">
-      <div onMouseEnter={() => setExpand(true)} onMouseLeave={() => setExpand(false)} className={`fixed w-[16%] h-[100vh] z-10 ${theme.chatWindowStyle} transition-transform duration-300 ease-in-out transform ${expand ? 'translate-x-0' : '-translate-x-full'}`}>
+      <div 
+        onMouseEnter={() => setExpand(true)} 
+        onMouseLeave={() => setExpand(false)} 
+        className={`fixed w-[16%] h-[100vh] z-10 ${theme.chatWindowStyle} transition-transform duration-300 ease-in-out transform ${expand ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="z-10 text-sm p-2 pt-2">
           {menuItems.map((e,i) => {
             return <Link key={i} href={e.href} className={`${pathname.split("/").slice(0,3).join("/") === e.href ? "border-2 rounded-md " + theme.primaryColor + " border-" + theme.secondaryColor?.replace("bg-", "") : "hover:" + theme.textColorPrimary + " border-2 hover:border-" + theme.secondaryColor?.replace("bg-", "") + " border-transparent rounded-md"} transition-all hover:${theme.hoverColor} cursor-pointer p-2 pl-3 flex ${theme.textColorSecondary}`}>

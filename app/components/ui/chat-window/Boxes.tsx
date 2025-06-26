@@ -140,7 +140,7 @@ function Boxes({f4rmers, session}: {f4rmers:F4rmerType[],session:F4Session}) {
           onReorder={setTabs} 
           className="w-full"
         >
-          <AnimatePresence>
+          <div>
             {tabs.map(tab => (
               <Reorder.Item 
                 key={tab.id} 
@@ -153,9 +153,9 @@ function Boxes({f4rmers, session}: {f4rmers:F4rmerType[],session:F4Session}) {
                     ? theme.primaryColor?.replace('bg-', '') || '#1f2937' 
                     : theme.secondaryColor?.replace('bg-', '') || 'transparent',
                   color: tab.isActive 
-                    ? theme.textColorPrimary?.replace('text-', '') || 'white'
+                    ? theme.textColorPrimary?.replace('text-', '') || 'text-black'
                     : theme.textColorSecondary?.replace('text-', '') || '#9ca3af',
-                  borderLeft: tab.isActive ? '4px solid #3b82f6' : '4px solid transparent',
+                  borderLeft: tab.isActive ? '4px solid #ffde59' : '4px solid transparent',
                   fontWeight: tab.isActive ? 600 : 400
                 }}
                 exit={{ opacity: 0, y: -20 }}
@@ -164,43 +164,31 @@ function Boxes({f4rmers, session}: {f4rmers:F4rmerType[],session:F4Session}) {
                   stiffness: 400, 
                   damping: 30 
                 }}
-                className={`flex items-center w-full px-3 py-2 cursor-move ${theme.secondaryColor} ${tab.isActive ? 'shadow-md' : ''}`}
+                className={`flex items-center w-full px-3 py-2 cursor-move ${theme.textColorPrimary} ${tab.isActive ? 'shadow-md' : ''}`}
                 onClick={() => activateTab(tab.id)}
               >
                 <span className="mr-2 text-xs">{tab.title}</span>
-                <motion.button 
+                <button 
                   onClick={(e) => {
                     e.stopPropagation();
                     closeTab(tab.id);
                   }}
                   className="hover:text-red-500 ml-auto"
-                  whileHover={{ scale: 1.2, rotate: 90 }}
-                  transition={{ duration: 0.2 }}
                 >
                   <X size={14} />
-                </motion.button>
+                </button>
               </Reorder.Item>
             ))}
-          </AnimatePresence>
+          </div>
         </Reorder.Group>
-        <motion.button 
+        <button 
           onClick={addTab}
-          className={`p-2 w-full flex justify-center ${theme.textColorSecondary || 'text-gray-400'}`}
-          whileHover={{ 
-            backgroundColor: theme.secondaryHoverColor?.replace('bg-', '') || '#374151',
-            scale: 1.05 
-          }}
-          whileTap={{ scale: 0.95 }}
-          transition={{ duration: 0.2 }}
+          className={`p-2 w-full flex justify-center ${theme.textColorPrimary|| 'text-gray-400'}`}
         >
-          <motion.div
-            animate={{ rotate: 0 }}
-            whileHover={{ rotate: 90 }}
-            transition={{ duration: 0.3 }}
-          >
+          <div>
             <Plus size={18} />
-          </motion.div>
-        </motion.button>
+          </div>
+        </button>
       </div>
       
       {/* Tab Content */}

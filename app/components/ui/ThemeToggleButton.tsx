@@ -2,7 +2,7 @@
 
 import { Palette } from "lucide-react"
 import { useTheme } from "@/app/context/ThemeContext"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Modal from "./modal/Modal"
 import { Theme } from "@/f4.config"
 
@@ -212,17 +212,20 @@ const themePresets: Record<string, Theme> = {
 export default function ThemeToggleButton() {
   const { theme, setTheme } = useTheme()
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [activeThemeKey, setActiveThemeKey] = useState<string>(() => {
-    // Try to get the active theme key from localStorage
+  const [activeThemeKey, setActiveThemeKey] = useState<string>('midnight') // Default theme key
+  const [isHydrated, setIsHydrated] = useState(false)
+  
+  // Load saved theme key after hydration
+  useEffect(() => {
+    setIsHydrated(true)
+    
     if (typeof window !== 'undefined') {
       const savedThemeKey = localStorage.getItem('f4rmhouse-theme-key')
       if (savedThemeKey) {
-        return savedThemeKey
+        setActiveThemeKey(savedThemeKey)
       }
     }
-    // Default to 'midnight' if no saved theme key
-    return 'midnight'
-  })
+  }, [])
   
   const applyTheme = (themeKey: string) => {
     setTheme(themePresets[themeKey])

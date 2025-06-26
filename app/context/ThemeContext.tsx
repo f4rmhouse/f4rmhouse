@@ -11,21 +11,26 @@ type ThemeContextType = {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  // Initialize theme from localStorage or fallback to default config
-  const [theme, setThemeState] = useState<Theme>(() => {
-    // Check if we're in the browser environment
+  // Initialize with default theme to prevent hydration mismatch
+  const [theme, setThemeState] = useState<Theme>(config.theme)
+  const [isHydrated, setIsHydrated] = useState(false)
+
+  // Load saved theme after hydration
+  useEffect(() => {
+    setIsHydrated(true)
+    
     if (typeof window !== 'undefined') {
       const savedTheme = localStorage.getItem('f4rmhouse-theme')
       if (savedTheme) {
         try {
-          return JSON.parse(savedTheme) as Theme
+          const parsedTheme = JSON.parse(savedTheme) as Theme
+          setThemeState(parsedTheme)
         } catch (error) {
           console.error('Failed to parse saved theme:', error)
         }
       }
     }
-    return config.theme
-  })
+  }, [])
 
   // Wrapper for setTheme that also saves to localStorage
   const setTheme = (newTheme: Theme) => {
@@ -37,6 +42,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   // Apply theme whenever it changes
   useEffect(() => {
+    if (!isHydrated) return
+    
     // Apply background color to body
     document.body.className = theme.backgroundColor
     
@@ -51,7 +58,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       // Remove background image if not set
       document.body.style.backgroundImage = ''
     }
-  }, [theme])
+  }, [theme, isHydrated])
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme}}>

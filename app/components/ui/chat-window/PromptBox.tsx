@@ -316,7 +316,7 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
           )}
         </div>
         <div className={`mt-auto sticky transition-all ${state === "canvas" ? "w-[98%]" : "w-[99%]"} ml-1 mr-2 ${chatSession.getMessages().length > 0 ? "bottom-[10%] sm:bottom-0 pb-1" : "bottom-[calc(40vh)]"}`}>
-            <div className={`${chatSession.getMessages().length === 0 ? "opacity-100" : "opacity-0"} pb-1`}>
+            <div className={`${chatSession.getMessages().length === 0 ? "block" : "hidden"} pb-1`}>
               <h1 className={`flex text-2xl ${theme.textColorPrimary ? theme.textColorPrimary : "text-white"}`}>{welcomeMessage} <img className="my-auto w-10" src={"https://media.tenor.com/R7JF4cuIjogAAAAj/spongebob-spongebob-meme.gif"} /></h1>
             </div>
           <UserInput onSubmit={sendMessage} onChange={handleInputChange} value={input}>
