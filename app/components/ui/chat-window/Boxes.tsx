@@ -206,7 +206,7 @@ function Boxes({f4rmers, session}: {f4rmers:F4rmerType[],session:F4Session}) {
       {/* Tab Content */}
       <div className="flex-1 overflow-hidden">
         {tabs.map(tab => (
-          <div key={tab.id} className={`h-full ${tab.isActive ? 'block' : 'hidden'}`}>
+          <div key={tab.id} className={`flex h-full ${tab.isActive ? 'block' : 'hidden'}`}>
             <PromptBox 
               f4rmers={f4rmers} 
               state={tab.state} 

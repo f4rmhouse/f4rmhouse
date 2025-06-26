@@ -331,7 +331,7 @@ class F4MCPClient {
    * @param client - MCP Client instance to use for the connection
    */
   async _connectWithMCPServerWithoutAuth(uti: string, serverURL: string, client: Client, transport: string) {
-    console.info("No auth needed for this server. Proceed to connection.")
+    // console.info("No auth needed for this server. Proceed to connection.")
 
     let encodedURL = "http://localhost:3000/api/mcp/streamable?server_uri=" + encodeURIComponent(serverURL);
     if(transport == "sse") {
@@ -423,6 +423,7 @@ class F4MCPClient {
    */
   async _connectToClientWithAuthToken(uti: string, serverURL: string, accessToken: string, client: Client, transport: string) {
     const authToken = "Bearer " + accessToken
+    console.log("server url: ", serverURL)
     /**
      * Helper function to add authorization headers to fetch requests
      * @param url - URL to fetch
@@ -458,6 +459,8 @@ class F4MCPClient {
 
   async _handleConnection(transport: string, url: URL, customHeaders: any, client: Client, uti: string, fetchWithAuth: any) {
     if (transport == "streamable_http") {
+      console.log("url", url)
+      console.log("custom headers", customHeaders)
       let t = new StreamableHTTPClientTransport(url, {requestInit: customHeaders});
       try {
         await client.connect(t);
@@ -468,7 +471,7 @@ class F4MCPClient {
       }
     }
     else {
-      let t = new SSEClientTransport(new URL("https://mcp.deepwiki.com/sse"), {
+      let t = new SSEClientTransport(new URL(url), {
           eventSourceInit: {
               fetch: fetchWithAuth,
           },
@@ -537,8 +540,15 @@ class F4MCPClient {
    * @returns Promise resolving to the fetch response
    */
   async _fetchRFC9728MetaData(remoteMetaDataEndpoint:string): Promise<any> {
-    const encodedURL = "http://localhost:3000/api/mcp/automatic/discovery?server_uri=" +encodeURIComponent(remoteMetaDataEndpoint);
-    return await fetch(encodedURL)
+    // console.log("Fetching RFC 9728 metadata from: ", remoteMetaDataEndpoint)
+    // const encodedURL = "http://localhost:3000/api/mcp/automatic/discovery?server_uri=" +encodeURIComponent(remoteMetaDataEndpoint);
+    try {
+      return await fetch(remoteMetaDataEndpoint)
+    }
+    catch(err) {
+      console.log(err)
+      return new Response('Discovery not available', { status: 404});
+    }
   }
 
   /**
@@ -547,9 +557,16 @@ class F4MCPClient {
    * @returns Promise resolving to the fetch response
    */
   async _fetchRFC8414AuthServerMetaData(remoteAuthServerMetaDataEndpoint:string): Promise<any> {
-    const encodedURL = "http://localhost:3000/api/mcp/automatic/discovery?server_uri=" + encodeURIComponent(remoteAuthServerMetaDataEndpoint);
-    return await fetch(encodedURL)
+    // console.log("Fetching RFC 8414 metadata from: ", remoteAuthServerMetaDataEndpoint)
+    try {
+      return await fetch(remoteAuthServerMetaDataEndpoint)
+    }
+    catch(err) {
+      console.log(err)
+      return new Response('Discovery not available', { status: 404});
+    }
   }
+
 
   /**
    * Extracts URL from resource_metadata attribute in WWW-Authenticate header

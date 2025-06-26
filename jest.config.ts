@@ -37,6 +37,7 @@ const config: Config = {
   // Module name mapper for path aliases and handling ESM imports
   moduleNameMapper: {
     "^(\\.{1,2}/.*)\\.js$": "$1",
+    "^@/(.*)$": "<rootDir>/$1",
   },
   // An array of glob patterns indicating a set of files for which coverage information should be collected
   // collectCoverageFrom: undefined,

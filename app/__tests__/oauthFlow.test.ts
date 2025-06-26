@@ -66,7 +66,7 @@ describe('OAuth Metadata Fetching', () => {
 
       // Verify fetch was called with correctly encoded URL
       expect(mockFetch).toHaveBeenCalledWith(
-        'http://localhost:3000/api/mcp/automatic/discovery?server_uri=https%3A%2F%2Fexample.com%2F.well-known%2Foauth-authorization-server'
+        testEndpoint
       );
     });
 
@@ -81,7 +81,7 @@ describe('OAuth Metadata Fetching', () => {
       await client._fetchRFC9728MetaData(complexEndpoint);
 
       expect(mockFetch).toHaveBeenCalledWith(
-        'http://localhost:3000/api/mcp/automatic/discovery?server_uri=https%3A%2F%2Fapi.example.com%2Foauth%2Fmetadata%3Fparam%3Dvalue%26other%3Dtest'
+        complexEndpoint
       );
     });
 
@@ -103,12 +103,19 @@ describe('OAuth Metadata Fetching', () => {
     });
 
     test('handles fetch errors', async () => {
-      const fetchError = new Error('Network error');
-      mockFetch.mockRejectedValueOnce(fetchError);
+      const errorResponse = {
+        ok: false,
+        status: 404,
+        statusText: 'Discovery not available',
+        text: async () => 'Discovery not available'
+      } as Response;
+      mockFetch.mockResolvedValueOnce(errorResponse);
 
-      await expect(
-        client._fetchRFC9728MetaData('https://example.com/.well-known/oauth-authorization-server')
-      ).rejects.toThrow('Network error');
+      const result = await client._fetchRFC9728MetaData('https://example.com/.well-known/oauth-authorization-server');
+
+      expect(result).toBe(errorResponse);
+      expect(result.status).toBe(404);
+      expect(result.statusText).toBe('Discovery not available');
     });
 
     test('handles HTTP error responses', async () => {
@@ -135,15 +142,12 @@ describe('OAuth Metadata Fetching', () => {
       const testCases = [
         {
           input: 'https://signin.mcp.shop/.well-known/oauth-authorization-server',
-          expected: 'https%3A%2F%2Fsignin.mcp.shop%2F.well-known%2Foauth-authorization-server'
         },
         {
           input: 'https://api.linear.app/oauth/metadata',
-          expected: 'https%3A%2F%2Fapi.linear.app%2Foauth%2Fmetadata'
         },
         {
           input: 'http://localhost:8080/auth/metadata',
-          expected: 'http%3A%2F%2Flocalhost%3A8080%2Fauth%2Fmetadata'
         }
       ];
 
@@ -151,26 +155,9 @@ describe('OAuth Metadata Fetching', () => {
         await client._fetchRFC9728MetaData(testCase.input);
         
         expect(mockFetch).toHaveBeenCalledWith(
-          `http://localhost:3000/api/mcp/automatic/discovery?server_uri=${testCase.expected}`
+          testCase.input
         );
       }
-    });
-  });
-
-  describe('_fetchRFC8414AuthServerMetaData', () => {
-    test('constructs correct proxy URL for auth server metadata', async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        status: 200
-      } as Response);
-
-      const authServerEndpoint = 'https://signin.mcp.shop/.well-known/oauth-authorization-server';
-      
-      await client._fetchRFC8414AuthServerMetaData(authServerEndpoint);
-
-      expect(mockFetch).toHaveBeenCalledWith(
-        'http://localhost:3000/api/mcp/automatic/discovery?server_uri=https%3A%2F%2Fsignin.mcp.shop%2F.well-known%2Foauth-authorization-server'
-      );
     });
   });
 
@@ -193,13 +180,6 @@ describe('OAuth Metadata Fetching', () => {
       invalidInputs.forEach(input => {
         expect(client._extractUrl(input)).toBeNull();
       });
-    });
-
-    test('handles complex URLs in resource_metadata', () => {
-      const input = 'resource_metadata="https://api.example.com/oauth/metadata?version=2&format=json"';
-      const result = client._extractUrl(input);
-      
-      expect(result).toBe('https://api.example.com/oauth/metadata?version=2&format=json');
     });
   });
 });

@@ -182,7 +182,7 @@ export default function RightSidebar() {
 
     // Adapt based on server metadata if available
     const authHandler = new OAuthClient(oauthClientParams, serverMetadata);
-    const encodedURL = "http://localhost:3000/api/mcp/automatic/discovery?server_uri=" + encodeURIComponent(registerEndpoint);
+    const encodedURL = registerEndpoint;
     authHandler.create(codeChallenge)
     const authUrl = await authHandler.register(encodedURL)
     window.open(authUrl, '_blank')

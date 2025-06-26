@@ -21,7 +21,7 @@ export async function POST(request: Request) {
       // },
     };
     
-    const response = await fetch("https://mcp.deepwiki.com/messages?session_id=" + session_id, fetchOptions);
+    const response = await fetch("" + session_id, fetchOptions);
     
     return new Response(response.body, {
       status: response.status,

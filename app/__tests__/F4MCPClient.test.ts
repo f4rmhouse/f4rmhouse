@@ -35,7 +35,7 @@ describe('F4MCPClient', () => {
       let user = undefined
       client = new F4MCPClient("test f4rmer", mockProducts, user, true);
       // Connect to the test server
-      await client.connect("linear", TEST_MCP_URL);
+      await client.connect("linear", TEST_MCP_URL, "sse");
     });
     
     // Clean up after all tests are complete
