@@ -135,11 +135,11 @@ export default function PromptBoxSimple({uti, description}: {uti: string, descri
       messages: chatSession.getNextJSMessages(), 
       description: description,
       show_intermediate_steps: false,
-      email: "",
-      provider: "",
-      token: "",
-      f4rmer: uti,
-      model: selectedModel
+      f4rmer: "",
+      session: {access_token: "", provider: "", expires: "", user: {name: "", email: "", image: ""}},
+      model: selectedModel,
+      tools: [],
+      allowList: [] 
     }
 
     // Send message
@@ -180,7 +180,7 @@ export default function PromptBoxSimple({uti, description}: {uti: string, descri
                       case "tool_init":
                         return (<ChatInitToolCallMessage key={i} message={m.content} debug={chatSession.getDebug(m.id) ?? {message: "no extra information"}}/>)
                       case "system":
-                        return (<ChatAIMessage key={i} message={m.content} openCanvas={() => console.log("open canvas")}/>)
+                        return (<ChatAIMessage key={i} message={m.content}/>)
                       case "tool_response":
                         return (<ChatToolMessage key={i} message={m.content} debug={chatSession.getDebug(m.id) ?? {message: "no extra information"}}/>)
                       case "error":

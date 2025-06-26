@@ -13,6 +13,7 @@ const getProvider = (pfp:string) => {
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [Google, GitHub],
+  trustHost: true,
   callbacks: {
     async jwt({token, account}) {
       if (account) {

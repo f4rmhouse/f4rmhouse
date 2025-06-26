@@ -47,8 +47,8 @@ async function Dashboard() {
         <div className="mt-10">
           <div className="overflow-hidden">
             <div>
-              <Boxes data={data} session={session}/>
-              <RightSidebar f4rmer={data}/>
+              <Boxes f4rmers={[data]} session={session}/>
+              <RightSidebar />
             </div>
           </div>
         </div>

@@ -40,8 +40,8 @@ async function Dashboard() {
     <main className="">
       {error == null ?
         <div className="overflow-none">
-          <Boxes data={data} session={session}/>
-          <RightSidebar f4rmer={data}/>
+          <Boxes f4rmers={[data]} session={session}/>
+          <RightSidebar />
         </div>
         :
         <div className="mt-16 text-center flex border border-neutral-700 p-4 rounded">

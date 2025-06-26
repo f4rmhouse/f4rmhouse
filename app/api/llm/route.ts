@@ -13,7 +13,6 @@ import { AIMessage, BaseMessage } from "@langchain/core/messages";
 import { BaseChatModel } from "@langchain/core/language_models/chat_models";
 import createF4Tool from "./f4-tool";
 import createMCPTool from "./mcp_sse_tool";
-import { F4SessionStorage } from "@/app/microstore/Session";
 import { ModelConfig, Endpoint, RequestBody } from "./agent.interfaces";
 import { LLMServiceError } from "./agent.errors";
 import { ChatOllama } from "@langchain/ollama";
@@ -135,7 +134,6 @@ export async function POST(req: NextRequest) {
     const body = await req.json() as RequestBody;
     const { description, messages = [], model: selectedModel, session, toolbox: initialToolbox, tools, allowList} = body;
     const prompt = PromptTemplate.fromTemplate(TEMPLATE);
-    const chat_session = new F4SessionStorage();
     const caller = new User(session.user.email, session.provider, session.access_token);
 
     console.log("ALLOW LIST: ", allowList)

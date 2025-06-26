@@ -39,8 +39,7 @@ export default async function F4rmerDetailsPage({ params }: { params: Params }) 
   }
   return(
     <div className="overflow-none">
-      <Boxes data={data} session={session}/>
-      <RightSidebar f4rmer={data}/>
+
     </div>
     )
 }
