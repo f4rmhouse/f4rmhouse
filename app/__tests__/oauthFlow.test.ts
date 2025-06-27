@@ -182,4 +182,12 @@ describe('OAuth Metadata Fetching', () => {
       });
     });
   });
+
+  describe('signOut', () => {
+    test('signs out successfully', () => {
+      const client = new F4MCPClient('test-client', []);
+      client.signOut("test-uti");
+      expect(client.getConnections().get("test-uti")).toBeUndefined();
+    });
+  });
 });

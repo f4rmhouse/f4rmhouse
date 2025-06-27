@@ -29,7 +29,9 @@ export default class MCPAuthHandler {
               redirect_uri: "http://localhost:3000/auth/github", 
               token_url: "https://github.com/login/oauth/access_token",
               authorization_server: "https://github.com/login/oauth/authorize",
-              client_id: "Ov23lisEYupHgMBdiir5" // This is public so no need to encrypt
+              client_id: "Ov23lisEYupHgMBdiir5", // This is public so no need to encrypt
+              revocation_url: "",
+              manual_revocation_url: "https://github.com/settings/applications"
             }
           case "linear":
             return {

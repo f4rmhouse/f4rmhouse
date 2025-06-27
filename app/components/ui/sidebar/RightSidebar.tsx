@@ -207,8 +207,8 @@ export default function RightSidebar() {
     window.open(authUrl, '_blank')
   }
 
-  const signOut = async () => {
-    alert("Sign out")
+  const signOut = async (uti: string) => {
+    client.signOut(uti)
   }
 
   return (
@@ -301,7 +301,7 @@ export default function RightSidebar() {
                       </div>
                     )}
                     <button 
-                      onClick={() => signOut()}
+                      onClick={() => signOut(tool.uti)}
                       className={`hover:${theme.textColorPrimary} p-2 rounded-md transition-all cursor-pointer flex ${theme.textColorSecondary} w-full text-base gap-3 my-auto items-center`}
                     >
                       <LogOut size={15} className="" />

@@ -7,6 +7,7 @@ import { InputSchema, Tool, ServerSummaryType, Prompt, MCPToolType, MCPResourceT
 import { MCPConnectionStatus } from "../components/types/MCPConnectionStatus";
 import MCPAuthHandler from "../MCPAuthHandler";
 import Store from "./Store";
+import axios from "axios";
 
 /**
  * F4MCPClient is a client for interacting with Model Context Protocol (MCP) servers.
@@ -645,6 +646,62 @@ class F4MCPClient {
    */
   getConnections() {
     return this.connections
+  }
+
+  async signOut(uti: string) {
+    // this.connections.get(uti)?.signOut()
+    // this._fetchRFC8414AuthServerMetaData(uti)
+    let store = new Store()
+    let product = await store.getProduct(uti)
+    let token = await this.caller?.getToken(uti)
+    token = token.Token
+    let authProvider = product.Message.server.auth_provider
+    if(authProvider) {
+      let authHandler = MCPAuthHandler.oauth2(authProvider)
+      if(authHandler.manual_revocation_url) {
+        alert(authProvider + " does not provide a revocation endpoint. Please revoke your access token manually at " + authHandler.manual_revocation_url)
+        window.open(authHandler.manual_revocation_url, '_blank')
+        this.caller?.deleteToken(uti)
+      }
+      else {
+        let result = await axios.post("/api/oauth/signout", {
+          access_token: token,
+          provider: authProvider,
+          uti: uti
+        }, {
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
+        })
+
+        if(result.status == 200) {
+          alert("Successfully revoked access token")
+          this.caller?.deleteToken(uti)
+        }
+        else {
+          alert("Failed to revoke access token")
+          this.caller?.deleteToken(uti)
+        }
+      }
+    }
+    else {
+      alert("automatic revocation discovery")
+      let result = await axios.post("/api/oauth/signout", {
+        access_token: token,
+        provider: authProvider,
+        uti: uti,
+        code_verifier: localStorage.getItem('pkce_code_verifier'),
+        client_id: "vL0xmOBu1Gt25q9Q"
+      }, {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      })
+      console.log("result: ", result)
+      this.caller?.deleteToken(uti)
+    }
   }
 }
 

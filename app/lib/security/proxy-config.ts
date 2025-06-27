@@ -27,6 +27,7 @@ export const MCP_PROXY_CONFIG: ProxySecurityConfig = {
     'signin.mcp.shop',
     'hiutdenim.co.uk',
     'api.githubcopilot.com',
+    'mcp.linear.app',
     
     // Example: Add your own MCP servers
     // 'your-mcp-server.com',
