@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
       body.code_verifier = code_verifier;
     }
     else {
-      const envVarName = `GITHUB_CLIENT_SECRET`;
+      const envVarName = `${provider.toUpperCase()}_CLIENT_SECRET`;
       const client_secret = process.env[envVarName];
 
       if (!client_secret) {

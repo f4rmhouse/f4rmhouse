@@ -10,7 +10,7 @@ import { useEffect, useState } from 'react';
 import { useSession } from "next-auth/react";
 import User from '@/app/microstore/User';
 import ProductType from '../../types/ProductType';
-import { BadgeCheck, Bot, BrainCircuit, ChevronRight, Hammer, HardDrive, LockKeyhole, QrCode, Server, Store as StoreIcon} from "lucide-react";
+import { BadgeCheck, Bot, BrainCircuit, ChevronRight, Hammer, HardDrive, LockKeyhole, LogOut, QrCode, Server, Store as StoreIcon} from "lucide-react";
 import { Delete, PanelLeftClose, PanelRightClose, Repeat2, Wrench } from 'lucide-react';
 import { useTheme } from "../../../context/ThemeContext";
 import { useAgent } from "../../../context/AgentContext";
@@ -207,6 +207,10 @@ export default function RightSidebar() {
     window.open(authUrl, '_blank')
   }
 
+  const signOut = async () => {
+    alert("Sign out")
+  }
+
   return (
     <div>
     <div onMouseEnter={() => setVisible(true)} onMouseLeave={() => setVisible(false)} className={`p-2 fixed right-0 w-[50%] sm:w-[25%] mt-9 h-[92vh] z-10 top-0 border-${theme.secondaryColor?.replace("bg-", "")} ${theme.chatWindowStyle} transition-transform duration-300 ease-in-out rounded-md transform p-3 ${visible ? 'translate-x-0' : 'translate-x-full'}`}>
@@ -296,7 +300,13 @@ export default function RightSidebar() {
                         You're allowing an LLM to perform all of these servers actions on your behalf without needing your permission.
                       </div>
                     )}
-                    <button onClick={() => alert("Do sign out")}>Sign out</button>
+                    <button 
+                      onClick={() => signOut()}
+                      className={`hover:${theme.textColorPrimary} p-2 rounded-md transition-all cursor-pointer flex ${theme.textColorSecondary} w-full text-base gap-3 my-auto items-center`}
+                    >
+                      <LogOut size={15} className="" />
+                      <span className="font-medium text-xs">Sign out</span>
+                    </button>
                     <button onClick={() => removeTool(tool.uti)}>remove</button>
                   </div>
                   :
