@@ -24,7 +24,7 @@ import MCPAuthHandler, { OAuthClient } from '@/app/MCPAuthHandler';
 export default function RightSidebar() {
   const { theme } = useTheme();
   const { data: session, status } = useSession();
-  const { selectedAgent, client } = useAgent();
+  const { selectedAgent, setSelectedAgent, client } = useAgent();
 
   const [qrImageURL, setQrImageURL] = useState<string>("")
   const [loading, setLoading] = useState<boolean>(false)
@@ -37,6 +37,9 @@ export default function RightSidebar() {
   
   // Track ping times for each server
   const [pingTimes, setPingTimes] = useState<{[key: string]: number}>({})
+
+  // Track trusted servers
+  const [trustedServers, setTrustedServers] = useState<{[key: string]: boolean}>({})
 
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [loginToolIndex, setLoginToolIndex] = useState<number | null>(null);
@@ -66,9 +69,7 @@ export default function RightSidebar() {
     
     let newF4rmer = {...selectedAgent}
     newF4rmer.toolbox = selectedAgent.toolbox.filter((e:ProductType) => e.uti != uti)
-    // @ts-expect-error
-    const user = new User(String(session.user.email), String(session.provider), String(session.access_token));
-    user.updateF4rmer(newF4rmer)
+    setSelectedAgent(newF4rmer)
   }
 
   const toggleToolSummary = (index: number) => {
@@ -281,6 +282,21 @@ export default function RightSidebar() {
                         )}
                       </div>
                     )}
+                    <label className="mt-5 mb-2 inline-flex items-center cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        checked={trustedServers[tool.uti] || false} 
+                        onChange={() => setTrustedServers(prev => ({...prev, [tool.uti]: !prev[tool.uti]}))}
+                        className="rounded"
+                      />
+                      <span className={`ml-2 text-sm font-medium ${theme.textColorPrimary}`}>I trust this server</span>
+                    </label>
+                    {trustedServers[tool.uti] && (
+                      <div className={`rounded text-xs ${theme.textColorSecondary}`}>
+                        You're allowing an LLM to perform all of these servers actions on your behalf without needing your permission.
+                      </div>
+                    )}
+                    <button onClick={() => alert("Do sign out")}>Sign out</button>
                     <button onClick={() => removeTool(tool.uti)}>remove</button>
                   </div>
                   :
