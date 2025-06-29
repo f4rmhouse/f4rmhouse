@@ -133,6 +133,8 @@ export async function GET(request: Request) {
         return new Response('No upstream stream', { status: 502 });
       }
 
+      console.log("Response body: ", response.body)
+
       // Proxy the response stream with proper SSE headers
       return new Response(response.body, {
         status: response.status,

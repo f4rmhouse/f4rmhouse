@@ -85,6 +85,7 @@ function createMCPTool({ uti, endpoint, title, tool_description, parameters, aut
 
             let accessToken = {Code: 0, Token: ""}
             if(askUserForConfirmation) {
+                console.log("ARGS: ", args)
                 return {
                     message: "Confirmation needed. Inform user to confirm or cancel the request so that personal or confidential data isn't sent to the server.", 
                     tool_identifier: endpoint, 
@@ -139,13 +140,32 @@ function createMCPTool({ uti, endpoint, title, tool_description, parameters, aut
             }
 
             try {
+                const filteredArgs = Object.fromEntries(
+                    Object.entries(args).filter(([key, value]) => {
+                        // Remove null, undefined, empty strings, and empty arrays
+                        if (value === null || value === undefined || value === '') {
+                            return false;
+                        }
+                        // Remove empty arrays
+                        if (Array.isArray(value) && value.length === 0) {
+                            return false;
+                        }
+                        // Remove empty objects
+                        if (typeof value === 'object' && !Array.isArray(value) && Object.keys(value).length === 0) {
+                            return false;
+                        }
+                        return true;
+                    })
+                );
+
                 // Validate that all required parameters are present
                 let result : any;
                 let content: any;
                 if(mcp_type == "tool") {
+                    console.log("ARGS: ", filteredArgs)
                     result = await client.callTool({
                         name: endpoint,
-                        arguments: args,
+                        arguments: filteredArgs,
                     }); 
                     if (!result || !result.content) {
                         throw new Error('Empty response');
@@ -155,10 +175,10 @@ function createMCPTool({ uti, endpoint, title, tool_description, parameters, aut
                 }
                 if (mcp_type == "prompt") {
                     console.log("Prompt: ", endpoint)
-                    console.log("Prompt args: ", args)
+                    console.log("Prompt args: ", filteredArgs)
                     result = await client.getPrompt({
                         name: endpoint,
-                        arguments: args,
+                        arguments: filteredArgs,
                     });
                     content = result.messages[0].content;
                 }

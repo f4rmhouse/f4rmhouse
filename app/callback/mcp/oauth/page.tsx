@@ -43,11 +43,12 @@ export default function OAuthCallbackPage() {
             const storageKey = `oauth_client_id_${clientIdentifier}`;
             let client_id = localStorage.getItem(storageKey);
             let token_url = localStorage.getItem(`token_url_${clientIdentifier}`)
+            let provider = ""
             
             if (!client_id && clientIdentifier) {
               let store = new Store()
               let product = await store.getProduct(clientIdentifier)
-              let provider = product.Message.server.auth_provider
+              provider = product.Message.server.auth_provider
               let auth = MCPAuthHandler.oauth2(provider)
               client_id = auth.client_id
               // Make code verifier empty so that backend reads client_secret from ENV
@@ -59,7 +60,7 @@ export default function OAuthCallbackPage() {
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ 
                 code, 
-                provider: clientIdentifier,
+                provider: provider,
                 code_verifier: codeVerifier,
                 client_id: client_id,
                 token_url: token_url
@@ -103,7 +104,7 @@ export default function OAuthCallbackPage() {
               }
               return prev - 1;
             });
-          }, 100000);
+          }, 5000);
         } catch (err) {
           console.error('OAuth callback error:', err);
           setError('Failed to process authorization');
