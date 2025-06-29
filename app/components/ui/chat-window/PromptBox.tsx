@@ -12,7 +12,7 @@ import ChatInitToolCallMessage from "../chat-messages/ChatInitToolCallMessage";
 import ChatMessageType from "../../types/ChatMessageType";
 import ChatUserMessage from "../chat-messages/ChatUserMessage";
 import ChatErrorMessage from "../chat-messages/ChatErrorMessage";
-import { ArrowLeft, ArrowRight, CornerRightUp, Paperclip, Pencil, RotateCcw } from "lucide-react";
+import { ArrowLeft, ArrowRight, CircleStop, CornerRightUp, Paperclip, Pencil, RotateCcw } from "lucide-react";
 import F4rmerEditor from "./F4rmerEditor";
 import Link from "next/link";
 import Modal from "../modal/Modal";
@@ -51,8 +51,9 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
   const [chatSession, setChatSession] = useState<ChatSession>(new ChatSession())
   const [currentSession, setCurrentSession] = useState<ChatMessageType[]>([]) 
   const { messages, input, setInput, handleInputChange, setMessages } = useChat({});
-  const [loading, setLoading] = useState<boolean>(false)
+  const [loading, setLoading] = useState(false)
   const [latestMessage, setLatestMessage] = useState<string>("")
+  const currentReaderRef = useRef<ReadableStreamDefaultReader<Uint8Array> | null>(null)
 
   const [welcomeMessage, setWelcomeMessage] = useState<string>()
 
@@ -75,28 +76,39 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
     setChatSession(chatSession)
   }, [loading])
 
+  /**
+   * stopStream cancels the current streaming operation
+   */
+  const stopStream = () => {
+    if (currentReaderRef.current) {
+      currentReaderRef.current.cancel();
+      currentReaderRef.current = null;
+      setLoading(false);
+    }
+  };
+
   // Add keyboard shortcut handlers
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Only handle shortcuts if not in an input field or textarea
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
-        return;
-      }
-      
-      // Cmd/Ctrl+O to toggle canvas
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'o') {
-        e.preventDefault();
-        // Toggle between canvas and chat
-        setState(state === 'canvas' ? 'chat' : 'canvas');
-      }
-      
-      // Cmd/Ctrl+X to clear chat
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'x') {
-        e.preventDefault();
-        chatSession.clear();
-        setCurrentSession([]);
-      }
-    };
+    // Only handle shortcuts if not in an input field or textarea
+    if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+      return;
+    }
+    
+    // Cmd/Ctrl+O to toggle canvas
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'o') {
+      e.preventDefault();
+      // Toggle between canvas and chat
+      setState(state === 'canvas' ? 'chat' : 'canvas');
+    }
+    
+    // Cmd/Ctrl+X to clear chat
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'x') {
+      e.preventDefault();
+      chatSession.clear();
+      setCurrentSession([]);
+    }
+  };
 
     // Add event listener for keyboard shortcuts
     window.addEventListener('keydown', handleKeyDown);
@@ -142,6 +154,7 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
       chatSession.push("error", "system", "Connection error. Either the connection to the server has been broken or your connection is not stable. Please come back later and try again.")
     } finally {
       setLoading(false);
+      currentReaderRef.current = null;
     }
   }
 
@@ -206,6 +219,8 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
       return
     }
 
+    // Store the reader reference for potential cancellation
+    currentReaderRef.current = stream
     await processStream(chatSession.getMessages().length, stream, MSStart) 
   }
 
@@ -337,9 +352,15 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
               </button>
               }
               </>
+              {!loading ?
               <button type="submit" className={`ml-auto rounded-md transition-all px-3 ${theme.accentColor}`}>
                 <span className=""><CornerRightUp size={15}/></span>
               </button>
+              :
+              <button type="button" onClick={stopStream} className={`ml-auto rounded-md transition-all px-3`}>
+                <span className="text-red-500"><CircleStop size={25} /></span>
+              </button>
+              }
             </div>
           </UserInput>
         </div>
