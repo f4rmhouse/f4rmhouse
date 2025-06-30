@@ -1,3 +1,4 @@
+"use client"
 import SectionType from "../components/types/SectionType";
 import SmallAppCardGrid from "../components/grid/SmallAppCardGrid";
 import InfoCardGrid from "../components/grid/InfoCardGrid";
@@ -5,6 +6,7 @@ import Banner from "../components/banner/Banner";
 import Link from "next/link";
 import { Hammer } from "lucide-react";
 import PostHogPageView from "../PostHogPageView";
+import { useTheme } from "../context/ThemeContext";
 
 const AppMocks = {
   "banner": {
@@ -27,13 +29,15 @@ const AppMocks = {
 
 export default function Home() {
 
+  const { theme } = useTheme();
+
   const renderSection = (type: string, section: SectionType) => {
 
     switch (type) {
       case "small_cards":
         return (
           <div className="mt-10 mb-10 sm:ml-12">
-            <h2 className="sm:pl-0 text-xl">Popular actions</h2>
+            <h2 className={`sm:pl-0 text-xl ${theme.textColorPrimary}`}>Popular Servers</h2>
             <SmallAppCardGrid apps={section.content}/>
           </div>
         )
@@ -73,9 +77,9 @@ export default function Home() {
             })
           }
         </div>
-        <footer className="border-neutral-700 pr-5 pl-5 sm:pr-0 sm:pl-0">
+        <footer className="px-5 sm:pr-0 sm:pl-0">
           <div className="flex">
-            <Link href="/docs" className="transition-all bg-neutral-800 border border-neutral-700 p-2 pl-2 pr-4 rounded text-blue-500 hover:bg-neutral-700 flex w-[200px] m-auto"><div className="m-auto flex"><Hammer size={20} className="mr-1"/> For developers</div></Link>
+            <Link href="/docs" className={`m-auto hover:${theme.textColorPrimary} p-2 rounded-md transition-all hover:${theme.hoverColor} cursor-pointer flex ${theme.textColorSecondary} text-base gap-3 my-auto`}><Hammer size={20}/> Submit a Server</Link>
           </div>
           <div className="grid grid-cols-2 pt-5 pb-5">
           </div>

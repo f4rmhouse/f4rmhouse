@@ -35,7 +35,7 @@ export default function SmallAppCardGrid({apps}: {apps: AppCardType[]|string}) {
             disclaimer: "",
             link: "",
             deployed: e.deployed,
-            deploymentType: e.deployment_type == "" ? "undefined" : e.deployment_type
+            deploymentType: e.server.transport == "" ? "custom" : e.server.transport
           } 
           return card
           }

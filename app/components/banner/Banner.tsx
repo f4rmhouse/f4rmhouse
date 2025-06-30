@@ -11,6 +11,7 @@ import AppCardType from "../types/AppCardType";
 import Image from 'next/image'
 import { usePostHog } from "posthog-js/react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useTheme } from "@/app/context/ThemeContext";
 
 // SimpleBannerItem shows an image and a message to the left side of it
 function SimpleBannerItem({item}: {item: AppCardType}) {
@@ -96,6 +97,7 @@ export default function Banner() {
   const posthog = usePostHog()
 
   const [currentPage, setCurrentPage] = useState<number>(0)
+  const { theme } = useTheme();
 
   // Mocked pages, in prod these should be returned from a server
   const pages = [
@@ -154,7 +156,7 @@ export default function Banner() {
     <div>
       <div className="flex w-full">
         <button onClick={() => previousPage()} className="transition-all text-neutral-600 hover:text-sky-500 h-[50vh] rounded-md bg-transparent hidden md:block" id="previous image" aria-label="previous image"><ChevronLeft size="40" /></button>
-        <div className="overflow-hidden h-[35vh] md:h-[50vh] md:min-h-[320px] bg-white sm:bg-white text-black flex w-full rounded-md border border-black">
+        <div className="shadow overflow-hidden h-[35vh] md:h-[50vh] md:min-h-[320px] bg-white sm:bg-white text-black flex w-full rounded-md">
           <div className="transition-all w-full h-full duration-[300ms] ease-in-out" style={{ transform: `translate3d(${-currentPage* 100}%, 0, 0)` }}>
           <div className="whitespace-nowrap">
               {
@@ -178,7 +180,7 @@ export default function Banner() {
           {
             pages.map((e,i) => {
               return(
-                <div key={i} onClick={() => selectPage(i)} className={`m-auto ${i == currentPage ? "bg-neutral-100" : "hover:bg-neutral-400 bg-neutral-700"} transition-all rounded-full p-1 mr-2 cursor-pointer`}>
+                <div key={i} onClick={() => selectPage(i)} className={`m-auto ${i == currentPage ? `${theme.accentColor}` : `${theme.secondaryHoverColor}`} transition-all rounded-full p-1 mr-2 cursor-pointer`}>
                 </div>
               )
             })
