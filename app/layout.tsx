@@ -7,6 +7,7 @@ import { PHProvider } from './providers'
 import { ThemeProvider } from "./context/ThemeContext";
 import { ArtifactProvider } from "./context/ArtifactContext";
 import { AgentProvider } from "./context/AgentContext";
+import { OnboardingProvider } from "./context/OnboardingContext";
 import config from "../f4.config"
 import KeyboardHandlerWrapper from "./components/ui/KeyboardHandlerWrapper";
 
@@ -25,7 +26,8 @@ export default function RootLayout({children,}: Readonly<{children: React.ReactN
       <PHProvider>
       <SessionProvider>
         <ThemeProvider>
-          <AgentProvider>
+          <OnboardingProvider>
+            <AgentProvider>
             <body>
               <ArtifactProvider>
               <KeyboardHandlerWrapper />
@@ -48,7 +50,8 @@ export default function RootLayout({children,}: Readonly<{children: React.ReactN
               </div>
               </ArtifactProvider>
             </body>
-          </AgentProvider>
+            </AgentProvider>
+          </OnboardingProvider>
         </ThemeProvider>
         </SessionProvider>
         </PHProvider>

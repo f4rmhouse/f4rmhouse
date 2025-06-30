@@ -13,6 +13,7 @@ import ProductType from '../../types/ProductType';
 import { BadgeCheck, Bot, BrainCircuit, ChevronRight, Hammer, HardDrive, LockKeyhole, QrCode, Server, Store as StoreIcon} from "lucide-react";
 import { Delete, PanelLeftClose, PanelRightClose, Repeat2, Wrench } from 'lucide-react';
 import { useTheme } from "../../../context/ThemeContext";
+import { useOnboarding } from "../../../context/OnboardingContext";
 import { useAgent } from "../../../context/AgentContext";
 import F4MCPClient from '@/app/microstore/F4MCPClient';
 import { ServerSummaryType } from '@/app/components/types/MCPTypes';
@@ -22,7 +23,8 @@ import ConfirmModal from "../modal/ConfirmModal";
 import MCPAuthHandler, { OAuthClient } from '@/app/MCPAuthHandler';
 
 export default function RightSidebar() {
-  const { theme } = useTheme();
+  const { theme } = useTheme()
+  const { completeStep, isStepCompleted } = useOnboarding();
   const { data: session, status } = useSession();
   const { selectedAgent, setSelectedAgent, client } = useAgent();
 
@@ -337,7 +339,15 @@ export default function RightSidebar() {
         </div>
       </div>
     </div>
-    <div onMouseEnter={() => setVisible(true)} className="bg-transparent absolute sm:fixed top-16 right-0 w-[50px] h-[10vh] sm:h-[100vh] z-0">
+    {isStepCompleted(1) && !isStepCompleted(2) ? 
+      <img className='absolute top-0 right-[-65px]' height={300} width={300} src="https://f4-public.s3.eu-central-1.amazonaws.com/public/assets/mcp_servers.png"/>
+    :
+      <></>
+    }
+    <div onMouseEnter={() => {
+      setVisible(true); 
+      completeStep(2); // Complete step 3 (sidebar hover)
+    }} className="bg-transparent absolute sm:fixed top-16 right-0 w-[50px] h-[10vh] sm:h-[100vh] z-0">
       <button onClick={() => setVisible(p => !p)} className={`z-10 ml-4 ${theme.textColorPrimary ? theme.textColorPrimary : "text-white" }`}><PanelLeftClose /></button>
     </div>
     {showConfirmModal && (

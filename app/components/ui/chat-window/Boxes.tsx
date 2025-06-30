@@ -6,7 +6,8 @@ import { useState, useEffect } from "react";
 import config from "../../../../f4.config"
 import User from "@/app/microstore/User";
 import { X, Plus } from "lucide-react";
-import { useTheme } from "../../../context/ThemeContext";
+import { useTheme } from '../../../context/ThemeContext'
+import { useOnboarding } from '../../../context/OnboardingContext';
 import { motion, AnimatePresence, Reorder } from "framer-motion";
 
 /**
@@ -15,7 +16,8 @@ import { motion, AnimatePresence, Reorder } from "framer-motion";
  * @returns 
  */
 function Boxes({f4rmers, session}: {f4rmers:F4rmerType[],session:F4Session}) {
-  const { theme } = useTheme();
+  const { theme } = useTheme()
+  const { completeStep, isStepCompleted, currentStep } = useOnboarding();
   const [tabs, setTabs] = useState<Array<{
     id: string;
     state: "canvas" | "chat" | "preview" | "edit";
@@ -47,6 +49,7 @@ function Boxes({f4rmers, session}: {f4rmers:F4rmerType[],session:F4Session}) {
         title: `${prevTabs.length + 1}`
       }
     ]);
+    completeStep(1); // Complete step 2 (add tab)
   };
 
   // Close a tab
@@ -141,6 +144,10 @@ function Boxes({f4rmers, session}: {f4rmers:F4rmerType[],session:F4Session}) {
           className="w-full"
         >
           <div>
+            {currentStep == 1 ? 
+              <img className='absolute top-[-50px] left-5 z-[-1]' height={300} width={300} src="https://f4-public.s3.eu-central-1.amazonaws.com/public/assets/session_tabs.png"/>
+            :
+            <></>}
             {tabs.map(tab => (
               <Reorder.Item 
                 key={tab.id} 
