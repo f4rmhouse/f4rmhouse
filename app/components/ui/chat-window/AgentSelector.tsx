@@ -110,12 +110,19 @@ export default function AgentSelector() {
     <div className="relative" ref={containerRef}>
       {/* Hash icon - always visible */}
       <div 
-        className={`transition-all hover:rotate-[90deg] rounded-md p-2 cursor-pointer ${theme.textColorPrimary ? theme.textColorPrimary : "text-white"}`}
+        className={`transition-all rounded-md p-2 cursor-pointer flex items-center gap-2 ${theme.textColorPrimary ? theme.textColorPrimary : "text-white"}`}
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}
         onClick={handleIconClick}
       >
-        <Hash size={15}/>
+        <div className="transition-all hover:rotate-[90deg]">
+          <Hash size={15}/>
+        </div>
+        {selectedAgent && (
+          <span className={`absolute left-8 w-[100px] text-xs ${theme.textColorSecondary || 'text-neutral-300'}`}>
+            {selectedAgent.title}
+          </span>
+        )}
       </div>
       
       {/* Custom dropdown - shows on hover */}

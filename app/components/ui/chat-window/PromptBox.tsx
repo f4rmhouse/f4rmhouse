@@ -404,7 +404,7 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
         <AgentSelector />
       </div>
       <div>
-        <button onClick={() => {}} className={`transition-all hover:rotate-[-90deg] rounded-md p-2 ${theme.textColorPrimary ? theme.textColorPrimary : "text-white"}`}><Brain size={15}/></button>
+        <ModelSelector onModelSelect={(e:any) => {setSelectedModel(e)}} selectedModel={selectedModel}/>
       </div>
       <div className={`flex flex-col gap-2 ${chatSession.getMessages().length == 0 ? "opacity-0" : "opacity-100"}`}>
         <button onClick={() => {chatSession.clear();setCurrentSession([])}} className={`transition-all hover:rotate-[-90deg] rounded-md p-2 ${theme.textColorPrimary ? theme.textColorPrimary : "text-white"}`}><RotateCcw size={15}/></button>
