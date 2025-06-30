@@ -4,7 +4,8 @@ import { useChat } from "ai/react";
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import { useTheme } from "@/app/context/ThemeContext"
-import { useAgent } from "@/app/context/AgentContext";
+import { useAgent } from '@/app/context/AgentContext'
+import { helpContent } from '../../../docs/commands/help';
 import F4Session from "../../types/F4Session";
 import ChatAIMessage from "../chat-messages/ChatAIMessage";
 import ChatToolMessage from "../chat-messages/ChatToolMessage";
@@ -188,6 +189,7 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
     if (input.length == 0) {
       return
     }
+
     // TODO: make it so that I need to type nextjsrole and f4role
     chatSession.push("user", "user", input)
     setInput("")
@@ -208,6 +210,13 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
     }
     if(selectedAgent == null || selectedAgent.title == ""){
       alert("Please select an agent to use.")
+      return
+    }
+
+    if(input == "/help") {
+      chatSession.push("system", "system", helpContent)
+      setInput("")
+      setLoading(false)
       return
     }
 
