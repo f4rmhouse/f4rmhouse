@@ -47,18 +47,19 @@ const themePresets: Record<string, Theme> = {
     "textColorSecondary": "text-gray-500",
     "chatWindowStyle": "bg-white"
   },
-  green: {
-    "primaryColor": "bg-emerald-700 shadow-sm",
-    "secondaryColor": "bg-emerald-600",
-    "accentColor": "bg-lime-400 shadow-sm",
-    "hoverColor": "bg-lime-300",
-    "backgroundColor": "bg-emerald-50",
+  bart: {
+    "primaryColor": "bg-[#8ace00]",
+    "secondaryColor": "bg-transparent text-black",
+    "accentColor": "bg-[#8ace00]",
+    "hoverColor": "bg-[#8ace00]",
+    "backgroundColor": "bg-[#8ace00]",
     "backgroundImage": "",
-    "primaryHoverColor": "bg-emerald-800",
-    "secondaryHoverColor": "bg-emerald-700",
+    "primaryHoverColor": "bg-[#8ace00]",
+    "secondaryHoverColor": "bg-[#8ace00]",
     "textColorPrimary": "text-black",
-    "textColorSecondary": "text-emerald-900",
-    "chatWindowStyle": "bg-emerald-50"
+    "textColorSecondary": "text-black",
+    "chatWindowStyle": "bg-transparent text-black",
+    "aiMessageStyle": "bg-[#8ace00] text-black"
   },
   cyberpunk: {
     "primaryColor": "bg-gray-900 shadow-sm",

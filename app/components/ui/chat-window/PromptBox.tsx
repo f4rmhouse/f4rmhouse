@@ -52,6 +52,18 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
   const [currentSession, setCurrentSession] = useState<ChatMessageType[]>([]) 
   const { messages, input, setInput, handleInputChange, setMessages } = useChat({});
   const [loading, setLoading] = useState(false)
+  const [currentLoadingMessage, setCurrentLoadingMessage] = useState("");
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (loading) {
+      interval = setInterval(() => {
+        const randomIndex = Math.floor(Math.random() * config.loadingMessages.length);
+        setCurrentLoadingMessage(config.loadingMessages[randomIndex]);
+      }, 2000);
+    }
+    return () => clearInterval(interval);
+  }, [loading]);
   const [latestMessage, setLatestMessage] = useState<string>("")
   const currentReaderRef = useRef<ReadableStreamDefaultReader<Uint8Array> | null>(null)
 
@@ -233,11 +245,22 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
           className={`p-2 no-scrollbar flex flex-col-reverse w-full gap-5 transition-all duration-500 overflow-y-scroll scrollb ${currentSession.length > 0 ? 'opacity-100' : 'opacity-0 h-0'}`}
           ref={messageContainerRef}
         >
-          {loading ? 
-            <div className="flex gap-2 ml-2"><img className="h-[30px] rounded-full" src="https://pbs.twimg.com/media/CrghjJoUMAEBcO_.jpg"/> <div className={`p-2 ${theme.textColorSecondary}`}><p className=""><span className=""></span>Thinking...</p><div className="text-xs"><Timer /></div></div></div>
-            :
+          {loading ? (
+            <div className="flex gap-2 ml-2">
+              <img className="h-[30px] rounded-full" src="https://pbs.twimg.com/media/CrghjJoUMAEBcO_.jpg" />
+              <div className={`p-2 ${theme.textColorSecondary}`}>
+                <p className="">
+                  <span className=""></span>
+                  {currentLoadingMessage}
+                </p>
+                <div className="text-xs">
+                  <Timer />
+                </div>
+              </div>
+            </div>
+          ) : (
             <></>
-          }
+          )}
           {chatSession.messagesTypes.length > 0 ? (
             [...chatSession.messagesTypes]
               .reverse()

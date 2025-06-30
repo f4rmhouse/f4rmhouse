@@ -21,12 +21,11 @@ export default function UserInput({onSubmit, onChange, value, children}: {onSubm
         <input
           className={`border-none grow ${theme.textColorPrimary} ${theme.primaryColor ? theme.primaryColor : "bg-neutral-800"} border-none z-10 focus:outline-none focus:ring-0`}
           value={value}
-          placeholder={"Ask me anything"}
+          placeholder={"Type a message or use /help for help"}
           onChange={onChange}
         />
       </div>
       <div>
-        {children}
       </div>
     </form>
   )
