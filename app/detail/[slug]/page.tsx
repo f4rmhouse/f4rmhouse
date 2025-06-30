@@ -1,8 +1,6 @@
 "use client"
-import PricingCard from "@/app/components/card/PricingCard";
 import ReviewProgress from "@/app/components/product/ReviewProgress";
 import Review from "@/app/components/product/Review";
-import Property from "@/app/components/product/Property";
 import ImageBanner from "@/app/components/banner/PrimitiveImageBanner";
 import ProductType from "@/app/components/types/ProductType";
 import { useEffect, useState, use } from "react";
@@ -15,11 +13,24 @@ import { useSession } from "next-auth/react";
 import axios from "axios";
 import { remark } from 'remark';
 import html from 'remark-html';
-import { ArrowLeft, UsersRound, Star, ShoppingCart, Heart, Shield, Award, CheckCircle2, PackagePlus, ChevronDown, ChevronUp, Hammer } from "lucide-react";
+import { 
+  ArrowLeft, 
+  Star, 
+  Heart, 
+  Shield, 
+  Award, 
+  CheckCircle2, 
+  PackagePlus, 
+  ChevronDown, 
+  ChevronUp, 
+  Hammer 
+} from "lucide-react";
 import F4rmerType from "@/app/components/types/F4rmerType";
 import User from "@/app/microstore/User";
 import F4rmerSelectModal from "@/app/components/ui/modal/F4rmerSelectModal";
 import { useAgent } from "@/app/context/AgentContext";
+import { useTheme } from "@/app/context/ThemeContext";
+import ProductPreviewCard from "@/app/components/card/ProductPreviewCard";
 
 type Params = Promise<{ slug: string }>
 
@@ -29,6 +40,7 @@ type Params = Promise<{ slug: string }>
  * @returns 
  */
 export default function DetailPage({ params }: { params: Params }) {
+    const { theme } = useTheme();
     const { data: session, status } = useSession();
     const { availableAgents, setAvailableAgents } = useAgent();
     const oci = new OCI();
@@ -161,12 +173,10 @@ export default function DetailPage({ params }: { params: Params }) {
           <div className="flex flex-row mb-4 text-sm text-neutral-400 border-b border-neutral-800 pb-2">
             <Link href="/store" className="hover:text-blue-400 transition-colors flex items-center"><ArrowLeft size={14} className="mr-1"/>Back to Store</Link>
             <span className="mx-2">/</span>
-            <Link href="/store/category" className="hover:text-blue-400 transition-colors">AI Tools</Link>
-            <span className="mx-2">/</span>
             <span className="text-neutral-300">{product.title}</span>
           </div>
           <div className="sm:grid sm:grid-cols-12 gap-6 mb-8">
-            <div className="sm:col-span-5 lg:col-span-7 rounded-lg overflow-hidden bg-zinc-900 border border-neutral-800 sticky top-5 self-start">
+            <div className="sm:col-span-5 lg:col-span-7 rounded-lg overflow-hidden sticky top-5 self-start">
               {showcase.length > 0 ? 
                 <div className="relative">
                   <ImageBanner images={showcase} />
@@ -196,121 +206,51 @@ export default function DetailPage({ params }: { params: Params }) {
                   <span className="mx-2 text-neutral-600">|</span>
                   <span className="text-sm text-neutral-300">{requestsAmt} uses in last 24h</span>
                 </div>
-                <p className="text-neutral-400 text-xs">Version {product.version} • By <span className="text-blue-400 hover:underline cursor-pointer">{product.developer}</span></p>
+                <p className="text-neutral-400 text-xs">By <span className="text-blue-400 hover:underline cursor-pointer">{product.developer}</span></p>
               </div>
               
-              <div className="bg-zinc-900 border border-neutral-800 rounded-lg p-4 mb-4">
+              <div className="p-4 mb-4">
                 <div className="flex justify-between items-center mb-3">
-                  <div>
-                    <p className="text-xl font-bold text-white">$0.01 <span className="text-sm font-normal text-neutral-400">per request</span></p>
-                    <div className="flex items-center mt-1">
-                      <CheckCircle2 size={14} className="text-green-500 mr-1" />
-                      <span className="text-sm text-green-500">Deployed</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center">
+                  <div className="flex items-center w-full">
                     <button 
                       onClick={getUserf4s} 
-                      className="bg-yellow-500 hover:bg-yellow-600 text-black font-medium py-2 px-4 rounded-md mr-2 transition-colors flex items-center"
+                      className="w-full flex justify-center items-center bg-yellow-500 hover:bg-yellow-600 text-black font-medium py-2 px-4 rounded-md mr-2 transition-colors"
                     >
                       <PackagePlus size={16} className="mr-1" />
                       Add to toolbox 
-                    </button>
-                    <button className="p-2 rounded-md border border-neutral-700 hover:bg-neutral-800 transition-colors">
-                      <Heart size={16} className="text-neutral-400" />
                     </button>
                   </div>
                 </div>
                 
                 <div className="flex flex-col space-y-2 mt-3">
+                  <p className="text-sm text-neutral-300">You get:</p>
                   <div className="flex items-center text-sm text-neutral-300">
                     <CheckCircle2 size={14} className="text-green-500 mr-2" />
-                    Unlimited access to this tool
-                  </div>
-                  <div className="flex items-center text-sm text-neutral-300">
-                    <CheckCircle2 size={14} className="text-green-500 mr-2" />
-                    Pay only for what you use
+                    Unlimited access to this server 
                   </div>
                 </div>
               </div>
               
-              <div className="bg-zinc-900 border border-neutral-800 rounded-lg p-4 mb-4">
-                <h2 className="text-lg font-bold mb-3">About this tool</h2>
+              <div className="rounded-lg p-4 mb-4">
                 <div className="markdown-body text-sm text-neutral-300" dangerouslySetInnerHTML={{ __html: readme}} />
                 <p className="text-sm text-neutral-300 mt-2">{product.overview}</p>
               </div>
             </div>
           </div>
-
-
-          <div className="bg-zinc-900 border border-neutral-800 rounded-lg p-4 mb-8">
-            <h2 className="text-lg font-bold mb-3 flex items-center">
-              <Hammer className="mr-2 text-blue-400" size={18} />
-              Tools 
-            </h2>
-            
-            {0 > 0 ? 
-              <div className="space-y-4">
-                {[1,2].map((e:any, j:number) => {
-                  // Default to collapsed unless explicitly set to false
-                  const isCollapsed = collapsedTables[j] !== false;
-                  return (
-                    <div key={j} className="mb-4">
-                      <div 
-                        className="flex items-center justify-between text-base font-medium text-white mb-2 pb-1 border-b border-neutral-700 cursor-pointer"
-                        onClick={() => setCollapsedTables(prev => ({ ...prev, [j]: !prev[j] }))}
-                      >
-                        <p className="flex">{e.name} <span className="my-auto ml-2 text-xs text-neutral-400 flex"> <Shield size={14} />{e.authorization.type}</span></p>
-                        <button className="text-neutral-400 hover:text-white transition-colors">
-                          {isCollapsed ? <ChevronDown size={18} /> : <ChevronUp size={18} />}
-                        </button>
-                      </div>
-                      <p className="py-2 px-3 text-sm text-neutral-400">{isCollapsed ? e.description.split(".")[0] + ".": e.description}</p>
-                      {!isCollapsed && (
-                        <table className="w-full border-collapse my-2">
-                          <thead>
-                            <tr className="text-left bg-zinc-800">
-                              <th className="py-2 px-3 font-medium text-xs uppercase tracking-wider text-neutral-300 rounded-tl">Parameter</th>
-                              <th className="py-2 px-3 font-medium text-xs uppercase tracking-wider text-neutral-300">Type</th>
-                              <th className="py-2 px-3 font-medium text-xs uppercase tracking-wider text-neutral-300 rounded-tr">Description</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                          {e.parameters.map((p:any, i:number) => {
-                            return (
-                              <tr key={i} className="border-b border-neutral-800 hover:bg-zinc-800 transition-colors">
-                                <td className="py-2 px-3 text-sm font-mono text-white">{p.parameter.name}</td>
-                                <td className="py-2 px-3 text-sm text-blue-400 font-medium">{p.parameter.type}</td>
-                                <td className="py-2 px-3 text-sm text-neutral-400">{p.parameter.description}</td>
-                              </tr>
-                            )
-                          })}
-                          </tbody>
-                        </table>
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
-              :
-              <p className="text-neutral-400 text-sm italic">No technical specifications available for this product.</p>
-            }
-          </div>
-          
-          <div className="bg-zinc-900 border border-neutral-800 rounded-lg p-4 mb-8">
+          <div className="p-4 mb-8">
             <h2 className="text-lg font-bold mb-3 flex items-center">
               <Award className="mr-2 text-green-500" size={18} />
               Security & Compliance
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div className="flex items-start p-3 bg-zinc-800 rounded-lg">
+              <div className="flex items-start p-3 rounded-lg">
                 <Shield className="text-green-500 mr-2 mt-0.5" size={16} />
                 <div>
                   <p className="text-sm font-medium text-white">Data Protection</p>
                   <p className="text-xs text-neutral-400">Your data is encrypted and securely processed</p>
                 </div>
               </div>
-              <div className="flex items-start p-3 bg-zinc-800 rounded-lg">
+              <div className="flex items-start p-3 rounded-lg">
                 <CheckCircle2 className="text-green-500 mr-2 mt-0.5" size={16} />
                 <div>
                   <p className="text-sm font-medium text-white">Compliance Certified</p>
@@ -320,17 +260,13 @@ export default function DetailPage({ params }: { params: Params }) {
             </div>
           </div>
 
-          <div id="reviews" className="mb-12 border-t border-neutral-800 pt-8">
+          <div id="reviews" className="mb-12 pt-8">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold">Customer Reviews</h2>
-              <Link href={`/dashboard/create/review/${product.uti}`} className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors flex items-center">
-                <Star size={16} className="mr-1" />
-                Write a Review
-              </Link>
+              <h2 className="text-2xl">Customer Reviews</h2>
             </div>
             
             <div className="sm:grid sm:grid-cols-12 gap-6">
-              <div className="col-span-4 lg:col-span-3 bg-zinc-900 self-start border border-neutral-800 rounded-lg p-4 sticky top-5">
+              <div className="col-span-4 lg:col-span-3 self-start rounded-lg p-4 sticky top-5">
                 <div className="text-center mb-4">
                   <h3 className="text-6xl font-bold text-white mb-1">{rating}</h3>
                   <div className="flex justify-center mb-1">
@@ -372,7 +308,7 @@ export default function DetailPage({ params }: { params: Params }) {
                 </div>
                 
                 {serverError || reviews.length == 0 ?
-                  <div className="text-center py-10 bg-zinc-900 border border-neutral-800 rounded-lg">
+                  <div className="text-center py-10">
                     <p className="text-4xl mb-2">😔</p>
                     <p className="font-medium text-neutral-300 mb-1">No reviews yet</p>
                     <p className="text-sm text-neutral-500">Be the first to review this product</p>
@@ -390,30 +326,11 @@ export default function DetailPage({ params }: { params: Params }) {
             </div>
           </div>
           
-          <div className="mb-12 border-t border-neutral-800 pt-8">
-            <h2 className="text-2xl font-bold mb-6">Customers also viewed</h2>
+          <div className="pb-[15vh] pt-8">
+            <h2 className="text-2xl mb-6">You might also like</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="bg-zinc-900 border border-neutral-800 rounded-lg overflow-hidden hover:border-neutral-700 transition-colors">
-                  <div className="aspect-video bg-zinc-800 flex items-center justify-center">
-                    <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
-                      <span className="text-white font-bold">AI</span>
-                    </div>
-                  </div>
-                  <div className="p-3">
-                    <h3 className="font-medium text-white mb-1 truncate">Similar AI Tool {i}</h3>
-                    <div className="flex items-center mb-2">
-                      <div className="flex mr-1">
-                        {[...Array(5)].map((_, j) => (
-                          <Star key={j} size={12} className={j < 4 ? "text-yellow-400 fill-yellow-400" : "text-neutral-600"} />
-                        ))}
-                      </div>
-                      <span className="text-xs text-neutral-400">(24)</span>
-                    </div>
-                    <p className="text-sm text-neutral-400 mb-2 line-clamp-2">Another useful AI tool for your workflow</p>
-                    <p className="text-sm font-medium">$0.01 <span className="text-xs text-neutral-500">per request</span></p>
-                  </div>
-                </div>
+              {["dashboarder", "linear_official", "deepwiki", "mediagen"].map((i:string) => (
+                <ProductPreviewCard key={i} name={i} />
               ))}
             </div>
           </div>
