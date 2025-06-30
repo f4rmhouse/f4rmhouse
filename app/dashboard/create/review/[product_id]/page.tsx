@@ -12,5 +12,5 @@ export default async function WriteReviewPage({ params }: {params: Params}) {
   const session = await auth()
   const slug = (await params).product_id;
    
-  return(<CreateReviewForm product_id={slug.product_id} username={String(session?.user?.name)}/>)
+  return(<CreateReviewForm product_id={String(slug)} username={String(session?.user?.name)}/>)
 }
