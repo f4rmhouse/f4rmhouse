@@ -13,7 +13,7 @@ import ChatInitToolCallMessage from "../chat-messages/ChatInitToolCallMessage";
 import ChatMessageType from "../../types/ChatMessageType";
 import ChatUserMessage from "../chat-messages/ChatUserMessage";
 import ChatErrorMessage from "../chat-messages/ChatErrorMessage";
-import { ArrowLeft, ArrowRight, CircleStop, CornerRightUp, Paperclip, Pencil, RotateCcw } from "lucide-react";
+import { ArrowLeft, ArrowRight, Brain, CircleStop, CornerRightUp, Hash, Paperclip, Pencil, RotateCcw } from "lucide-react";
 import F4rmerEditor from "./F4rmerEditor";
 import Link from "next/link";
 import Modal from "../modal/Modal";
@@ -400,6 +400,12 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
     </div>
     <div className="absolute bg-transparent sm:static ml-2 right-2 top-[40%]">
       <button onClick={() => state === "edit" ? setState("chat") : setState("edit")} className={`transition-all hover:rotate-[90deg] rounded-md p-2 ${theme.textColorPrimary ? theme.textColorPrimary : "text-white"}`}><Pencil size={15}/></button>
+      <div>
+        <AgentSelector />
+      </div>
+      <div>
+        <button onClick={() => {}} className={`transition-all hover:rotate-[-90deg] rounded-md p-2 ${theme.textColorPrimary ? theme.textColorPrimary : "text-white"}`}><Brain size={15}/></button>
+      </div>
       <div className={`flex flex-col gap-2 ${chatSession.getMessages().length == 0 ? "opacity-0" : "opacity-100"}`}>
         <button onClick={() => {chatSession.clear();setCurrentSession([])}} className={`transition-all hover:rotate-[-90deg] rounded-md p-2 ${theme.textColorPrimary ? theme.textColorPrimary : "text-white"}`}><RotateCcw size={15}/></button>
       </div> 

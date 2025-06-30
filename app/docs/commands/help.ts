@@ -8,7 +8,7 @@ export const helpContent = `### Basics
 - \`/clear\` - Clear the current chat session
 
 ### Tips
-- Create your own MCP profiles. You can browse available MCP servers in the Action store or you can add local ones.
+- Create your own MCP profiles. You can browse available MCP servers in the \`Action Store\` or you can add local ones.
 - Use specific, clear instructions for best results
 - Check the sidebar for available MCP servers and tools
 - Use OpenRouter to automatically route your prompt to the best model.

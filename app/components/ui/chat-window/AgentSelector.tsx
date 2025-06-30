@@ -1,13 +1,19 @@
-import { Bot, BotMessageSquare } from 'lucide-react';
-import { useState, useEffect, useRef } from 'react';
-import { useTheme } from "../../../context/ThemeContext";
-import { useAgent } from "../../../context/AgentContext";
-import F4rmerType from '../../types/F4rmerType';
+import React, { useState, useEffect, useRef } from 'react';
+import { Hash } from 'lucide-react';
+import { useTheme } from '@/app/context/ThemeContext';
+import { useAgent } from '@/app/context/AgentContext';
+import F4rmerType from '@/app/components/types/F4rmerType';
+import ItemsDropdown from './ItemsDropdown';
 
 export default function AgentSelector() {
   const { theme } = useTheme();
   const { selectedAgent, setSelectedAgent, availableAgents } = useAgent();
   const selectRef = useRef<HTMLSelectElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isHovering, setIsHovering] = useState(false);
+  const [isClicked, setIsClicked] = useState(false);
+  
+  const isDropdownVisible = isHovering || isClicked;
   
   // Add keyboard shortcut listener for Cmd+A to open agent selector and Option+number to select agents
   useEffect(() => {
@@ -60,6 +66,24 @@ export default function AgentSelector() {
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [availableAgents, setSelectedAgent]);
+
+  // Add click outside listener to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsClicked(false);
+        setIsHovering(false);
+      }
+    };
+
+    if (isDropdownVisible) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isDropdownVisible]);
   
   const handleAgentChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedTitle = event.target.value;
@@ -68,13 +92,52 @@ export default function AgentSelector() {
       setSelectedAgent(agent);
     }
   };
+
+  const handleAgentSelect = (agent: string) => {
+    const selectedProfile = availableAgents.find(a => a.title === agent)
+    if(selectedProfile) {
+      setSelectedAgent(selectedProfile);
+    }
+    setIsClicked(false); // Close dropdown after selection
+    setIsHovering(false); // Also clear hover state to ensure dropdown closes
+  };
+
+  const handleIconClick = () => {
+    setIsClicked(!isClicked);
+  };
   
   return (
-    <div className={`rounded-md group cursor-pointer flex ${theme.primaryColor} hover:${theme.primaryHoverColor} transition-all`}>
+    <div className="relative" ref={containerRef}>
+      {/* Hash icon - always visible */}
+      <div 
+        className={`transition-all hover:rotate-[90deg] rounded-md p-2 cursor-pointer ${theme.textColorPrimary ? theme.textColorPrimary : "text-white"}`}
+        onMouseEnter={() => setIsHovering(true)}
+        onMouseLeave={() => setIsHovering(false)}
+        onClick={handleIconClick}
+      >
+        <Hash size={15}/>
+      </div>
+      
+      {/* Custom dropdown - shows on hover */}
+      <ItemsDropdown
+        items={availableAgents.map((agent:F4rmerType) => agent.title)}
+        selectedItem={selectedAgent?.title}
+        isVisible={isDropdownVisible}
+        title="Select Profile"
+        onItemSelect={handleAgentSelect}
+        onClose={() => {
+          setIsClicked(false);
+          setIsHovering(false);
+        }}
+        onMouseEnter={() => setIsHovering(true)}
+        onMouseLeave={() => setIsHovering(false)}
+      />
+      
+      {/* Hidden select for keyboard shortcuts compatibility */}
       <select
         id="agent-selector"
         ref={selectRef}
-        className={`transition-all rounded-md cursor-pointer ${theme.textColorSecondary} block w-full text-xs border-none bg-transparent`}
+        className="sr-only"
         value={selectedAgent?.title || (availableAgents.length > 0 ? availableAgents[0].title : '')}
         onChange={handleAgentChange}
       >
