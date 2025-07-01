@@ -1,5 +1,6 @@
 import { X } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useTheme } from "@/app/context/ThemeContext";
 
 /**
  * Modal is the component that all modal windows in f4rmhouse use
@@ -7,7 +8,7 @@ import { useEffect, useState } from "react";
  * @returns 
  */
 export default function Modal({children, open, title, onClose}: Readonly<{children: React.ReactNode, open: boolean, title:string, onClose?: () => void}>) {
-
+  const { theme } = useTheme();
   const [isOpen, setIsOpen] = useState<boolean>(open);
 
   useEffect(() => {
@@ -26,13 +27,24 @@ export default function Modal({children, open, title, onClose}: Readonly<{childr
     {isOpen ?
         <div id="popup-modal" onClick={handleBackdropClick} className="flex m-auto overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-10 w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
           <div className="relative m-auto z-50 p-4 w-full max-w-xl max-h-full">
-            <div className="relative z-50 rounded-lg shadow bg-black bg-opacity-50 backdrop-blur-xl p-2">
+            <div className="relative z-50 rounded-lg shadow backdrop-blur-xl p-2" style={{
+              backgroundColor: theme.backgroundColor,
+              opacity: 1
+            }}>
               <div className="flex">
-                <p className="font-bold text-xs text-neutral-200">{title.toLocaleUpperCase()}</p>
+                <p className="font-bold text-xs" style={{
+                  color: theme.textColorPrimary
+                }}>{title.toLocaleUpperCase()}</p>
                 <button onClick={() => {
                   setIsOpen(false);
                   if (onClose) onClose();
-                }} className="transition-all hover:text-red-500 rounded-full cursor-pointer ml-auto p-2 hover:bg-neutral-700"><X /></button>
+                }} className="transition-all hover:text-red-500 rounded-full cursor-pointer ml-auto p-2 hover:opacity-80"
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = theme.hoverColor;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}><X /></button>
               </div>
               {children}
             </div>

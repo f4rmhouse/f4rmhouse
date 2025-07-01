@@ -136,14 +136,8 @@ export async function POST(req: NextRequest) {
     const prompt = PromptTemplate.fromTemplate(TEMPLATE);
     const caller = new User(session.user.email, session.provider, session.access_token);
 
-    console.log("ALLOW LIST: ", allowList)
-
     // Handle toolbox initialization
     let toolbox = tools;
-    //if (!toolbox && f4rmer) {
-    //  const f4rmerData = await chat_session.readF4rmer(f4rmer);
-    //  toolbox = f4rmerData?.[0]?.tool_box ?? [];
-    //}
 
     // Process endpoints
     let endpoints: Endpoint[] = [];
