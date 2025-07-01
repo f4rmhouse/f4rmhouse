@@ -1,36 +1,36 @@
 "use client"
-import { useChat } from "ai/react";
-
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import { useTheme } from "@/app/context/ThemeContext"
 import { useAgent } from '@/app/context/AgentContext'
-import { helpContent } from '../../../docs/commands/help';
 import F4Session from "../../types/F4Session";
-import ChatAIMessage from "../chat-messages/ChatAIMessage";
-import ChatToolMessage from "../chat-messages/ChatToolMessage";
-import ChatInitToolCallMessage from "../chat-messages/ChatInitToolCallMessage";
-import ChatMessageType from "../../types/ChatMessageType";
-import ChatUserMessage from "../chat-messages/ChatUserMessage";
-import ChatErrorMessage from "../chat-messages/ChatErrorMessage";
-import { ArrowLeft, ArrowRight, Brain, CircleStop, CornerRightUp, Paperclip, Pencil, RotateCcw } from "lucide-react";
+import { 
+  ArrowLeft, 
+  ArrowRight, 
+  CircleStop, 
+  CornerRightUp, 
+  Paperclip, 
+  Pencil, 
+  RotateCcw 
+} from "lucide-react";
 import F4rmerEditor from "./F4rmerEditor";
 import Link from "next/link";
 import Modal from "../modal/Modal";
-import Timer from "../misc/Timer";
 import UserInput from "./UserInput";
 import ModelSelector from "./ModelSelector";
 import AgentSelector from "./AgentSelector";
 import config from "../../../../f4.config";
 import Canvas from "./Canvas";
-import ChatSession from "./utils/ChatSession";
 import { PostDataType } from "./utils/types";
 import StreamProcessor from "./utils/StreamProcessor";
 import F4rmerType from "../../types/F4rmerType";
-import User from "@/app/microstore/User";
-import ChatConfirmMessage from "../chat-messages/ChatConfirmMessage";
-import MCPAuthHandler from "../../../MCPAuthHandler";
-import { ToolPermission } from "../../types/ToolPermissionType";
+import MessageRenderer from "./MessageRenderer";
+import { useKeyboardShortcuts } from "../../../utils/keyboardShortcuts";
+import { useChatSession } from "./hooks/useChatSession";
+import { useLoadingState } from "./hooks/useLoadingState";
+import { MessageHandlers } from "./utils/messageHandlers";
+import { helpContent } from '../../../docs/commands/help';
+import Timer from "../misc/Timer";
 
 /**
  * PromptBox is the text input box at the bottom of the screen on /f4rmers/details page
@@ -46,39 +46,40 @@ import { ToolPermission } from "../../types/ToolPermissionType";
 export default function PromptBox({session, state, setState, f4rmers}: {session: F4Session, state: "canvas" | "chat" | "preview" | "edit", setState: (state: "canvas" | "chat" | "preview" | "edit") => void, f4rmers: F4rmerType[]}) {
   const { theme } = useTheme();
   const { selectedAgent, setSelectedAgent, setAvailableAgents, client } = useAgent();
+  
+  // Custom hooks for state management
+  const {
+    input,
+    setInput,
+    handleInputChange,
+    setMessages,
+    chatSession,
+    setChatSession,
+    currentSession,
+    setCurrentSession,
+    latestMessage,
+    welcomeMessage,
+    setWelcomeMessage,
+    currentReaderRef,
+    clearChat,
+    updateLatestMessage,
+  } = useChatSession();
+  
+  const { loading, setLoading, currentLoadingMessage } = useLoadingState();
+  
+  // Component state
   const messageContainerRef = useRef<HTMLDivElement | null>(null);
-  const [promptForUserLogin, setPromptForUserLogin] = useState<boolean>(false)
+  const [promptForUserLogin, setPromptForUserLogin] = useState<boolean>(false);
   const [selectedModel, setSelectedModel] = useState<any>(config.models[Object.keys(config.models)[0]][0]);
-  const [chatSession, setChatSession] = useState<ChatSession>(new ChatSession())
-  const [currentSession, setCurrentSession] = useState<ChatMessageType[]>([]) 
-  const { messages, input, setInput, handleInputChange, setMessages } = useChat({});
-  const [loading, setLoading] = useState(false)
-  const [currentLoadingMessage, setCurrentLoadingMessage] = useState("");
 
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (loading) {
-      interval = setInterval(() => {
-        const randomIndex = Math.floor(Math.random() * config.loadingMessages.length);
-        setCurrentLoadingMessage(config.loadingMessages[randomIndex]);
-      }, 2000);
-    }
-    return () => clearInterval(interval);
-  }, [loading]);
-  const [latestMessage, setLatestMessage] = useState<string>("")
-  const currentReaderRef = useRef<ReadableStreamDefaultReader<Uint8Array> | null>(null)
 
-  const [welcomeMessage, setWelcomeMessage] = useState<string>()
 
   useEffect(() => {
     setWelcomeMessage(config.welcomeText[Math.floor(Math.random() * config.welcomeText.length)].replace("{{username}}", session.user.name === "undefined" ? "anon" : session.user.name.split(" ")[0]))
-  }, [session])
-
-  useEffect(() => {
     if(f4rmers && f4rmers.length > 0) {
       setAvailableAgents(f4rmers)
     }
-  }, [f4rmers]) 
+  }, [session])
 
   useEffect(() => {
     setMessages(chatSession.messages)
@@ -89,58 +90,53 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
     setChatSession(chatSession)
   }, [loading])
 
-  /**
+  // Message handlers
+  const messageHandlers = new MessageHandlers(
+    chatSession,
+    selectedAgent || null,
+    selectedModel,
+    session,
+    client,
+    processStream,
+    setLoading,
+    updateLatestMessage,
+    setChatSession,
+    setCurrentSession,
+    setSelectedAgent,
+    setState
+  );
+
+  // Keyboard shortcuts
+  const { registerShortcuts, cleanup } = useKeyboardShortcuts({
+    TOGGLE_CANVAS: {
+      key: 'o',
+      metaKey: true,
+      preventDefault: true,
+      callback: () => setState(state === 'canvas' ? 'chat' : 'canvas'),
+    },
+    CLEAR_CHAT: {
+      key: 'x',
+      metaKey: true,
+      preventDefault: true,
+      callback: clearChat,
+    },
+  });
+
+  useEffect(() => {
+    registerShortcuts();
+    return cleanup;
+  }, [state]);
+
+   /**
    * stopStream cancels the current streaming operation
    */
-  const stopStream = () => {
+   const stopStream = () => {
     if (currentReaderRef.current) {
       currentReaderRef.current.cancel();
       currentReaderRef.current = null;
       setLoading(false);
     }
   };
-
-  // Add keyboard shortcut handlers
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-    // Only handle shortcuts if not in an input field or textarea
-    if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
-      return;
-    }
-    
-    // Cmd/Ctrl+O to toggle canvas
-    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'o') {
-      e.preventDefault();
-      // Toggle between canvas and chat
-      setState(state === 'canvas' ? 'chat' : 'canvas');
-    }
-    
-    // Cmd/Ctrl+X to clear chat
-    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'x') {
-      e.preventDefault();
-      chatSession.clear();
-      setCurrentSession([]);
-    }
-  };
-
-    // Add event listener for keyboard shortcuts
-    window.addEventListener('keydown', handleKeyDown);
-    
-    // Add event listener for openCanvas custom event
-    const handleOpenCanvas = (event: CustomEvent) => {
-      // Switch to canvas view when the event is triggered
-      setState('canvas');
-    };
-
-    // Add event listener for the custom event
-    document.addEventListener('openCanvas', handleOpenCanvas as EventListener);
-    
-    // Clean up event listeners on component unmount
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      document.removeEventListener('openCanvas', handleOpenCanvas as EventListener);
-    };
-  }, [state, chatSession])
 
   /**
    * processStream processes the incoming stream of messages from the LLM.
@@ -160,7 +156,7 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
         if (done) break;
 
         const chunk = new TextDecoder().decode(value);
-        StreamProcessor.processTokenChunk(chunk, chatSession, MSStart, setLatestMessage, loading)
+        StreamProcessor.processTokenChunk(chunk, chatSession, MSStart, updateLatestMessage, loading)
       }
     } catch (err) {
       console.error(err)
@@ -271,101 +267,20 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
             <></>
           )}
           {chatSession.messagesTypes.length > 0 ? (
-            [...chatSession.messagesTypes]
-              .reverse()
-              .map((m, i) => {
-                switch (m.role) {
-                  case "user":
-                    return (<ChatUserMessage key={i} content={m.content} timestamp={m.timestamp}/>)
-                  case "tool_init":
-                    return (<ChatInitToolCallMessage key={i} message={m.content} debug={chatSession.getDebug(m.id) ?? {message: "no extra information"}}/>)
-                  case "system":
-                    return (<ChatAIMessage key={i} message={m.content} />)
-                  case "tool_response":
-                    return (<ChatToolMessage key={i} message={m.content} debug={chatSession.getDebug(m.id) ?? {message: "no extra information"}}/>)
-                  case "error":
-                    return (<ChatErrorMessage key={i} content={m.content}/>)
-                  case "auth":
-                    return (<ChatConfirmMessage 
-                      onCancel={(_) => {
-                        // Update the status and create a new reference
-                        const updatedSession = chatSession.updateStatus(m.id, "cancelled");
-                        // Force a re-render by updating latestMessage
-                        setLatestMessage(Date.now().toString());
-                        // Update the current session display
-                        setChatSession(updatedSession)
-                        setCurrentSession(updatedSession.getMessages())
-                      }} 
-                      onAuthenticate={async (_) => {
-                        alert("OK sending message!")
-                        // window.open(url, '_blank')
-
-                        console.log("Client allow list: ", [chatSession.getDebug(m.id)])
-
-                        let tools = await client.preparePrompt()
-
-                        if(selectedModel == null){
-                          alert("Please select a model to use.")
-                          return
-                        }
-                        if(selectedAgent == null || selectedAgent.title == ""){
-                          alert("Please select an agent to use.")
-                          return
-                        }
-
-                        let MSStart = new Date().getTime()
-                        setLoading(true)
-                        let permission: ToolPermission[] = []
-                        if(chatSession.getDebug(m.id) != undefined){
-                          let p = chatSession.getDebug(m.id) as ToolPermission
-                          permission = [p]
-                        }
-                       
-
-                        let postData: PostDataType = {
-                          messages: chatSession.getNextJSMessages(), 
-                          description: selectedAgent.jobDescription,
-                          show_intermediate_steps: false,
-                          session: session,
-                          f4rmer: selectedAgent.title,
-                          model: selectedModel,
-                          tools: tools,
-                          allowList: permission
-                        }
-
-                        // Send message
-                        const stream = await chatSession.send(postData)
-                        if(!stream) {
-                          alert("There was a server error while sending your request. This is completely our, fault we will do better in the future.")
-                          return
-                        }
-
-                        await processStream(chatSession.getMessages().length, stream, MSStart) 
-
-                        const updatedSession = chatSession.updateStatus(m.id, "completed");
-                        // Force a re-render by updating latestMessage
-                        setLatestMessage(Date.now().toString());
-                        // Update the current session display
-                        setChatSession(updatedSession)
-                        setCurrentSession(updatedSession.getMessages())
-                      }} 
-                      key={i} 
-                      uti={m.content} 
-                      uri={m.content} 
-                      deactivated={m.status === "cancelled" || m.status === "completed"} 
-                      state={m.status ?? "pending"}
-                      debug= {chatSession.getDebug(m.id)?? {}}
-                    />)
-                }
-              })
+            <MessageRenderer
+              messages={chatSession.messagesTypes}
+              chatSession={chatSession}
+              onAuthenticate={messageHandlers.authenticateMessage}
+              onCancel={messageHandlers.cancelMessage}
+            />
           ) : (
-            ""
+            <></>
           )}
         </div>
         <div className={`mt-auto sticky transition-all ${state === "canvas" ? "w-[98%]" : "w-[99%]"} ml-1 mr-2 ${chatSession.getMessages().length > 0 ? "bottom-[10%] sm:bottom-0 pb-1" : "bottom-[calc(40vh)]"}`}>
-            <div className={`${chatSession.getMessages().length === 0 ? "block" : "hidden"} pb-1`}>
-              <h1 className={`flex text-2xl ${theme.textColorPrimary ? theme.textColorPrimary : "text-white"}`}>{welcomeMessage} <img className="my-auto w-10" src={"https://media.tenor.com/R7JF4cuIjogAAAAj/spongebob-spongebob-meme.gif"} /></h1>
-            </div>
+          <div className={`${chatSession.getMessages().length === 0 ? "block" : "hidden"} pb-1`}>
+            <h1 className={`flex text-2xl ${theme.textColorPrimary ? theme.textColorPrimary : "text-white"}`}>{welcomeMessage} <img className="my-auto w-10" src={"https://media.tenor.com/R7JF4cuIjogAAAAj/spongebob-spongebob-meme.gif"} /></h1>
+          </div>
           <UserInput onSubmit={sendMessage} onChange={handleInputChange} value={input}>
             <div className="flex p-0">
               <AgentSelector />
@@ -407,7 +322,7 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
         <ModelSelector onModelSelect={(e:any) => {setSelectedModel(e)}} selectedModel={selectedModel}/>
       </div>
       <div className={`flex flex-col gap-2 ${chatSession.getMessages().length == 0 ? "opacity-0" : "opacity-100"}`}>
-        <button onClick={() => {chatSession.clear();setCurrentSession([])}} className={`transition-all hover:rotate-[-90deg] rounded-md p-2 ${theme.textColorPrimary ? theme.textColorPrimary : "text-white"}`}><RotateCcw size={15}/></button>
+        <button onClick={clearChat} className={`transition-all hover:rotate-[-90deg] rounded-md p-2 ${theme.textColorPrimary ? theme.textColorPrimary : "text-white"}`}><RotateCcw size={15}/></button>
       </div> 
     </div>
     {promptForUserLogin ? 
@@ -434,19 +349,7 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
       f4rmer={selectedAgent} 
       isVisible={state === "edit"}
       onClose={() => setState("chat")}
-      onSave={(updatedF4rmer:F4rmerType) => {
-        // Handle saving the updated f4rmer
-        let user = new User(session.user.email, session.provider, session.access_token)
-        user.updateF4rmer(updatedF4rmer).then(e => {
-          // Update the agent in the context as well
-          setSelectedAgent(updatedF4rmer);
-          alert("Your f4rmer was updated successfully!")
-          setState("chat")
-        }).catch(e => {
-          console.log("Failed to update f4rmer:", e)
-          alert("Failed to update f4rmer")
-        })
-      }}
+      onSave={messageHandlers.updateF4rmer}
     />
     </div>
   )
