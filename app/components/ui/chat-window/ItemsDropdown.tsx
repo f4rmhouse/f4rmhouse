@@ -40,9 +40,9 @@ export default function ItemsDropdown({
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      <div className={`rounded-md shadow-lg border ${theme.backgroundColor || 'bg-zinc-900'} ${theme.textColorPrimary || 'text-white'} border-neutral-700`}>
+      <div className={`rounded-md shadow-lg ${theme.backgroundColor || 'bg-zinc-900'} ${theme.textColorPrimary || 'text-white'}`}>
         {/* Header with title and close button */}
-        <div className={`flex items-center justify-between px-4 border-b border-neutral-700`}>
+        <div className={`flex items-center justify-between px-4`}>
           <h3 className={`text-xs font-medium ${theme.textColorPrimary || 'text-white'}`}>
             {title}
           </h3>

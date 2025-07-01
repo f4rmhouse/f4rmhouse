@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Hash } from 'lucide-react';
+import { AtSign, Hash } from 'lucide-react';
 import { useTheme } from '@/app/context/ThemeContext';
 import { useAgent } from '@/app/context/AgentContext';
 import F4rmerType from '@/app/components/types/F4rmerType';
@@ -116,7 +116,7 @@ export default function AgentSelector() {
         onClick={handleIconClick}
       >
         <div className="transition-all hover:rotate-[90deg]">
-          <Hash size={15}/>
+          <AtSign size={15}/>
         </div>
         {selectedAgent && (
           <span className={`absolute left-8 w-[100px] text-xs ${theme.textColorSecondary || 'text-neutral-300'}`}>

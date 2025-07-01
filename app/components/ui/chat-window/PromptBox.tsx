@@ -13,7 +13,7 @@ import ChatInitToolCallMessage from "../chat-messages/ChatInitToolCallMessage";
 import ChatMessageType from "../../types/ChatMessageType";
 import ChatUserMessage from "../chat-messages/ChatUserMessage";
 import ChatErrorMessage from "../chat-messages/ChatErrorMessage";
-import { ArrowLeft, ArrowRight, Brain, CircleStop, CornerRightUp, Hash, Paperclip, Pencil, RotateCcw } from "lucide-react";
+import { ArrowLeft, ArrowRight, Brain, CircleStop, CornerRightUp, Paperclip, Pencil, RotateCcw } from "lucide-react";
 import F4rmerEditor from "./F4rmerEditor";
 import Link from "next/link";
 import Modal from "../modal/Modal";
