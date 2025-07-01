@@ -164,16 +164,16 @@ export default function DetailPage({ params }: { params: Params }) {
     }
 
     return (
-      <div className="m-auto bg-zinc-950">
+      <div className={`m-auto ${theme.backgroundColor} ${theme.textColorPrimary}`}>
         <div className="relative max-w-screen-2xl w-[95vw] justify-between mx-auto pt-10">
           {!noActionFound ?
           <div>
           {product?
           <>
-          <div className="flex flex-row mb-4 text-sm text-neutral-400 border-b border-neutral-800 pb-2">
-            <Link href="/store" className="hover:text-blue-400 transition-colors flex items-center"><ArrowLeft size={14} className="mr-1"/>Back to Store</Link>
+          <div className="flex flex-row mb-4 text-sm pb-2">
+            <Link href="/store" className="hover:text-blue-400 transition-colors flex items-center"><ArrowLeft size={14}/>Back to Store</Link>
             <span className="mx-2">/</span>
-            <span className="text-neutral-300">{product.title}</span>
+            <span>{product.title}</span>
           </div>
           <div className="sm:grid sm:grid-cols-12 gap-6 mb-8">
             <div className="sm:col-span-5 lg:col-span-7 rounded-lg overflow-hidden sticky top-5 self-start">
@@ -194,19 +194,19 @@ export default function DetailPage({ params }: { params: Params }) {
             
             <div className="col-span-12 sm:col-span-7 lg:col-span-5 flex flex-col mt-4 sm:mt-0">
               <div className="mb-4">
-                <h1 className="text-2xl sm:text-3xl font-bold text-white mt-1 mb-1">{product.title}</h1>
+                <h1 className="text-2xl sm:text-3xl mt-1 mb-1">{product.title}</h1>
                 <div className="flex items-center mb-2">
                   <div className="flex mr-2">
                     {[...Array(5)].map((_, i) => (
                       <Star key={i} size={16} className={i < Math.round(rating) ? "text-yellow-400 fill-yellow-400" : "text-neutral-600"} />
                     ))}
                   </div>
-                  <span className="text-sm text-neutral-300 mr-1">{rating}</span>
+                  <span className="text-sm mr-1">{rating}</span>
                   <a href="#reviews" className="text-sm text-blue-400 hover:underline">({reviews.length} reviews)</a>
-                  <span className="mx-2 text-neutral-600">|</span>
-                  <span className="text-sm text-neutral-300">{requestsAmt} uses in last 24h</span>
+                  <span className="mx-2">|</span>
+                  <span className="text-sm">{requestsAmt} uses in last 24h</span>
                 </div>
-                <p className="text-neutral-400 text-xs">By <span className="text-blue-400 hover:underline cursor-pointer">{product.developer}</span></p>
+                <p className="text-xs">By <span className="text-blue-400 hover:underline cursor-pointer">{product.developer}</span></p>
               </div>
               
               <div className="p-4 mb-4">
@@ -223,8 +223,8 @@ export default function DetailPage({ params }: { params: Params }) {
                 </div>
                 
                 <div className="flex flex-col space-y-2 mt-3">
-                  <p className="text-sm text-neutral-300">You get:</p>
-                  <div className="flex items-center text-sm text-neutral-300">
+                  <p className="text-sm">You get:</p>
+                  <div className="flex items-center text-sm">
                     <CheckCircle2 size={14} className="text-green-500 mr-2" />
                     Unlimited access to this server 
                   </div>
@@ -232,8 +232,8 @@ export default function DetailPage({ params }: { params: Params }) {
               </div>
               
               <div className="rounded-lg p-4 mb-4">
-                <div className="markdown-body text-sm text-neutral-300" dangerouslySetInnerHTML={{ __html: readme}} />
-                <p className="text-sm text-neutral-300 mt-2">{product.overview}</p>
+                <div className="markdown-body text-sm" dangerouslySetInnerHTML={{ __html: readme}} />
+                <p className="text-sm mt-2">{product.overview}</p>
               </div>
             </div>
           </div>
@@ -246,15 +246,15 @@ export default function DetailPage({ params }: { params: Params }) {
               <div className="flex items-start p-3 rounded-lg">
                 <Shield className="text-green-500 mr-2 mt-0.5" size={16} />
                 <div>
-                  <p className="text-sm font-medium text-white">Data Protection</p>
-                  <p className="text-xs text-neutral-400">Your data is encrypted and securely processed</p>
+                  <p className="text-sm font-medium">Data Protection</p>
+                  <p className="text-xs">Your data is encrypted and securely processed</p>
                 </div>
               </div>
               <div className="flex items-start p-3 rounded-lg">
                 <CheckCircle2 className="text-green-500 mr-2 mt-0.5" size={16} />
                 <div>
-                  <p className="text-sm font-medium text-white">Compliance Certified</p>
-                  <p className="text-xs text-neutral-400">Meets industry standards for AI safety</p>
+                  <p className="text-sm font-medium">Compliance Certified</p>
+                  <p className="text-xs">Meets industry standards for AI safety</p>
                 </div>
               </div>
             </div>
@@ -268,13 +268,13 @@ export default function DetailPage({ params }: { params: Params }) {
             <div className="sm:grid sm:grid-cols-12 gap-6">
               <div className="col-span-4 lg:col-span-3 self-start rounded-lg p-4 sticky top-5">
                 <div className="text-center mb-4">
-                  <h3 className="text-6xl font-bold text-white mb-1">{rating}</h3>
+                  <h3 className="text-6xl font-bold mb-1">{rating}</h3>
                   <div className="flex justify-center mb-1">
                     {[...Array(5)].map((_, i) => (
                       <Star key={i} size={16} className={i < Math.round(rating) ? "text-yellow-400 fill-yellow-400" : "text-neutral-600"} />
                     ))}
                   </div>
-                  <p className="text-sm text-neutral-400">{reviews.length} global ratings</p>
+                  <p className="text-sm">{reviews.length} global ratings</p>
                 </div>
                 
                 <div className="space-y-2">
@@ -287,15 +287,15 @@ export default function DetailPage({ params }: { params: Params }) {
                 
                 <div className="mt-6 pt-4 border-t border-neutral-700">
                   <h3 className="font-bold mb-1">Review this product</h3>
-                  <p className="text-sm text-neutral-400 mb-3">Share your experience with the community</p>
+                  <p className="text-sm mb-3">Share your experience with the community</p>
                   <Link href={`/dashboard/create/review/${product.uti}`} className="block">
-                    <p className="text-center rounded-md w-full border border-neutral-600 hover:bg-neutral-800 transition-all text-sm py-2 font-medium">Write a customer review</p>
+                    <p className={`text-center rounded-md w-full border border-neutral-600 hover:${theme.hoverColor} transition-all text-sm py-2 font-medium`}>Write a customer review</p>
                   </Link>
                 </div>
               </div>
               
               <div className="col-span-8 lg:col-span-9 mt-6 sm:mt-0">
-                <div className="flex items-center justify-between mb-4 pb-2 border-b border-neutral-800">
+                <div className="flex items-center justify-between mb-4 pb-2">
                   <p className="text-lg font-medium">{reviews.length} Customer Reviews</p>
                   <div className="flex items-center">
                     <span className="text-sm text-neutral-400 mr-2">Sort by:</span>
