@@ -86,6 +86,18 @@ class Store {
     }
   }
 
+  async getDefaultF4rmers(): Promise<any> {
+    try {
+      const response: AxiosResponse = await axios.get(
+        `${this.baseUrl}/store/get/default/f4rmers`,
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching services:', error);
+      throw error;
+    }
+  }
+
 }
 
 export default Store;

@@ -37,10 +37,13 @@ class F4MCPClient {
   constructor(name: string, metadata: ProductType[], caller?: User, testing:boolean=false) {
     this.name = name;
     this.metadata = new Map<string, ProductType>();
-    metadata.map((product:ProductType) => 
-      this.metadata.set(product.uti, product)
-    )
+    if(metadata) {
+      metadata.map((product:ProductType) => 
+        this.metadata.set(product.uti, product)
+      )
+    }
     this.connections = new Map<string, Client>();
+
     if(caller) {
       this.caller = caller;
     }

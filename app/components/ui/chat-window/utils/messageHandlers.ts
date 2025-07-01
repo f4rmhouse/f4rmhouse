@@ -77,7 +77,7 @@ export class MessageHandlers {
       this.setState("chat");
     } catch (e) {
       console.log("Failed to update f4rmer:", e);
-      alert("Failed to update f4rmer");
+      alert("Failed to update f4rmer. Make sure you're logged in to update f4rmers!");
     }
   };
 

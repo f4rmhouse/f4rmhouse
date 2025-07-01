@@ -15,29 +15,36 @@ import { ThemeProvider } from "./context/ThemeContext";
 import ThemeToggleButton from "./components/ui/ThemeToggleButton";
 import HelpModal from "./components/ui/HelpModal";
 import config from "../f4.config";
+import ProductType from "./components/types/ProductType";
 
 async function Dashboard() {
 
   const session = await getSession()
   var error: Error | null = null
-  var toolbox = [] 
+  var toolbox : ProductType[] = [] 
 
-  const store = new Store()
-  try {
-    let result = await store.getProduct("html-upload")
-    toolbox.push(result.Message)
-  } catch(err) {
-    error = err as Error
-    console.error(err)
-  }
-
-  let data:F4rmerType = {
+  let data:F4rmerType[] = [{
     uid: '',
-    title: 'Default F4rmer',
+    title: 'default',
     jobDescription: "You are a helpful assistant known as a 'f4rmer' on the 'f4rmhouse' platform. You know how to be helpful and write very nicely formatted markdown answers to user prompts. Users asking you questions will be able to give you tools to make you even more useful. Always reason through step by step when answering complex question if you can't answer some question be sure to remind users that there are tools available on the platform that can help them.",
     toolbox: toolbox, 
     creator: "f4rmhouse", 
     created: '2025-04-11 15:54:31'
+  }]
+
+  const store = new Store()
+  try {
+    let result = await store.getDefaultF4rmers()
+    data = result
+    
+    // Move Default F4rmer to the front of the array
+    const default_f4rmer = data.filter(e => e.title === "default")
+    const other_f4rmers = data.filter(e => e.title !== "default")
+    data = [...default_f4rmer, ...other_f4rmers]
+
+  } catch(err) {
+    error = err as Error
+    console.error(err)
   }
 
   // Different tutorials to help user get accustomed with the platform
@@ -47,7 +54,7 @@ async function Dashboard() {
         <div className="mt-10">
           <div className="overflow-hidden">
             <div>
-              <Boxes f4rmers={[data]} session={session}/>
+              <Boxes f4rmers={data} session={session}/>
               <RightSidebar />
             </div>
           </div>
