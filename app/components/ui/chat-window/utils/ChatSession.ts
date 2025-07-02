@@ -112,7 +112,6 @@ export default class ChatSession {
     }
 
     pushToken = (token: string) => {
-      console.log("time: ", Date.now())
       this.messages[this.messages.length - 1].content += token
       this.messagesTypes[this.messagesTypes.length - 1].content += token
       this.messagesTypes[this.messagesTypes.length - 1].finishTime = Date.now()

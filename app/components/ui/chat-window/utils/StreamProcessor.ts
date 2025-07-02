@@ -32,14 +32,15 @@ export default class StreamProcessor {
       vals.map((v, _) => {
         if(JSON.parse(v)[0].id[2] == "ToolMessage") {
           // Check if tool is asking for auth
-          console.log("Tool message: ", JSON.parse(v)[0].kwargs.content)
-          if(JSON.parse(JSON.parse(v)[0].kwargs.content).code == 401) {
-            chatSession.push("auth", "system", JSON.parse(JSON.parse(v)[0].kwargs.content).tool_identifier, JSON.parse(JSON.parse(v)[0].kwargs.content).data, startTime, "pending")
+          let content = JSON.parse(v)[0].kwargs.content
+          if(content.code == 401) {
+            chatSession.push("auth", "system", content.tool_identifier, startTime, content.data)
             chatSession.push("system", "system", "", startTime)
           }
           // Otherwise output tool response
           else {
-            chatSession.push("tool_response", "system", JSON.stringify(JSON.parse(v)[0].kwargs.content), startTime, JSON.parse(v)[0]);
+            console.log("The content: ", content)
+            chatSession.push("tool_response", "system", content, startTime, JSON.parse(v)[0]);
             chatSession.push("system", "system", "", startTime)
           }
         }

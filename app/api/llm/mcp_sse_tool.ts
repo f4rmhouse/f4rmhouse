@@ -63,7 +63,7 @@ function createMCPTool({ uti, endpoint, title, tool_description, parameters, aut
         zodSchema = z.object({})
     }
 
-    async function execute(args: Record<string, string>) {
+    async function execute(args: Record<string, string>) : Promise<any>{
         try {
             const client = new Client({
                 name: "f4rmhouse-client",
@@ -75,7 +75,7 @@ function createMCPTool({ uti, endpoint, title, tool_description, parameters, aut
             const baseUrl = process.env.NEXT_PUBLIC_APP_ENV === 'production' ? 'http://localhost:8000' : 'http://localhost:8000';
             // Check if auth needed
             // TODO: Add auth check
-            let askUserForConfirmation = true 
+            let askUserForConfirmation = false 
 
             allowList.map(e => {
                 if(e.name == endpoint) {
@@ -85,7 +85,6 @@ function createMCPTool({ uti, endpoint, title, tool_description, parameters, aut
 
             let accessToken = {Code: 0, Token: ""}
             if(askUserForConfirmation) {
-                console.log("ARGS: ", args)
                 return {
                     message: "Confirmation needed. Inform user to confirm or cancel the request so that personal or confidential data isn't sent to the server.", 
                     tool_identifier: endpoint, 
@@ -162,7 +161,6 @@ function createMCPTool({ uti, endpoint, title, tool_description, parameters, aut
                 let result : any;
                 let content: any;
                 if(mcp_type == "tool") {
-                    console.log("ARGS: ", filteredArgs)
                     result = await client.callTool({
                         name: endpoint,
                         arguments: filteredArgs,
@@ -174,8 +172,6 @@ function createMCPTool({ uti, endpoint, title, tool_description, parameters, aut
                     content = result.content;
                 }
                 if (mcp_type == "prompt") {
-                    console.log("Prompt: ", endpoint)
-                    console.log("Prompt args: ", filteredArgs)
                     result = await client.getPrompt({
                         name: endpoint,
                         arguments: filteredArgs,
@@ -183,14 +179,12 @@ function createMCPTool({ uti, endpoint, title, tool_description, parameters, aut
                     content = result.messages[0].content;
                 }
 
-                console.log("CONTENT: ", content)
-
                 if (!content) {
                     throw new Error('Empty response');
                 }
 
                 client.close()
-                return Array.isArray(content) ? content[0] : content;
+                return content;
             } finally {
                 client.close();
             }

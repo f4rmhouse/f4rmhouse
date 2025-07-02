@@ -17,7 +17,7 @@ export const useLoadingState = () => {
       setRandomMessage()
       interval = setInterval(() => {
         setRandomMessage()
-      }, 2000);
+      }, 5000);
     }
     return () => clearInterval(interval);
   }, [loading]);

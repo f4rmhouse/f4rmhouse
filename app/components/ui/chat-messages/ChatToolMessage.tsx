@@ -20,22 +20,22 @@ export default function RemoteToolResponse({message, debug}:{message:string | un
   
   // Check if debug.kwargs.content contains a URL, extract it, and set it as the current artifact
   useEffect(() => {
-    if (debug?.kwargs.content && typeof debug.kwargs.content === 'string') {
-      const urls = extractUrls(debug.kwargs.content);
-      
-      if (urls.length > 0) {
-        // Use the first URL found in the content
-        const url = urls[0];
-        
-        // Set the URL as the current artifact
-        addArtifact(url)
-        
-        // Dispatch a custom event to open the canvas
-        const event = new CustomEvent('openCanvas', { detail: { url } });
-        document.dispatchEvent(event);
-      }
-    }
-  }, [debug?.kwargs.content, addArtifact])
+    //if (debug?.kwargs.content && typeof debug.kwargs.content === 'string') {
+    //  const urls = extractUrls(debug.kwargs.content);
+    //  
+    //  if (urls.length > 0) {
+    //    // Use the first URL found in the content
+    //    const url = urls[0];
+    //    
+    //    // Set the URL as the current artifact
+    //    addArtifact(url)
+    //    
+    //    // Dispatch a custom event to open the canvas
+    //    const event = new CustomEvent('openCanvas', { detail: { url } });
+    //    document.dispatchEvent(event);
+    //  }
+    //}
+  }, [addArtifact])
 
   return (
     <div className="">
