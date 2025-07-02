@@ -10,7 +10,7 @@ export default function NewAIMessage({id, message, latency}:{id: string, message
   return (
     <>
     {message &&
-    <div className="group flex gap-2 w-full text-black font-base">
+    <div className="relative group flex gap-2 w-full text-black font-base">
       <img className="h-[30px] rounded-full" src="https://pbs.twimg.com/media/CrghjJoUMAEBcO_.jpg"/> 
       <div className='rounded-2xl rounded-tl-sm w-[92%]'>
           <div>
@@ -20,7 +20,7 @@ export default function NewAIMessage({id, message, latency}:{id: string, message
               </div>
             </div>
           </div>
-          <div className="absolute group-hover:opacity-100 opacity-0 text-xs text-black w-full">
+          <div className="absolute bottom-0 left-0 group-hover:opacity-100 opacity-0 text-xs text-black w-full">
             <div className="flex">
               <Timer size={15}/>
               <p className="ml-1">{(latency / 1000).toFixed(2)}s</p>
