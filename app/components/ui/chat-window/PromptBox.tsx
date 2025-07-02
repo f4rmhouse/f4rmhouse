@@ -160,7 +160,7 @@ export default function PromptBox({session, state, setState, f4rmers, addTab}: {
       }
     } catch (err) {
       console.error(err)
-      chatSession.push("error", "system", "Connection error. Either the connection to the server has been broken or your connection is not stable. Please come back later and try again.")
+      chatSession.push("error", "system", "Connection error. Either the connection to the server has been broken or your connection is not stable. Please come back later and try again.", 0)
     } finally {
       setLoading(false);
       currentReaderRef.current = null;
@@ -187,7 +187,7 @@ export default function PromptBox({session, state, setState, f4rmers, addTab}: {
     }
 
     // TODO: make it so that I need to type nextjsrole and f4role
-    chatSession.push("user", "user", input)
+    chatSession.push("user", "user", input, 0)
     setInput("")
 
     // Add session to the components chat message storage
@@ -197,7 +197,6 @@ export default function PromptBox({session, state, setState, f4rmers, addTab}: {
     setMessages(chatSession.toNextJSMessage("user"))
 
     // show loading animation
-    let MSStart = new Date().getTime()
     setLoading(true)
 
     if(selectedModel == null){
@@ -210,7 +209,7 @@ export default function PromptBox({session, state, setState, f4rmers, addTab}: {
     }
 
     if(input.startsWith("/help")) {
-      chatSession.push("system", "system", helpContent)
+      chatSession.push("system", "system", helpContent, 0)
       setInput("")
       setLoading(false)
       return
@@ -228,6 +227,9 @@ export default function PromptBox({session, state, setState, f4rmers, addTab}: {
       setLoading(false)
       return
     }
+
+    // Start latency measure when we prepeare the prompt
+    let MSStart = new Date().getTime()
 
     let tools = await client.preparePrompt()
 

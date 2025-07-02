@@ -4,7 +4,8 @@ type ChatMessageType = {
     content: string,
     tool_calls: any[],
     role: "system"|"user"|"tool_response"|"tool_init"|"error"|"auth",
-    timestamp: number 
+    finishTime: number,
+    startTime: number,
     status?: "pending" | "completed" | "cancelled"
 }
 

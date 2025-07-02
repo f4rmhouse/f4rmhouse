@@ -17,14 +17,14 @@ export default class StreamProcessor {
       langchainMessage.latency = Date.now() - startTime;
       if (langchainMessage.tool_calls.length > 0) {
         langchainMessage.content = JSON.stringify(langchainMessage.tool_calls);
-        chatSession.push("tool_init", "system", JSON.stringify(langchainMessage.content), langchainMessage);
+        chatSession.push("tool_init", "system", JSON.stringify(langchainMessage.content), startTime, langchainMessage);
       } else {
-        chatSession.push("system", "system", langchainMessage.content);
+        chatSession.push("system", "system", langchainMessage.content, startTime);
       }
     }
   
     private static async processToolMessage(toolMessage: ToolMessageType, chatSession: ChatSession) {
-      chatSession.push("tool_response", "system", toolMessage.content, toolMessage);
+      chatSession.push("tool_response", "system", toolMessage.content, 0, toolMessage);
     }
 
     static async processTokenChunk(chunk: string, chatSession: ChatSession, startTime: number, setLatestMessage: (message: string | ((prevMessage: string) => string)) => void, loading: boolean) {
@@ -34,17 +34,17 @@ export default class StreamProcessor {
           // Check if tool is asking for auth
           console.log("Tool message: ", JSON.parse(v)[0].kwargs.content)
           if(JSON.parse(JSON.parse(v)[0].kwargs.content).code == 401) {
-            chatSession.push("auth", "system", JSON.parse(JSON.parse(v)[0].kwargs.content).tool_identifier, JSON.parse(JSON.parse(v)[0].kwargs.content).data, "pending")
-            chatSession.push("system", "system", "")
+            chatSession.push("auth", "system", JSON.parse(JSON.parse(v)[0].kwargs.content).tool_identifier, JSON.parse(JSON.parse(v)[0].kwargs.content).data, startTime, "pending")
+            chatSession.push("system", "system", "", startTime)
           }
           // Otherwise output tool response
           else {
-            chatSession.push("tool_response", "system", JSON.stringify(JSON.parse(v)[0].kwargs.content), JSON.parse(v)[0]);
-            chatSession.push("system", "system", "")
+            chatSession.push("tool_response", "system", JSON.stringify(JSON.parse(v)[0].kwargs.content), startTime, JSON.parse(v)[0]);
+            chatSession.push("system", "system", "", startTime)
           }
         }
         else if (!chatSession.streaming) {
-          chatSession.push("system", "system", "")
+          chatSession.push("system", "system", "", startTime)
           if(JSON.parse(v)[0].kwargs.content.length > 0){
             chatSession.pushToken(JSON.parse(v)[0].kwargs.content)
             setLatestMessage((p: string) => p + JSON.parse(v)[0].kwargs.content)

@@ -29,7 +29,7 @@ export default function MessageRenderer({
           <ChatUserMessage 
             key={i} 
             content={m.content} 
-            timestamp={m.timestamp} 
+            timestamp={m.finishTime} 
           />
         );
       case "tool_init":
@@ -44,7 +44,9 @@ export default function MessageRenderer({
         return (
           <ChatAIMessage 
             key={i} 
+            id={m.id}
             message={m.content} 
+            latency={m.finishTime - m.startTime}
           />
         );
       case "tool_response":

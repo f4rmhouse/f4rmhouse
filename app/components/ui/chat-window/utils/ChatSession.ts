@@ -15,14 +15,15 @@ export default class ChatSession {
         this.streaming = false
     } 
   
-    push = (f4role: "user" | "system" | "tool_response" | "tool_init" | "error" | "auth", nextjsrole: "user" | "assistant" | "system" | "tool", message:string, debug?: Object, status?: "pending" | "completed" | "cancelled") => {
+    push = (f4role: "user" | "system" | "tool_response" | "tool_init" | "error" | "auth", nextjsrole: "user" | "assistant" | "system" | "tool", message:string, startTime:number, debug?: Object, status?: "pending" | "completed" | "cancelled") => {
       let id = this.messagesTypes.length.toString()
       this.messagesTypes.push({
         id: id, 
         role: f4role, 
         content: message,
         tool_calls: [],
-        timestamp: new Date().getTime()
+        finishTime: new Date().getTime(),
+        startTime: startTime,
       })
   
       this.messages.push(
@@ -76,7 +77,8 @@ export default class ChatSession {
           content: "[ERROR] Connection error. Either the connection to the server has been broken or your connection is not stable. Please come back later and try again.", 
           role: "error" as const, 
           tool_calls: [], 
-          timestamp: new Date().getTime()
+          finishTime: new Date().getTime(),
+          startTime: new Date().getTime()
         }
   
         this.messagesTypes.push(chatErrMsg)
@@ -95,7 +97,8 @@ export default class ChatSession {
           role: role,
           content: m.content,
           tool_calls: m.tool_calls,
-          timestamp: m.timestamp
+          finishTime: m.finishTime,
+          startTime: m.startTime
         }
       })   
     }
@@ -109,8 +112,10 @@ export default class ChatSession {
     }
 
     pushToken = (token: string) => {
+      console.log("time: ", Date.now())
       this.messages[this.messages.length - 1].content += token
       this.messagesTypes[this.messagesTypes.length - 1].content += token
+      this.messagesTypes[this.messagesTypes.length - 1].finishTime = Date.now()
     }
 
     updateStatus = (key: string, status: "pending" | "completed" | "cancelled") => {
