@@ -3,10 +3,14 @@
 import React from 'react';
 import { X } from 'lucide-react';
 import { useTheme } from '@/app/context/ThemeContext';
-import F4rmerType from '@/app/components/types/F4rmerType';
+
+type Item = {
+  value: string
+  decorator: string
+}
 
 interface ItemsDropdownProps {
-  items: string[];
+  items: Item[];
   selectedItem: string | null | undefined;
   isVisible: boolean;
   title?: string;
@@ -57,17 +61,22 @@ export default function ItemsDropdown({
         
         {/* Items list */}
         <div className="py-1">
-          {items.map((item: string, i:number) => (
+          {items.map((item: Item, i:number) => (
             <button
               key={i}
-              onClick={() => onItemSelect(item)}
-              className={`w-full text-left px-4 py-2 text-xs hover:${theme.primaryColor || 'hover:bg-blue-600'} transition-colors ${
-                selectedItem === item
+              onClick={() => onItemSelect(item.value)}
+              className={`flex w-full text-left px-4 py-2 text-xs hover:${theme.primaryColor || 'hover:bg-blue-600'} transition-colors ${
+                selectedItem === item.value
                   ? `${theme.primaryColor || 'bg-blue-600'} ${theme.textColorPrimary || 'text-white'}` 
                   : `${theme.textColorSecondary || 'text-neutral-300'}`
               }`}
             >
-              {item}
+              {item.decorator != undefined && item.decorator.length > 0 ?
+                <img className='rounded-full mr-2 object-cover' width={15} height={15} src={item.decorator}/>
+                :
+                <></>
+              }
+              {item.value}
             </button>
           ))}
         </div>

@@ -207,6 +207,7 @@ function Boxes({f4rmers, session}: {f4rmers:F4rmerType[],session:F4Session}) {
               state={tab.state} 
               setState={(newState) => updateTabState(tab.id, newState)} 
               session={session}
+              addTab={() => addTab()}
             />
           </div>
         ))}

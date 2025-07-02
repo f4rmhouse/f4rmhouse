@@ -8,6 +8,7 @@ interface Model {
   id: string;
   name: string;
   provider: string;
+  logo: string
 }
 
 export default function ModelSelector({ onModelSelect, selectedModel }: { onModelSelect: (model: Model) => void, selectedModel: Model | null }) {
@@ -139,7 +140,7 @@ export default function ModelSelector({ onModelSelect, selectedModel }: { onMode
       </div>
       
       <ItemsDropdown
-        items={availableModels.map((model: Model) => model.name)}
+        items={availableModels.map((model: Model) => ({"value": model.name, "decorator": model.logo}))}
         selectedItem={selectedModel?.name}
         isVisible={isDropdownVisible}
         title="Select Model"

@@ -127,7 +127,7 @@ export default function AgentSelector() {
       
       {/* Custom dropdown - shows on hover */}
       <ItemsDropdown
-        items={availableAgents.map((agent:F4rmerType) => agent.title)}
+        items={availableAgents.map((agent:F4rmerType) => ({"value": agent.title, "decorator": ""}))}
         selectedItem={selectedAgent?.title}
         isVisible={isDropdownVisible}
         title="Select Profile"

@@ -3,6 +3,7 @@ interface Model {
   id: string;
   name: string;
   provider: string;
+  logo: string;
 }
 
 // Provider configuration
@@ -45,24 +46,23 @@ const config: Config = {
     "loadingMessages": ["Generating slop...", "Analyzing Memes...", "Pretending to Like Matcha...", "Taking a coffee break...", "Summoning the Council of Elrond...", "Asking the Jedi Council...", "Generating slop..."],
     "models": {
         "openai": [
-            { "id": "gpt-4o-mini", "name": "GPT-4o", "provider": "openai"},
+            { "id": "gpt-4o-mini", "name": "GPT-4o", "provider": "openai", "logo": "https://d-cb.jc-cdn.com/sites/crackberry.com/files/styles/large/public/article_images/2023/08/openai-logo.jpg"},
         ],
         "anthropic": [
-            { "id": "claude-sonnet-4-20250514", "name": "Claude 4 Sonnet", "provider": "anthropic"},
-            { "id": "claude-3-7-sonnet-20250219", "name": "Claude 3.5 Sonnet", "provider": "anthropic"},
-            { "id": "claude-3-5-haiku-20241022", "name": "Claude 3.7 Haiku", "provider": "anthropic"},
+            { "id": "claude-sonnet-4-20250514", "name": "Claude 4 Sonnet", "provider": "anthropic", "logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRnM91o7r1wba01xcHW15PLqbe-ONaTIjOO3g&s"},
+            { "id": "claude-3-7-sonnet-20250219", "name": "Claude 3.5 Sonnet", "provider": "anthropic", "logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRnM91o7r1wba01xcHW15PLqbe-ONaTIjOO3g&s"},
+            { "id": "claude-3-5-haiku-20241022", "name": "Claude 3.7 Haiku", "provider": "anthropic", "logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRnM91o7r1wba01xcHW15PLqbe-ONaTIjOO3g&s"},
         ],
         "groq": [
-            {"id": "meta-llama/llama-4-maverick-17b-128e-instruct", "name": "Llama 4 Maverick", "provider": "groq"},
-            {"id": "qwen/qwen3-32b", "name": "Qwen 3.2 32B", "provider": "groq"},
-            {"id": "deepseek-r1-distill-llama-70b", "name": "DeepSeek R1 70B", "provider": "groq"},
-            {"id": "llama3-70b-8192", "name": "Llama 3.7 70B 8192", "provider": "groq"}
+            {"id": "meta-llama/llama-4-maverick-17b-128e-instruct", "name": "Llama 4 Maverick", "provider": "groq", "logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFM23hF3C0Gcai4Vk6TZHh5dsGwLpvpK28bA&s"},
+            {"id": "llama3-70b-8192", "name": "Llama 3.7 70B 8192", "provider": "groq", "logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFM23hF3C0Gcai4Vk6TZHh5dsGwLpvpK28bA&s"},
+            {"id": "qwen/qwen3-32b", "name": "Qwen 3.2 32B", "provider": "groq", "logo": "https://brandlogos.net/wp-content/uploads/2025/06/qwen_icon-logo_brandlogos.net_gb71b-512x512.png"},
+            {"id": "deepseek-r1-distill-llama-70b", "name": "DeepSeek R1 70B", "provider": "groq", "logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQpYbZuEmkfVNRMO3BhGNbsNHk7unONjvk9bw&s"},
         ],
         "google": [
-            {"id": "gemini-2.5-flash", "name": "Gemini 2.5 Flash", "provider": "google"}
+            {"id": "gemini-2.5-flash", "name": "Gemini 2.5 Flash", "provider": "google", "logo": "https://brandlogos.net/wp-content/uploads/2025/03/gemini_icon-logo_brandlogos.net_bqzeu-300x300.png"}
         ],
         "local": [
-            { "id": "llama3.2 ", "name": "Llama 3.2", "provider": "local"},
         ]
         /**
          * To add new providers just add them to this array using the following schema:

@@ -6,11 +6,12 @@ export const helpContent = `### Basics
 ### Commands
 - \`/help\` - Show this help message
 - \`/clear\` - Clear the current chat session
+- \`/tab\` - Create a new session tab 
 
 ### Tips
 - Create your own MCP profiles. You can browse available MCP servers in the \`Action Store\` or you can add local ones.
-- Use specific, clear instructions for best results
-- Check the sidebar for available MCP servers and tools
+- Use specific, clear instructions for best results.
+- Check the sidebar for available MCP servers and tools.
 - Use OpenRouter to automatically route your prompt to the best model.
 - Use multiple \`#\` to run prompts in parallel and choose the response you want to keep working with.
 

@@ -43,7 +43,7 @@ import Timer from "../misc/Timer";
  * 
  * @returns 
  */
-export default function PromptBox({session, state, setState, f4rmers}: {session: F4Session, state: "canvas" | "chat" | "preview" | "edit", setState: (state: "canvas" | "chat" | "preview" | "edit") => void, f4rmers: F4rmerType[]}) {
+export default function PromptBox({session, state, setState, f4rmers, addTab}: {session: F4Session, state: "canvas" | "chat" | "preview" | "edit", setState: (state: "canvas" | "chat" | "preview" | "edit") => void, f4rmers: F4rmerType[], addTab: () => void}) {
   const { theme } = useTheme();
   const { selectedAgent, setSelectedAgent, setAvailableAgents, client } = useAgent();
   
@@ -209,9 +209,22 @@ export default function PromptBox({session, state, setState, f4rmers}: {session:
       return
     }
 
-    if(input == "/help") {
+    if(input.startsWith("/help")) {
       chatSession.push("system", "system", helpContent)
       setInput("")
+      setLoading(false)
+      return
+    }
+
+    if(input.startsWith("/clear")) {
+      setInput("")
+      setLoading(false)
+      clearChat()
+      return
+    }
+    
+    if(input.startsWith("/tab")) {
+      addTab()
       setLoading(false)
       return
     }
