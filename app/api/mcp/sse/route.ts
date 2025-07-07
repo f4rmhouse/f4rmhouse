@@ -11,7 +11,12 @@ export async function GET(request: Request) {
     
     if (!validation.isValid) {
         console.error('SSRF Protection - Invalid SSE URL:', validation.error);
-        return new Response(`Invalid server URI: ${validation.error}`, { status: 400 });
+        return new Response(`Invalid server URI: ${validation.error}`, { 
+            status: 400,
+            headers: {
+                'Content-Type': 'text/plain'
+            }
+        });
     }
     
     const targetUrl = validation.url!;
@@ -31,30 +36,41 @@ export async function GET(request: Request) {
     }
 
     try {
-      // Use secure fetch with SSRF protection
-      const response = await secureFetch(targetUrl, {
+      // Create a new fetch with no timeout and proper SSE headers
+      const response = await fetch(targetUrl, {
         headers: proxyHeaders,
+        signal: request.signal, // Use request signal for proper cancellation
+        method: 'GET',
       });
 
-      if (!response.body) {
-        return new Response('No upstream stream', { status: 502 });
-      }
-      
-      if (!response.ok) {
-        return new Response(`Upstream error: ${response.status} ${response.statusText}`, { 
-          status: response.status 
+      // Create a new Response with proper SSE headers
+      const headers = {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+      };
+
+      // If we have a response body, proxy it
+      if (response.body) {
+        return new Response(response.body, {
+          headers,
+          status: response.status,
         });
       }
 
-      if (response.status === 401) {
-        return new Response('Unauthorized', { status: 401, headers: response.headers });
-      }
-
-      // Proxy the response stream with proper SSE headers
-      return response
+      // If no body, return empty SSE stream
+      return new Response('', {
+        headers,
+        status: 200,
+      });
 
     } catch (error) {
-      console.error('Secure SSE proxy error:', error);
-      return new Response(`Proxy error: ${error instanceof Error ? error.message : 'Unknown error'}`, { status: 500 });
+      console.error('SSE proxy error:', error);
+      return new Response(`Proxy error: ${error instanceof Error ? error.message : 'Unknown error'}`, { 
+        status: 500,
+        headers: {
+          'Content-Type': 'text/plain'
+        }
+      });
     }
 }
