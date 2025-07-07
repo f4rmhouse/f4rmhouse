@@ -5,7 +5,7 @@ import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/
 import { DynamicStructuredTool } from "@langchain/core/tools";
 import { z } from "zod";
 
-function createMCPTool({ uti, endpoint, title, tool_description, parameters, authorization, caller, uri, transport, mcp_type, allowList}: F4ToolParams) {
+function createMCPTool({ uti, endpoint, title, tool_description, parameters, authorization, caller, uri, transport, mcp_type, allowList, generatedContent, onContentGenerated}: F4ToolParams) {
 
     let zodSchema;
 
@@ -181,6 +181,13 @@ function createMCPTool({ uti, endpoint, title, tool_description, parameters, aut
 
                 if (!content) {
                     throw new Error('Empty response');
+                }
+
+                if(content.length > 2) {
+                    // Call the callback to store the large content
+                    onContentGenerated(content);
+                    client.close()
+                    return ["The result does not fit into the context window."];
                 }
 
                 client.close()

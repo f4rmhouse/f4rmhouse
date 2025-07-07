@@ -149,14 +149,20 @@ export default function PromptBox({session, state, setState, f4rmers, addTab}: {
    */
   async function processStream(id:number, reader:ReadableStreamDefaultReader<Uint8Array>, MSStart: number) {
     try {
+      let buffer = ''
+      let decoder = new TextDecoder()
       while (true) {
         id++
         const { done, value } = await reader.read();
   
         if (done) break;
 
-        const chunk = new TextDecoder().decode(value);
-        StreamProcessor.processTokenChunk(chunk, chatSession, MSStart, updateLatestMessage, loading)
+        buffer += decoder.decode(value, {stream: true});
+        const lines = buffer.split("\n")
+        buffer = lines.pop()!
+        for (const line of lines) {
+          StreamProcessor.processTokenChunk(line, chatSession, MSStart, updateLatestMessage, loading)
+        }
       }
     } catch (err) {
       console.error(err)

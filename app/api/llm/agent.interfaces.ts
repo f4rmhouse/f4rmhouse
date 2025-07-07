@@ -16,7 +16,9 @@ export interface F4ToolParams {
     uri: string
     transport: string
     mcp_type: string
-    allowList: ToolPermission[]
+    allowList: ToolPermission[],
+    generatedContent: any[]
+    onContentGenerated: (content: any[]) => void
 }
 
 export interface F4ToolExecuteParams {

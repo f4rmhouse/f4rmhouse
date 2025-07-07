@@ -65,6 +65,7 @@ class ModelFactory {
 }
 
 class ToolManager {
+  static generatedContent: any[] = []
   static createMCPTools(toolbox: MCPToolType[] | undefined, endpoints: any[], caller: User, allowList: ToolPermission[]): any[] {
     let f4tools: any[] = []
     if (!toolbox) return f4tools;
@@ -82,7 +83,13 @@ class ToolManager {
           uri: tool.uri,
           transport: tool.transport,
           mcp_type: "tool",
-          allowList: allowList
+          allowList: allowList,
+          generatedContent: [],
+          onContentGenerated: (content:any[]) => {
+            // Store content in our static array
+            console.log("onContentGenerated: ", content[0])
+            ToolManager.generatedContent.push(...content);
+          }
         }))
       })
       tool.prompts.map((p: Prompt) => {
@@ -98,7 +105,12 @@ class ToolManager {
           uri: tool.uri,
           transport: tool.transport,
           mcp_type: "prompt",
-          allowList: allowList
+          allowList: allowList,
+          generatedContent: [],
+          onContentGenerated: (content) => {
+            // Store content in our static array
+            ToolManager.generatedContent.push(content);
+          }
         }))
       })
     }
@@ -216,8 +228,30 @@ export async function POST(req: NextRequest) {
       async start(controller) {
         while (true) {
           const { done, value } = await reader.read();
-          if (done) break;
-          controller.enqueue(encoder.encode(JSON.stringify(value)))
+          if (done) {
+            // Include any generated content from tools before closing
+            if (ToolManager.generatedContent.length > 0) {
+              console.log("generated content length: ", ToolManager.generatedContent.length)
+              // Send each element as a separate chunk to handle large content
+              for (let i = 0; i < ToolManager.generatedContent.length; i++) {
+                let content = ToolManager.generatedContent[i];
+                
+                const generatedContentMessage = {
+                  type: 'generated_content',
+                  content: content,
+                  kwargs: {content: ""},
+                  id: ["f4rmhouse_core", "messages", "GeneratedContent"],
+                  total: ToolManager.generatedContent.length,
+                  timestamp: Date.now()
+                };
+                controller.enqueue(encoder.encode(JSON.stringify([generatedContentMessage, {langgraph_step: 4}]) + "\n"));
+              }
+              // Clear the generated content after sending
+              ToolManager.generatedContent = [];
+            }
+            break;
+          }
+          controller.enqueue(encoder.encode(JSON.stringify(value) + "\n"))
         }
         controller.close();
       }
