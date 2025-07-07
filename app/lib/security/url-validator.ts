@@ -24,6 +24,9 @@ const DEFAULT_CONFIG: SecurityConfig = {
     'signin.mcp.shop',
     'hiutdenim.co.uk',
     'api.githubcopilot.com',
+    'mcp.exa.ai',
+    'mcp.context7.com',
+    'mcp.icons8.com'
     // Add your trusted MCP servers here
   ],
   // Only allow standard HTTP/HTTPS ports and common development ports

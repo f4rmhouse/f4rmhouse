@@ -1,5 +1,34 @@
 import { extractAndValidateServerUri, secureFetch } from '@/app/lib/security/url-validator';
 import { getProxyConfig } from '@/app/lib/security/proxy-config';
+import { headers } from 'next/headers';
+
+/**
+ * Parses Server-Sent Events (SSE) format to extract JSON-RPC data
+ * @param sseText - The SSE formatted text containing event and data fields
+ * @returns Parsed JSON-RPC object or null if parsing fails
+ */
+function parseSSEToJsonRpc(sseText: string): any | null {
+  try {
+    // Split by lines and find the data line
+    const lines = sseText.split('\n');
+    
+    for (const line of lines) {
+      // Look for lines that start with "data: "
+      if (line.startsWith('data: ')) {
+        // Extract the JSON part after "data: "
+        const jsonString = line.substring(6); // Remove "data: " prefix
+        
+        // Parse the JSON string
+        return JSON.parse(jsonString);
+      }
+    }
+    
+    return null;
+  } catch (error) {
+    console.error('Error parsing SSE to JSON-RPC:', error);
+    return null;
+  }
+}
 
 export async function POST(request: Request) {
     // Extract and validate the server URI with SSRF protection
@@ -29,7 +58,8 @@ export async function POST(request: Request) {
 
     // Extract authorization header from incoming request
     const authHeader = request.headers.get('Authorization');
-    
+    const mcpSessionId = request.headers.get('mcp-session-id');
+
     // Build headers for the proxied request
     const proxyHeaders: Record<string, string> = {
       "Content-Type": "application/json",
@@ -41,7 +71,9 @@ export async function POST(request: Request) {
       proxyHeaders.Authorization = authHeader;
     }
 
-    console.log("body: ", bodyJson)
+    if (mcpSessionId) {
+      proxyHeaders['mcp-session-id'] = mcpSessionId;
+    }
 
     try {
       // Use secure fetch with SSRF protection
@@ -52,37 +84,11 @@ export async function POST(request: Request) {
         duplex: 'half',
       } as RequestInit & { duplex: 'half' });
 
-      if (response.status === 401) {
-        return new Response('Unauthorized', { status: 401, headers: response.headers });
-      }
-
-      if (!response.body) {
-        return new Response('No upstream server', { status: 502 });
-      }
-
-      // Read and log the response body for debugging
-      const responseText = await response.text();
-      let responseJson = {};
-      try {
-        if(responseText.length > 0) {
-          responseJson = JSON.parse(responseText);
-        }
-      } catch (e) {
-        console.log("Response body is not valid JSON:", e);
-      }
+      const id = response.headers.get('mcp-session-id');
+      console.log('mcp session id: ', id);
 
       // Proxy the response stream with proper headers
-      return new Response(responseText, {
-        status: response.status,
-        statusText: response.statusText,
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json, text/event-stream",
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Headers': 'Authorization, Content-Type',
-          'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
-        }
-      });
+      return response 
 
     } catch (error) {
       console.error('Secure streamable proxy error:', error);
@@ -108,10 +114,10 @@ export async function GET(request: Request) {
     
     // Extract authorization header from incoming request
     const authHeader = request.headers.get('Authorization');
-    
+
     // Build headers for the proxied request
     const proxyHeaders: Record<string, string> = {
-      Accept: 'text/event-stream',
+      Accept: 'text/event-stream, application/json',
     };
 
     // Add authorization header if present
@@ -133,20 +139,15 @@ export async function GET(request: Request) {
         return new Response('No upstream stream', { status: 502 });
       }
 
-      console.log("Response body: ", response.body)
+      const responseText = await response.text();
+      const id = response.headers.get('Mcp-Session-Id');
+      console.log('mcp sse id: ', id);
 
       // Proxy the response stream with proper SSE headers
       return new Response(response.body, {
         status: response.status,
         statusText: response.statusText,
-        headers: {
-          'Content-Type': 'text/event-stream',
-          'Cache-Control': 'no-cache',
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Headers': 'Authorization, Content-Type',
-          'Access-Control-Allow-Methods': 'GET',
-          'Connection': 'keep-alive',
-        },
+        headers: response.headers,
       });
 
     } catch (error) {

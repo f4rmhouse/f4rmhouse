@@ -3,24 +3,22 @@ export async function POST(request: Request) {
     
     // Get session_id from URL parameters
     const url = new URL(request.url);
-    const session_id = url.searchParams.get("session_id");
-
-    console.log("url: ", url)
-    console.log("session_id: ", session_id)
-
-    console.log("Handling message...")
+    const sessionId = url.searchParams.get("sessionId");
 
     // Create fetch options with the required duplex property
     const fetchOptions: any = {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'text/event-stream'
+      },
       body: request.body,
       duplex: 'half', // Required when forwarding a request body
     };
     
-    const response = await fetch("" + session_id, fetchOptions);
+    const response = await fetch("https://mcp.deepwiki.com/sse/message?sessionId=" + sessionId, fetchOptions);
+
+    console.log("Response: ", response)
     
-    return new Response(response.body, {
-      status: response.status,
-      headers: response.headers
-    });
+    return response; 
   }

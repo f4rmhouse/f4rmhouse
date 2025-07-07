@@ -55,7 +55,7 @@ const config: Config = {
         "groq": [
             {"id": "meta-llama/llama-4-maverick-17b-128e-instruct", "name": "Llama 4 Maverick", "provider": "groq", "logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFM23hF3C0Gcai4Vk6TZHh5dsGwLpvpK28bA&s"},
             {"id": "qwen/qwen3-32b", "name": "Qwen 3.2 32B", "provider": "groq", "logo": "https://brandlogos.net/wp-content/uploads/2025/06/qwen_icon-logo_brandlogos.net_gb71b-512x512.png"},
-            {"id": "qwen-qwq-32b", "name": "Qwen QWQ 32B", "provider": "groq", "logo": "https://brandlogos.net/wp-content/uploads/2025/06/qwen_icon-logo_brandlogos.net_gb71b-512x512.png"},
+            {"id": "qwen-qwq-32b", "name": "Qwen QwQ 32B", "provider": "groq", "logo": "https://brandlogos.net/wp-content/uploads/2025/06/qwen_icon-logo_brandlogos.net_gb71b-512x512.png"},
         ],
         "google": [
             {"id": "gemini-2.5-pro", "name": "Gemini 2.5 Pro", "provider": "google", "logo": "https://brandlogos.net/wp-content/uploads/2025/03/gemini_icon-logo_brandlogos.net_bqzeu-300x300.png"}

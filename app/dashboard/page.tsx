@@ -11,7 +11,7 @@ import getSession from "@/app/context/getSession";
 import User from "@/app/microstore/User";
 import Boxes from "../components/ui/chat-window/Boxes";
 import { PostHog } from 'posthog-node'
-import { Github } from "lucide-react";
+import { BadgeDollarSign, Github, Shield } from "lucide-react";
 import ThemeToggleButton from "../components/ui/ThemeToggleButton";
 import HelpModal from "../components/ui/HelpModal";
 import FPSCounter from "../components/ui/FPSCounter";

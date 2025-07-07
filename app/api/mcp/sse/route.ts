@@ -22,7 +22,7 @@ export async function GET(request: Request) {
     
     // Build headers for the proxied request
     const proxyHeaders: Record<string, string> = {
-      Accept: 'text/event-stream',
+      Accept: 'text/event-stream, application/json',
     };
     
     // Add authorization header if present
@@ -51,18 +51,7 @@ export async function GET(request: Request) {
       }
 
       // Proxy the response stream with proper SSE headers
-      return new Response(response.body, {
-        status: response.status,
-        statusText: response.statusText,
-        headers: {
-          'Content-Type': 'text/event-stream',
-          'Cache-Control': 'no-cache',
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Headers': 'Authorization, Content-Type',
-          'Access-Control-Allow-Methods': 'GET',
-          'Connection': 'keep-alive',
-        },
-      });
+      return response
 
     } catch (error) {
       console.error('Secure SSE proxy error:', error);

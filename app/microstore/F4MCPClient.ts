@@ -263,7 +263,7 @@ class F4MCPClient {
    * @returns Promise resolving to connection status object
    * @throws Error if connection fails or server is unreachable
    */
-  async connect(uti: string, serverURL: string, transport: string): Promise<MCPConnectionStatus> {
+  async connect(uti: string, serverURL: string, transport: string, auth_provider: string): Promise<MCPConnectionStatus> {
     let accessToken = ""
 
     // Create a new MCP client instance for this connection
@@ -306,7 +306,7 @@ class F4MCPClient {
 
         let res = await fetch(url)
 
-        if(res.status == 200 || res.status == 404) {
+        if(res.status == 200 || res.status == 404 || res.status == 500) {
           // Server allows unauthenticated access
           await this._connectWithMCPServerWithoutAuth(uti, serverURL, client, transport)
           return {status: "success"}
@@ -338,7 +338,7 @@ class F4MCPClient {
 
     let encodedURL = "http://localhost:3000/api/mcp/streamable?server_uri=" + encodeURIComponent(serverURL);
     if(transport == "sse") {
-      encodedURL = serverURL;
+      encodedURL = "http://localhost:3000/api/mcp/sse?server_uri=" + encodeURIComponent(serverURL);
     }
     let url = new URL(encodedURL);
 
@@ -453,7 +453,7 @@ class F4MCPClient {
     // Avoid CORS in issues streamable http by using proxy
     let encodedURL = "http://localhost:3000/api/mcp/streamable?server_uri=" + encodeURIComponent(serverURL);
     if(transport == "sse") {
-      encodedURL = serverURL;
+      encodedURL = "http://localhost:3000/api/mcp/sse?server_uri=" + encodeURIComponent(serverURL);
     }
     let url = new URL(encodedURL);
 
@@ -462,8 +462,6 @@ class F4MCPClient {
 
   async _handleConnection(transport: string, url: URL, customHeaders: any, client: Client, uti: string, fetchWithAuth: any) {
     if (transport == "streamable_http") {
-      console.log("url", url)
-      console.log("custom headers", customHeaders)
       let t = new StreamableHTTPClientTransport(url, {requestInit: customHeaders});
       try {
         await client.connect(t);
@@ -474,6 +472,8 @@ class F4MCPClient {
       }
     }
     else {
+      console.log("url", url)
+      console.log("transport", transport)
       let t = new SSEClientTransport(new URL(url), {
           eventSourceInit: {
               fetch: fetchWithAuth,

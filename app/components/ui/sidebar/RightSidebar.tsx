@@ -20,6 +20,7 @@ import { ServerSummaryType } from '@/app/components/types/MCPTypes';
 import ServerSummary from './ServerSummary';
 import { MCPConnectionStatus } from '../../types/MCPConnectionStatus';
 import ConfirmModal from "../modal/ConfirmModal";
+import AddLocalServerModal from "../modal/AddLocalServerModal";
 import MCPAuthHandler, { OAuthClient } from '@/app/MCPAuthHandler';
 
 export default function RightSidebar() {
@@ -46,6 +47,7 @@ export default function RightSidebar() {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [loginToolIndex, setLoginToolIndex] = useState<number | null>(null);
   const [isConnecting, setIsConnecting] = useState<boolean>(false)
+  const [showAddServerModal, setShowAddServerModal] = useState(false);
 
   const getQR = () => {
     setLoading(true)
@@ -71,7 +73,12 @@ export default function RightSidebar() {
     
     let newF4rmer = {...selectedAgent}
     newF4rmer.toolbox = selectedAgent.toolbox.filter((e:ProductType) => e.uti != uti)
-    setSelectedAgent(newF4rmer)
+    // @ts-expect-error
+    let user = new User(session.user.email, session.provider, session.access_token)
+    user.updateF4rmer(newF4rmer).then(e => {
+      alert("Tool removed successfully")
+      setSelectedAgent(newF4rmer)
+    })
   }
 
   const toggleToolSummary = (index: number) => {
@@ -128,11 +135,11 @@ export default function RightSidebar() {
             let user = new User(session?.user.email, session?.provider, session?.access_token) 
             if(!tool.server.uri.endsWith("/sse") && tool.server.transport == "sse") {
               client.setUser(user)
-              connectionStatus = await client.connect(uti, tool.server.uri + "/sse", tool.server.transport)
+              connectionStatus = await client.connect(uti, tool.server.uri, tool.server.transport, tool.server.auth_provider)
             }
             else {
               client.setUser(user)
-              connectionStatus = await client.connect(uti, tool.server.uri, tool.server.transport)
+              connectionStatus = await client.connect(uti, tool.server.uri, tool.server.transport, tool.server.auth_provider)
             }
             _isOnline = _isOnline.map((item, i) => i === index? connectionStatus : item)
             setIsConnecting(false)
@@ -315,27 +322,13 @@ export default function RightSidebar() {
         <Link href="/store" className={`hover:${theme.textColorPrimary} p-2 rounded-md transition-all hover:${theme.hoverColor} cursor-pointer flex ${theme.textColorSecondary} w-full text-base gap-3 my-auto`}><StoreIcon size={20}/><BadgeCheck className='ml-[-20px] rounded-full bg-blue-500 text-white' size={12}/> Browse verified servers</Link>
       </div>
         <div className=''>
-        <Link href="/" className={`hover:${theme.textColorPrimary} p-2 rounded-md transition-all hover:${theme.hoverColor} cursor-pointer flex ${theme.textColorSecondary} w-full text-base gap-3 my-auto`}><HardDrive size={20}/> Add local server</Link>
-        <Link href="/" className={`hover:${theme.textColorPrimary} p-2 rounded-md transition-all hover:${theme.hoverColor} cursor-pointer flex ${theme.textColorSecondary} w-full text-base gap-3 my-auto`}><BrainCircuit size={20}/> Add local model</Link>
-          <button className={`hover:${theme.textColorPrimary} p-2 rounded-md transition-all hover:${theme.hoverColor} cursor-pointer my-auto flex ${theme.textColorSecondary} w-full text-base gap-3`} onClick={() => getQR()}><QrCode size={20}/> Generate QR code</button>
-          {
-            qrImageURL.length > 0 ? 
-            <div className='m-4'>
-              <p className='text-sm'>WhatsApp:</p>
-              <div className='bg-white rounded-md'>
-                <img src={qrImageURL} className='w-full' height={100} width={100}/>
-              </div>
-            </div>
-            :
-            <div className='m-10 flex'>
-              {
-                loading ?
-                <div className='m-auto animate-pulse w-40 h-40 bg-neutral-600 rounded-md flex'><p className='m-auto text-center text-xs font-mono'>Generating QR code</p></div>
-                :
-                <div></div>
-              }
-            </div>
-          }
+          <button 
+          onClick={() => setShowAddServerModal(true)}
+          className={`hover:${theme.textColorPrimary} p-2 rounded-md transition-all hover:${theme.hoverColor} cursor-pointer flex ${theme.textColorSecondary} w-full text-base gap-3 my-auto`}
+        >
+          <HardDrive size={20}/> Add custom server
+        </button>
+          <button className={`hover:${theme.textColorPrimary} p-2 rounded-md transition-all hover:${theme.hoverColor} cursor-pointer flex ${theme.textColorSecondary} w-full text-base gap-3 my-auto`}><BrainCircuit size={20}/> Add local model</button>
         </div>
       </div>
     </div>
@@ -374,6 +367,10 @@ export default function RightSidebar() {
         }}
       />
     )}
+    <AddLocalServerModal 
+      open={showAddServerModal}
+      onClose={() => setShowAddServerModal(false)}
+    />
     </div>
   )
 }

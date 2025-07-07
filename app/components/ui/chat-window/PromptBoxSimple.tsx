@@ -80,7 +80,7 @@ export default function PromptBoxSimple({uti, description}: {uti: string, descri
       }
     } catch (err) {
       console.error(err)
-      chatSession.push("error", "system", "Connection error. Either the connection to the server has been broken or your connection is not stable. Please come back later and try again.")
+      chatSession.push("error", "system", "Connection error. Either the connection to the server has been broken or your connection is not stable. Please come back later and try again.", 0)
     } finally {
       setLoading(false);
     }
@@ -113,7 +113,7 @@ export default function PromptBoxSimple({uti, description}: {uti: string, descri
       return
     }
     // TODO: make it so that I need to type nextjsrole and f4role
-    chatSession.push("user", "user", input)
+    chatSession.push("user", "user", input, 0)
     setInput("")
 
     // Add session to the components chat message storage
@@ -176,11 +176,11 @@ export default function PromptBoxSimple({uti, description}: {uti: string, descri
                   .map((m, i) => {
                     switch (m.role) {
                       case "user":
-                        return (<ChatUserMessage key={i} content={m.content} timestamp={m.timestamp}/>)
+                        return (<ChatUserMessage key={i} content={m.content} timestamp={m.finishTime}/>)
                       case "tool_init":
                         return (<ChatInitToolCallMessage key={i} message={m.content} debug={chatSession.getDebug(m.id) ?? {message: "no extra information"}}/>)
                       case "system":
-                        return (<ChatAIMessage key={i} message={m.content}/>)
+                        return (<ChatAIMessage key={i} id={m.id} message={m.content} latency={m.finishTime - m.startTime}/>)
                       case "tool_response":
                         return (<ChatToolMessage key={i} message={m.content} debug={chatSession.getDebug(m.id) ?? {message: "no extra information"}}/>)
                       case "error":

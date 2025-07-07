@@ -27,6 +27,9 @@ export const MCP_PROXY_CONFIG: ProxySecurityConfig = {
     'signin.mcp.shop',
     'hiutdenim.co.uk',
     'api.githubcopilot.com',
+    'mcp.exa.ai',
+    'mcp.context7.com',
+    'mcp.icons8.com',
     
     // Example: Add your own MCP servers
     // 'your-mcp-server.com',
@@ -82,7 +85,7 @@ export function getProxyConfig(): ProxySecurityConfig {
     );
     
     // Reduce timeout in production
-    baseConfig.timeoutMs = 5000;
+    baseConfig.timeoutMs = 20000;
   }
   
   return baseConfig;
