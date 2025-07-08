@@ -45,17 +45,17 @@ const config: Config = {
     "welcomeText": ["{{username}} returns!" ,"> anon joins the chat!", "ASIC speed. OMGGGGGGG", "Try out the open source models. They're super fast!", "Ask me about roko's basilisk.", "Security is always 1st but spongebob dancing is a close 2nd", "Have you said thank you once??"],
     "loadingMessages": ["Generating slop...", "Analyzing Memes...", "Pretending to Like Matcha...", "Taking a coffee break...", "Summoning the Council of Elrond...", "Asking the Jedi Council...", "Generating slop..."],
     "models": {
+        "groq": [
+            {"id": "meta-llama/llama-4-maverick-17b-128e-instruct", "name": "Llama 4 Maverick", "provider": "groq", "logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFM23hF3C0Gcai4Vk6TZHh5dsGwLpvpK28bA&s"},
+            {"id": "qwen/qwen3-32b", "name": "Qwen 3.2 32B", "provider": "groq", "logo": "https://brandlogos.net/wp-content/uploads/2025/06/qwen_icon-logo_brandlogos.net_gb71b-512x512.png"},
+            {"id": "qwen-qwq-32b", "name": "Qwen QwQ 32B", "provider": "groq", "logo": "https://brandlogos.net/wp-content/uploads/2025/06/qwen_icon-logo_brandlogos.net_gb71b-512x512.png"},
+        ],
         "openai": [
             { "id": "gpt-4o-mini", "name": "GPT-4o", "provider": "openai", "logo": "https://d-cb.jc-cdn.com/sites/crackberry.com/files/styles/large/public/article_images/2023/08/openai-logo.jpg"},
         ],
         "anthropic": [
             { "id": "claude-sonnet-4-20250514", "name": "Claude 4 Sonnet", "provider": "anthropic", "logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRnM91o7r1wba01xcHW15PLqbe-ONaTIjOO3g&s"},
             { "id": "claude-3-7-sonnet-20250219", "name": "Claude 3.7 Sonnet", "provider": "anthropic", "logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRnM91o7r1wba01xcHW15PLqbe-ONaTIjOO3g&s"},
-        ],
-        "groq": [
-            {"id": "meta-llama/llama-4-maverick-17b-128e-instruct", "name": "Llama 4 Maverick", "provider": "groq", "logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFM23hF3C0Gcai4Vk6TZHh5dsGwLpvpK28bA&s"},
-            {"id": "qwen/qwen3-32b", "name": "Qwen 3.2 32B", "provider": "groq", "logo": "https://brandlogos.net/wp-content/uploads/2025/06/qwen_icon-logo_brandlogos.net_gb71b-512x512.png"},
-            {"id": "qwen-qwq-32b", "name": "Qwen QwQ 32B", "provider": "groq", "logo": "https://brandlogos.net/wp-content/uploads/2025/06/qwen_icon-logo_brandlogos.net_gb71b-512x512.png"},
         ],
         "google": [
             {"id": "gemini-2.5-pro", "name": "Gemini 2.5 Pro", "provider": "google", "logo": "https://brandlogos.net/wp-content/uploads/2025/03/gemini_icon-logo_brandlogos.net_bqzeu-300x300.png"}

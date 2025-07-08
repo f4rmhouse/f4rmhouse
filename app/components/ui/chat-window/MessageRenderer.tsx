@@ -91,7 +91,6 @@ export default function MessageRenderer({
     <>
       {messages.length > 0 ? (
         [...messages]
-          .reverse()
           .map((m, i) => renderMessage(i, m))
       ) : (
         <></>

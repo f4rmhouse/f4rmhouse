@@ -46,7 +46,6 @@ export default class StreamProcessor {
               }
             }
             else if (JSON.parse(chunk)[0].id[2] == "GeneratedContent") {
-              console.log("Generated content: ", JSON.parse(chunk)[0].content.text)
               chatSession.pushToken(JSON.parse(chunk)[0].content.text)
               setLatestMessage((p: string) => p + JSON.parse(chunk)[0].content.text)
             }

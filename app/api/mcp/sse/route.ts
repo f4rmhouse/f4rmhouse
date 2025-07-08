@@ -20,7 +20,6 @@ export async function GET(request: Request) {
     }
     
     const targetUrl = validation.url!;
-    console.log('Proxying SSE request to validated URL:', targetUrl);
     
     // Extract authorization header from incoming request
     const authHeader = request.headers.get('Authorization');
@@ -65,7 +64,6 @@ export async function GET(request: Request) {
       });
 
     } catch (error) {
-      console.error('SSE proxy error:', error);
       return new Response(`Proxy error: ${error instanceof Error ? error.message : 'Unknown error'}`, { 
         status: 500,
         headers: {

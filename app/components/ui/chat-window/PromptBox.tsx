@@ -5,8 +5,10 @@ import { useTheme } from "@/app/context/ThemeContext"
 import { useAgent } from '@/app/context/AgentContext'
 import F4Session from "../../types/F4Session";
 import { 
+  ArrowDown,
   ArrowLeft, 
   ArrowRight, 
+  ArrowUp, 
   CircleStop, 
   CornerRightUp, 
   Paperclip, 
@@ -71,8 +73,9 @@ export default function PromptBox({session, state, setState, f4rmers, addTab}: {
   const messageContainerRef = useRef<HTMLDivElement | null>(null);
   const [promptForUserLogin, setPromptForUserLogin] = useState<boolean>(false);
   const [selectedModel, setSelectedModel] = useState<any>(config.models[Object.keys(config.models)[0]][0]);
-
-
+  const [isAtBottom, setIsAtBottom] = useState<boolean>(true);
+  const [isAtTop, setIsAtTop] = useState<boolean>(true);
+  const [isScrollable, setIsScrollable] = useState<boolean>(false);
 
   useEffect(() => {
     setWelcomeMessage(config.welcomeText[Math.floor(Math.random() * config.welcomeText.length)].replace("{{username}}", session.user.name === "undefined" ? "anon" : session.user.name.split(" ")[0]))
@@ -80,6 +83,49 @@ export default function PromptBox({session, state, setState, f4rmers, addTab}: {
       setAvailableAgents(f4rmers)
     }
   }, [session])
+
+  // Scroll detection effect
+  useEffect(() => {
+    const container = messageContainerRef.current;
+    if (!container) return;
+
+    const checkScrollState = () => {
+      const { scrollTop, scrollHeight, clientHeight } = container;
+      const threshold = 10; // Small threshold for better UX
+      
+      // Check if content is scrollable
+      const contentScrollable = scrollHeight > clientHeight;
+      setIsScrollable(contentScrollable);
+      
+      if (!contentScrollable) {
+        setIsAtTop(true);
+        setIsAtBottom(true);
+        return;
+      }
+      
+      // Check scroll position
+      const atTop = scrollTop <= threshold;
+      const atBottom = scrollTop >= scrollHeight - clientHeight - threshold;
+      
+      setIsAtTop(atTop);
+      setIsAtBottom(atBottom);
+    };
+
+    // Initial check
+    checkScrollState();
+    
+    // Add scroll listener
+    container.addEventListener('scroll', checkScrollState);
+    
+    // Also check when content changes (new messages)
+    const resizeObserver = new ResizeObserver(checkScrollState);
+    resizeObserver.observe(container);
+    
+    return () => {
+      container.removeEventListener('scroll', checkScrollState);
+      resizeObserver.disconnect();
+    };
+  }, [chatSession.messages]);
 
   useEffect(() => {
     setMessages(chatSession.messages)
@@ -126,6 +172,39 @@ export default function PromptBox({session, state, setState, f4rmers, addTab}: {
     registerShortcuts();
     return cleanup;
   }, [state]);
+
+  // Scroll position monitoring
+  useEffect(() => {
+    const container = messageContainerRef.current;
+    if (!container) return;
+
+    const threshold = 0;
+    const isNearTop = container.scrollTop < threshold;
+
+    if (isNearTop) {
+      container.scrollTop = 0; // scroll to top (which is actually bottom of flex-col-reverse)
+    }
+  }, [chatSession.getMessages().length]);
+
+  // Scroll to top function
+  const scrollToTop = () => {
+    if (messageContainerRef.current) {
+      messageContainerRef.current.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  // Scroll to bottom function
+  const scrollToBottom = () => {
+    if (messageContainerRef.current) {
+      messageContainerRef.current.scrollTo({
+        top: messageContainerRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
+  };
 
    /**
    * stopStream cancels the current streaming operation
@@ -263,42 +342,71 @@ export default function PromptBox({session, state, setState, f4rmers, addTab}: {
   }
 
   return (
-    <div className="sm:flex overflow-hidden w-[100vw]">
+    <div className="sm:flex w-[100vw]">
       <div className={`flex transition-all ${state === "canvas" ? "m-0" : "m-auto"}`}>
-    <div className={`relative m-auto mt-1 md:pt-0 w-[100vw] h-[100vh] sm:h-[93vh] overflow-hidden ${state === "chat" || state === "edit" ? "sm:w-[16cm]" : "sm:w-[10cm]"} rounded-md ${theme.chatWindowStyle ? theme.chatWindowStyle : ""}`}>
-      <div className="no-scrollbar flex flex-col w-full transition-all duration-500 overflow-y-auto flex-grow h-full">
-        <div
-          className={`p-2 no-scrollbar flex flex-col-reverse w-full gap-5 transition-all duration-500 overflow-y-scroll scrollb ${currentSession.length > 0 ? 'opacity-100' : 'opacity-0 h-0'}`}
-          ref={messageContainerRef}
-        >
-          {loading ? (
-            <div className="flex gap-2 ml-2">
-              <img className="h-[30px] rounded-full" src="https://pbs.twimg.com/media/CrghjJoUMAEBcO_.jpg" />
-              <div className={`p-2 ${theme.textColorSecondary}`}>
-                <p className="">
-                  <span className=""></span>
-                  {currentLoadingMessage}
-                </p>
-                <div className="text-xs">
-                  <Timer />
+        <div className={`relative m-auto mt-1 md:pt-0 w-[100vw] h-[100vh] sm:h-[93vh] ${state === "chat" || state === "edit" ? "sm:w-[16cm]" : "sm:w-[10cm]"} rounded-md ${theme.chatWindowStyle ? theme.chatWindowStyle : ""}`}>
+          <div className="flex flex-col w-full transition-all duration-500 flex-grow h-full">
+            <div
+              className={`overflow-auto scrollbar-hide p-2 flex flex-col w-full gap-5 transition-all duration-500 ${currentSession.length > 0 ? 'opacity-100' : 'opacity-0 h-0'}`}
+              ref={messageContainerRef}
+            >
+              {chatSession.messagesTypes.length > 0 ? (
+                <MessageRenderer
+                  messages={chatSession.messagesTypes}
+                  chatSession={chatSession}
+                  onAuthenticate={messageHandlers.authenticateMessage}
+                  onCancel={messageHandlers.cancelMessage}
+                />
+              ) : (
+                <></>
+              )}
+              {loading ? (
+                <div className="flex gap-2 ml-2">
+                  <img className="h-[30px] rounded-full" src="https://pbs.twimg.com/media/CrghjJoUMAEBcO_.jpg" />
+                  <div className={`p-2 ${theme.textColorSecondary}`}>
+                    <p className="">
+                      <span className=""></span>
+                      {currentLoadingMessage}
+                    </p>
+                    <div className="text-xs">
+                      <Timer />
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          ) : (
-            <></>
-          )}
-          {chatSession.messagesTypes.length > 0 ? (
-            <MessageRenderer
-              messages={chatSession.messagesTypes}
-              chatSession={chatSession}
-              onAuthenticate={messageHandlers.authenticateMessage}
-              onCancel={messageHandlers.cancelMessage}
-            />
-          ) : (
-            <></>
-          )}
+              ) : (
+                <></>
+              )}
         </div>
         <div className={`mt-auto sticky transition-all ${state === "canvas" ? "w-[98%]" : "w-[99%]"} ml-1 mr-2 ${chatSession.getMessages().length > 0 ? "bottom-[10%] sm:bottom-0 pb-1" : "bottom-[calc(40vh)]"}`}>
+          {/* Scroll buttons - only show when scrolling is available */}
+          {isScrollable && chatSession.getMessages().length > 0 && (
+            <div className="flex absolute bottom-10 right-0">
+              {/* Scroll to bottom button - only show when not at bottom */}
+              {!isAtBottom && (
+                <div className="flex w-full mb-2">
+                  <button 
+                    onClick={scrollToBottom}
+                    className={`${theme.textColorSecondary ? theme.textColorSecondary : "text-neutral-300"} m-auto p-2 rounded-full hover:scale-110 transition-all duration-200`}
+                    title="Scroll to bottom"
+                  >
+                    <ArrowDown size={16} />
+                  </button>
+                </div>
+              )}
+              {/* Scroll to top button - only show when not at top */}
+              {!isAtTop && (
+                <div className="flex w-full mb-2">
+                  <button 
+                    onClick={scrollToTop}
+                    className={`${theme.textColorSecondary ? theme.textColorSecondary : "text-neutral-300"} m-auto p-2 rounded-full hover:scale-110 transition-all duration-200`}
+                    title="Scroll to top"
+                  >
+                    <ArrowUp size={16} />
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
           <div className={`${chatSession.getMessages().length === 0 ? "block" : "hidden"} pb-1`}>
             <h1 className={`flex text-2xl ${theme.textColorPrimary ? theme.textColorPrimary : "text-white"}`}>{welcomeMessage} <img className="my-auto w-10" src={"https://media.tenor.com/R7JF4cuIjogAAAAj/spongebob-spongebob-meme.gif"} /></h1>
           </div>

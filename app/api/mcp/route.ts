@@ -15,7 +15,6 @@ export async function POST(request: Request) {
     }
     
     const targetUrl = validation.url!;
-    console.log('Proxying request to validated URL:', targetUrl);
   
     // Extract authorization header from incoming request
     const authHeader = request.headers.get('Authorization');
@@ -31,8 +30,6 @@ export async function POST(request: Request) {
       proxyHeaders.Authorization = authHeader;
       console.log('Forwarding Authorization header to:', targetUrl);
     }
-
-    console.log("Proxy Headers: ", proxyHeaders);
 
     try {
       // Use secure fetch with SSRF protection
@@ -101,8 +98,6 @@ export async function GET(request: Request) {
       console.log('Forwarding Authorization header to:', targetUrl);
     }
 
-    console.log("Proxy Headers: ", proxyHeaders);
-
     try {
       // Use secure fetch with SSRF protection
       const response = await secureFetch(targetUrl, {
@@ -113,9 +108,6 @@ export async function GET(request: Request) {
         return new Response('No upstream stream', { status: 502 });
       }
       
-      console.log("Response status:", response.status);
-      console.log("Response headers:", Object.fromEntries(response.headers.entries()));
-
       if (response.status === 401) {
         return new Response('Unauthorized', { status: 401, headers: response.headers });
       }
