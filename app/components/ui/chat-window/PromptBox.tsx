@@ -294,7 +294,7 @@ export default function PromptBox({session, state, setState, f4rmers, addTab}: {
     }
 
     if(input.startsWith("/help")) {
-      chatSession.push("system", "system", helpContent, 0)
+      chatSession.push("system", "system", helpContent, new Date().getTime())
       setInput("")
       setLoading(false)
       return
