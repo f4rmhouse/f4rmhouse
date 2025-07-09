@@ -45,7 +45,23 @@ import Timer from "../misc/Timer";
  * 
  * @returns 
  */
-export default function PromptBox({session, state, setState, f4rmers, addTab}: {session: F4Session, state: "canvas" | "chat" | "preview" | "edit", setState: (state: "canvas" | "chat" | "preview" | "edit") => void, f4rmers: F4rmerType[], addTab: () => void}) {
+export default function PromptBox(
+  {
+    session, 
+    state, 
+    setState, 
+    f4rmers, 
+    addTab
+  }
+  : 
+  {
+    session: F4Session, 
+    state: "canvas" | "chat" | "preview" | "edit", 
+    setState: (state: "canvas" | "chat" | "preview" | "edit") => void, 
+    f4rmers: F4rmerType[], 
+    addTab: () => void
+  }
+){
   const { theme } = useTheme();
   const { selectedAgent, setSelectedAgent, setAvailableAgents, client } = useAgent();
   
@@ -77,8 +93,53 @@ export default function PromptBox({session, state, setState, f4rmers, addTab}: {
   const [isAtTop, setIsAtTop] = useState<boolean>(true);
   const [isScrollable, setIsScrollable] = useState<boolean>(false);
 
+  // Message handlers
+  const messageHandlers = new MessageHandlers(
+    chatSession,
+    selectedAgent || null,
+    selectedModel,
+    session,
+    client,
+    processStream,
+    setLoading,
+    updateLatestMessage,
+    setChatSession,
+    setCurrentSession,
+    setSelectedAgent,
+    setState
+  );
+
+  // Keyboard shortcuts
+  const { registerShortcuts, cleanup } = useKeyboardShortcuts({
+    TOGGLE_CANVAS: {
+      key: 'o',
+      metaKey: true,
+      preventDefault: true,
+      callback: () => setState(state === 'canvas' ? 'chat' : 'canvas'),
+    },
+    CLEAR_CHAT: {
+      key: 'x',
+      metaKey: true,
+      preventDefault: true,
+      callback: clearChat,
+    },
+  });
+
   useEffect(() => {
-    setWelcomeMessage(config.welcomeText[Math.floor(Math.random() * config.welcomeText.length)].replace("{{username}}", session.user.name === "undefined" ? "anon" : session.user.name.split(" ")[0]))
+    registerShortcuts();
+    return cleanup;
+  }, [state]);
+
+  useEffect(() => {
+
+    let randomIndex = Math.floor(Math.random() * config.welcomeText.length)
+    let sessionUsername = 
+      session.user.name === "undefined" ? "anon" 
+      : 
+      session.user.name.split(" ")[0]
+
+    setWelcomeMessage(config.welcomeText[randomIndex]
+      .replace("{{username}}", sessionUsername))
     if(f4rmers && f4rmers.length > 0) {
       setAvailableAgents(f4rmers)
     }
@@ -135,56 +196,6 @@ export default function PromptBox({session, state, setState, f4rmers, addTab}: {
     chatSession.streaming = false
     setChatSession(chatSession)
   }, [loading])
-
-  // Message handlers
-  const messageHandlers = new MessageHandlers(
-    chatSession,
-    selectedAgent || null,
-    selectedModel,
-    session,
-    client,
-    processStream,
-    setLoading,
-    updateLatestMessage,
-    setChatSession,
-    setCurrentSession,
-    setSelectedAgent,
-    setState
-  );
-
-  // Keyboard shortcuts
-  const { registerShortcuts, cleanup } = useKeyboardShortcuts({
-    TOGGLE_CANVAS: {
-      key: 'o',
-      metaKey: true,
-      preventDefault: true,
-      callback: () => setState(state === 'canvas' ? 'chat' : 'canvas'),
-    },
-    CLEAR_CHAT: {
-      key: 'x',
-      metaKey: true,
-      preventDefault: true,
-      callback: clearChat,
-    },
-  });
-
-  useEffect(() => {
-    registerShortcuts();
-    return cleanup;
-  }, [state]);
-
-  // Scroll position monitoring
-  useEffect(() => {
-    const container = messageContainerRef.current;
-    if (!container) return;
-
-    const threshold = 0;
-    const isNearTop = container.scrollTop < threshold;
-
-    if (isNearTop) {
-      container.scrollTop = 0; // scroll to top (which is actually bottom of flex-col-reverse)
-    }
-  }, [chatSession.getMessages().length]);
 
   // Scroll to top function
   const scrollToTop = () => {
@@ -262,7 +273,11 @@ export default function PromptBox({session, state, setState, f4rmers, addTab}: {
    * @param e - Form submission event
    */
   async function sendMessage(e: FormEvent<HTMLFormElement>) {
-    if(chatSession.getMessages().length % 4 == 0 && chatSession.getMessages().length != 0 && session.access_token == "undefined") {
+    if(
+      chatSession.getMessages().length % 4 == 0 && 
+      chatSession.getMessages().length != 0 && 
+      session.access_token == "undefined"
+    ) {
       setPromptForUserLogin(true)
     }
 
