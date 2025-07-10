@@ -22,6 +22,7 @@ import { MCPConnectionStatus } from '../../types/MCPConnectionStatus';
 import ConfirmModal from "../modal/ConfirmModal";
 import AddLocalServerModal from "../modal/AddLocalServerModal";
 import MCPAuthHandler, { OAuthClient } from '@/app/MCPAuthHandler';
+import { demonstrateTokenEncryption } from '@/app/lib/security/example-usage';
 
 export default function RightSidebar() {
   const { theme } = useTheme()
@@ -327,7 +328,7 @@ export default function RightSidebar() {
           className={`hover:${theme.textColorPrimary} p-2 rounded-md transition-all hover:${theme.hoverColor} cursor-pointer flex ${theme.textColorSecondary} w-full text-base gap-3 my-auto`}
         >
           <HardDrive size={20}/> Add custom server
-        </button>
+          </button>
           <button className={`hover:${theme.textColorPrimary} p-2 rounded-md transition-all hover:${theme.hoverColor} cursor-pointer flex ${theme.textColorSecondary} w-full text-base gap-3 my-auto`}><BrainCircuit size={20}/> Add local model</button>
         </div>
       </div>

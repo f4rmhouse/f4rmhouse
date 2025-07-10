@@ -3,6 +3,7 @@ import ReviewType from '../components/types/ReviewType';
 import UsageType from '../components/types/UsageType';
 import F4rmerType from '../components/types/F4rmerType';
 import TokenType from '../components/types/TokenType';
+import { TokenEncryption, EncryptionConfig } from '../lib/security/encryption';
 
 /**
  * User is an abstraction of a general consumer of f4rmhouse products. A user can
@@ -384,28 +385,93 @@ class User {
           headers: { Authorization: `${this.token}`, "X-Username": this.username, "X-Provider": this.provider}
         }
       );
-      return response.data;
+
+      // Decrypt the response data if it's encrypted
+      return await this.decryptTokenData(response.data.Token);
     } catch (error) {
-      console.error('Error fetching services:', error);
+      console.error('Error fetching or decrypting token:', error);
       throw error;
     }
   }
 
   async createToken(token: TokenType): Promise<any> {
     try {
+      // Encrypt the token before sending it to the server
+      const encryptedTokenData = await this.encryptTokenData(token);
+      
+      let encryptedToken = token;
+      encryptedToken.token = encryptedTokenData.encryptedData;
+      
       const response: AxiosResponse = await axios.post(
         `${this.baseUrl}/user/create/token`,
-        token,
+        encryptedToken,
         {
-          headers: { Authorization: `${this.token}`, "X-Username": this.username, "X-Provider": this.provider}
+          headers: { 
+            Authorization: `${this.token}`, 
+            "X-Username": this.username, 
+            "X-Provider": this.provider,
+            "Content-Type": "application/json"
+          }
         }
       );
       return response.data;
     } catch (error) {
-      console.error('Error fetching services:', error);
+      console.error('Error creating encrypted token:', error);
       throw error;
     }
   }
+  /**
+   * Utility method to encrypt token data for secure transmission
+   * @param tokenData - The token data to encrypt
+   * @returns Encrypted token data ready for transmission
+   */
+  private async encryptTokenData(tokenData: any): Promise<any> {
+    try {
+      // Pass username for secure key derivation
+      const encryptionPassword = EncryptionConfig.getEncryptionPassword(this.username);
+      const encryptedToken = await TokenEncryption.encryptToken(tokenData, this.token);
+      
+      return {
+        encryptedData: encryptedToken,
+        encrypted: true
+      };
+    } catch (error) {
+      console.error('Failed to encrypt token data:', error);
+      throw new Error('Token encryption failed');
+    }
+  }
+
+  /**
+   * Utility method to decrypt token data received from server
+   * @param responseData - The response data that may contain encrypted tokens
+   * @returns Decrypted token data or original data if not encrypted
+   */
+  private async decryptTokenData(responseData: any): Promise<any> {
+    try {
+      // Check if the response contains encrypted data
+      if (responseData && responseData.encryptedData) {
+        // Pass username for secure key derivation
+        const encryptionPassword = EncryptionConfig.getEncryptionPassword(this.username);
+        const decryptedToken = await TokenEncryption.decryptToken(
+          responseData,
+          this.token
+        );
+
+        return {
+          ...responseData,
+          token: decryptedToken,
+          encrypted: false // Mark as decrypted for client use
+        };
+      }
+      
+      // Return as-is if not encrypted (backward compatibility)
+      return responseData;
+    } catch (error) {
+      console.error('Failed to decrypt token data:', error);
+      throw new Error('Token decryption failed');
+    }
+  }
+
   async deleteToken(server: string): Promise<any> {
     try {
       const response: AxiosResponse = await axios.delete(

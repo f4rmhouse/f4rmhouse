@@ -275,17 +275,16 @@ class F4MCPClient {
     // Check if we have authentication credentials for this server
     if(this.caller) {
       let token = await this.caller.getToken(uti)
-      if(token.Code == 404) {
+      if(token.encryptedData == "") {
         accessToken = ""
       }
       else {
-        accessToken = token.Token
+        accessToken = token.token.token
       }
     }
 
     try {
       if (accessToken) {
-        // Connect using existing authentication token
         await this._connectToClientWithAuthToken(uti, serverURL, accessToken, client, transport)
         return {status: "success"}
       }

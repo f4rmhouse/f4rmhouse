@@ -3,7 +3,7 @@
 type TokenType = {
     username: string,
     server: string,
-    token: string,
+    token: any,
     provider: string
 }
 
