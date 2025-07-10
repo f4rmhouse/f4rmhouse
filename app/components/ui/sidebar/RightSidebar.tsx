@@ -10,19 +10,17 @@ import { useEffect, useState } from 'react';
 import { useSession } from "next-auth/react";
 import User from '@/app/microstore/User';
 import ProductType from '../../types/ProductType';
-import { BadgeCheck, Bot, BrainCircuit, ChevronRight, Hammer, HardDrive, LockKeyhole, QrCode, Server, Store as StoreIcon} from "lucide-react";
-import { Delete, PanelLeftClose, PanelRightClose, Repeat2, Wrench } from 'lucide-react';
+import { BadgeCheck, Bot, BrainCircuit, ChevronRight, HardDrive, LockKeyhole, LogOut, Store as StoreIcon, Trash} from "lucide-react";
+import { PanelLeftClose } from 'lucide-react';
 import { useTheme } from "../../../context/ThemeContext";
 import { useOnboarding } from "../../../context/OnboardingContext";
 import { useAgent } from "../../../context/AgentContext";
-import F4MCPClient from '@/app/microstore/F4MCPClient';
 import { ServerSummaryType } from '@/app/components/types/MCPTypes';
 import ServerSummary from './ServerSummary';
 import { MCPConnectionStatus } from '../../types/MCPConnectionStatus';
 import ConfirmModal from "../modal/ConfirmModal";
 import AddLocalServerModal from "../modal/AddLocalServerModal";
 import MCPAuthHandler, { OAuthClient } from '@/app/MCPAuthHandler';
-import { demonstrateTokenEncryption } from '@/app/lib/security/example-usage';
 
 export default function RightSidebar() {
   const { theme } = useTheme()
@@ -125,36 +123,54 @@ export default function RightSidebar() {
     if (selectedAgent && session && !isConnecting) {
       setIsConnecting(true)
       setOpenList(selectedAgent.toolbox.map(_ => false))
-      let _isOnline = selectedAgent.toolbox.map((_): MCPConnectionStatus => ({ status: "error" })) 
-      let connectionStatus: MCPConnectionStatus
       // Connect to each tool server
-      const connectToTool = async (uti:string, index:number) => {
-        try {
-          const tool = selectedAgent.toolbox[index];
-          if(!(_isOnline[index].status == "connecting") && (tool.server.uri.startsWith("http://") || tool.server.uri.startsWith("https://"))) {
-            // @ts-expect-error
-            let user = new User(session?.user.email, session?.provider, session?.access_token) 
-            if(!tool.server.uri.endsWith("/sse") && tool.server.transport == "sse") {
-              client.setUser(user)
-              connectionStatus = await client.connect(uti, tool.server.uri, tool.server.transport, tool.server.auth_provider)
-            }
-            else {
-              client.setUser(user)
-              connectionStatus = await client.connect(uti, tool.server.uri, tool.server.transport, tool.server.auth_provider)
-            }
-            _isOnline = _isOnline.map((item, i) => i === index? connectionStatus : item)
-            setIsConnecting(false)
-          }
-        } catch (error) {
-          _isOnline = _isOnline.map((item, i) => i === index? { status: "error" } as MCPConnectionStatus : item)
-          setIsConnecting(false)
-        }
-        setIsOnline(_isOnline)
-      }
-          
-      selectedAgent.toolbox.map((tool, index) => connectToTool(tool.uti, index))
+      selectedAgent.toolbox.map((tool) => connectToTool(tool.uti))
     }
   }, [selectedAgent, session])
+
+  const connectToTool = async (uti: string) => {
+    if (!selectedAgent || !session) return;
+
+    let _isOnline = selectedAgent.toolbox.map((_): MCPConnectionStatus => ({ status: "error" })) 
+    let connectionStatus: MCPConnectionStatus
+    let index = selectedAgent.toolbox.findIndex((tool) => tool.uti === uti)
+
+    try {
+
+      const tool = selectedAgent.toolbox[index];
+      const isNotConnecting = !(_isOnline[index].status == "connecting")  
+      const startsWithHTTP = tool.server.uri.startsWith("http")
+
+      if(isNotConnecting && startsWithHTTP){
+        // @ts-expect-error
+        let user = new User(session?.user.email, session?.provider, session?.access_token) 
+        if(!tool.server.uri.endsWith("/sse") && tool.server.transport == "sse") {
+            client.setUser(user)
+            connectionStatus = await client.connect(
+              uti, 
+              tool.server.uri, 
+              tool.server.transport, 
+              tool.server.auth_provider
+            )
+          }
+          else {
+            client.setUser(user)
+            connectionStatus = await client.connect(
+              uti, 
+              tool.server.uri, 
+              tool.server.transport, 
+              tool.server.auth_provider
+            )
+          }
+          _isOnline = _isOnline.map((item, i) => i === index? connectionStatus : item)
+          setIsConnecting(false)
+        }
+      } catch (error) {
+        _isOnline = _isOnline.map((item, i) => i === index? { status: "error" } as MCPConnectionStatus : item)
+        setIsConnecting(false)
+      }
+      setIsOnline(_isOnline)
+  }
 
   const getStatusIndicator = (status: string) => {
     switch(status) {
@@ -217,11 +233,21 @@ export default function RightSidebar() {
     window.open(authUrl, '_blank')
   }
 
+  const signOut = async (uti: string) => {
+    if(!session?.user) return;
+    // @ts-expect-error
+    const user = new User(session?.user.email, session?.provider, session?.access_token) 
+    await user.deleteToken(uti).then(e => {
+      connectToTool(uti); 
+      client.close(uti)
+    })  
+  }
+
   return (
     <div>
     <div onMouseEnter={() => setVisible(true)} onMouseLeave={() => setVisible(false)} className={`p-2 fixed right-0 w-[50%] sm:w-[25%] mt-9 h-[92vh] z-10 top-0 border-${theme.secondaryColor?.replace("bg-", "")} ${theme.chatWindowStyle} transition-transform duration-300 ease-in-out rounded-md transform p-3 ${visible ? 'translate-x-0' : 'translate-x-full'}`}>
       <div className='h-[95%] flex flex-col'>
-        <p className={`pl-2 pb-2 flex text-base flex mb-2 ${theme.textColorPrimary}`}><span className="mr-2 bg-yellow-500 rounded-md p-1 text-yellow-900"><Bot size={20}/></span><span className='my-auto'>{selectedAgent?.title}</span></p>
+        <p className={`pl-2 pb-2 flex text-base flex mb-2 ${theme.textColorPrimary}`}><span className='my-auto'>{selectedAgent?.title}</span></p>
         <p className={`pl-2 text-base flex mb-2 ${theme.textColorPrimary} w-[100%]`}>MCP Servers</p>
         {selectedAgent?.toolbox ?
         <div className="space-y-1 max-h-[50vh] overflow-y-auto pr-1">
@@ -239,7 +265,7 @@ export default function RightSidebar() {
               <div className="">
                 <p>{openList[0]}</p>
                 {openList[index] ? 
-                  <div className={`flex flex-col text-sm ${theme.textColorSecondary} p-0 pr-2 pl-2 ${theme.secondaryColor}`}>
+                  <div className={`flex flex-col text-sm ${theme.textColorSecondary} rounded-md shadow p-0 pr-2 pl-2 ${theme.secondaryColor}`}>
                     <ServerSummary summary={summary.get(tool.uti)}/>
                     {isOnline[index].status === "error" ? (
                       <div className="text-xs text-red-400 mt-1 mb-2">
@@ -292,22 +318,28 @@ export default function RightSidebar() {
                         )}
                       </div>
                     )}
-                    <label className="mt-5 mb-2 inline-flex items-center cursor-pointer">
-                      <input 
-                        type="checkbox" 
-                        checked={trustedServers[tool.uti] || false} 
-                        onChange={() => setTrustedServers(prev => ({...prev, [tool.uti]: !prev[tool.uti]}))}
-                        className="rounded"
-                      />
-                      <span className={`ml-2 text-sm font-medium ${theme.textColorPrimary}`}>I trust this server</span>
-                    </label>
+                    {isOnline[index].status === "success" && (
+                      <label className="mt-5 mb-2 inline-flex items-center cursor-pointer">
+                        <input 
+                          type="checkbox" 
+                          checked={trustedServers[tool.uti] || false} 
+                          onChange={() => setTrustedServers(prev => ({...prev, [tool.uti]: !prev[tool.uti]}))}
+                          className="rounded"
+                        />
+                        <span className={`ml-2 text-sm font-medium ${theme.textColorPrimary}`}>I trust this server</span>
+                        </label>
+                      )}
                     {trustedServers[tool.uti] && (
                       <div className={`rounded text-xs ${theme.textColorSecondary}`}>
                         You're allowing an LLM to perform all of these servers actions on your behalf without needing your permission.
                       </div>
                     )}
-                    <button onClick={() => alert("Do sign out")}>Sign out</button>
-                    <button onClick={() => removeTool(tool.uti)}>remove</button>
+                    <div className="flex space-x-2">
+                      {isOnline[index].status === "success" && (
+                        <button className={`${theme.textColorPrimary} hover:${theme.hoverColor} p-2 rounded-md transition-all hover:${theme.hoverColor} cursor-pointer ${theme.textColorSecondary} text-base gap-3 my-auto flex text-xs`} onClick={() => signOut(tool.uti)}><LogOut size={15} /> Sign out</button>
+                      )}
+                      <button className={`${theme.textColorPrimary} hover:${theme.hoverColor} p-2 rounded-md transition-all hover:${theme.hoverColor} cursor-pointer ${theme.textColorSecondary} text-base gap-3 my-auto flex text-xs`} onClick={() => removeTool(tool.uti)}><Trash className="m-auto" size={15} /> Remove</button>
+                    </div>
                   </div>
                   :
                   <></>

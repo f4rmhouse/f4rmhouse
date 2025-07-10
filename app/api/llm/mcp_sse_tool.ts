@@ -97,7 +97,6 @@ function createMCPTool({ uti, endpoint, title, tool_description, parameters, aut
             }
 
             let token = await caller.getToken(uti) 
-            console.log("TOKEN: ", token)
             if(token.encryptedData.length > 0) {
                 accessToken = token.token.token
             }
