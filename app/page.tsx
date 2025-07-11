@@ -16,6 +16,7 @@ import ThemeToggleButton from "./components/ui/ThemeToggleButton";
 import HelpModal from "./components/ui/HelpModal";
 import config from "../f4.config";
 import ProductType from "./components/types/ProductType";
+import { toast, Toaster } from "sonner";
 
 async function Dashboard() {
 
@@ -75,10 +76,9 @@ async function Dashboard() {
           <p className="text-neutral-500 text-xs">v{config.version}</p>
         </div>
         {error && (
-            <div className="bg-black p-4 rounded absolute bottom-10 right-24">
-              <p className="text-neutral-100 text-xs">👩🏾‍💻 Running in local mode</p>
-              <p className="text-neutral-100 text-xs">Only local MCP tool calling available</p>
-            </div>
+          <div className="p-4 rounded absolute bottom-10 right-24">
+            <p className="text-xs">Running in local mode</p>
+          </div>
           )}
       </main>
     </ThemeProvider>
