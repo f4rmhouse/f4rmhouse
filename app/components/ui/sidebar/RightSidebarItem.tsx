@@ -11,6 +11,7 @@ import MCPAuthHandler, { OAuthClient } from '@/app/MCPAuthHandler';
 import User from '@/app/microstore/User';
 import { useSession } from "next-auth/react";
 import { ServerSummaryType } from '../../types/MCPTypes';
+import { Toaster, toast } from 'sonner';
 
 export default function RightSidebarItem(
   {
@@ -161,7 +162,6 @@ export default function RightSidebarItem(
 
     try {
 
-      const isNotConnecting = !(_isOnline.status == "connecting")  
       const startsWithHTTP = tool.server.uri.startsWith("http")
 
       // Only connect with remote servers (no stdio)
@@ -181,6 +181,7 @@ export default function RightSidebarItem(
       }
     } catch (error) {
       _isOnline = { status: "error" } as MCPConnectionStatus
+      toast.error('Failed to connect MCP server: ' + tool.uti)
     }
     setIsOnline(_isOnline)
   }

@@ -7,6 +7,7 @@ import { InputSchema, Tool, ServerSummaryType, Prompt, MCPToolType, MCPResourceT
 import { MCPConnectionStatus } from "../components/types/MCPConnectionStatus";
 import MCPAuthHandler from "../MCPAuthHandler";
 import Store from "./Store";
+import { toast } from "sonner";
 
 /**
  * F4MCPClient is a client for interacting with Model Context Protocol (MCP) servers.
@@ -312,6 +313,7 @@ class F4MCPClient {
         }
         else if(res.status == 401) {
           // Server requires authentication - initiate OAuth flow
+          toast.info(uti + ' needs you to authenticate to use the MCP server.')
           let result = await this._initiateMCPAuthentication(uti, serverURL, res)
           return result
         }

@@ -16,6 +16,7 @@ import ThemeToggleButton from "../components/ui/ThemeToggleButton";
 import HelpModal from "../components/ui/HelpModal";
 import FPSCounter from "../components/ui/FPSCounter";
 import config from "@/f4.config";
+import { Toaster } from "sonner";
 
 const posthog = new PostHog(process.env.NEXT_PUBLIC_POSTHOG_KEY ? process.env.NEXT_PUBLIC_POSTHOG_KEY : "", {
   host: process.env.NEXT_PUBLIC_POSTHOG_HOST,

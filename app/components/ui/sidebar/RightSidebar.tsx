@@ -14,6 +14,7 @@ import { useAgent } from "../../../context/AgentContext";
 import AddLocalServerModal from "../modal/AddLocalServerModal";
 import { useKeyboardShortcuts } from '@/app/utils/keyboardShortcuts';
 import RightSidebarItem from './RightSidebarItem';
+import { toast } from 'sonner';
 
 
 export default function RightSidebar() {

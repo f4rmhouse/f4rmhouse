@@ -6,6 +6,7 @@ import getSession from "../context/getSession";
 import { redirect } from 'next/navigation'
 import User from "../microstore/User";
 import KeyboardHandlerWrapper from "../components/KeyboardHandlerWrapper";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "f4rmhouse",
@@ -48,6 +49,7 @@ export default async function DashboardLayout({children,}: Readonly<{children: R
         <KeyboardHandlerWrapper />
         <div>
           <div className="flex md:mt-0">
+            <Toaster />
             <div>{children}</div>
               <div>
               {err ? 
