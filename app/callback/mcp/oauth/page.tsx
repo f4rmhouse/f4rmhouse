@@ -5,8 +5,10 @@ import { useSession } from 'next-auth/react';
 import User from '@/app/microstore/User';
 import Store from '@/app/microstore/Store';
 import MCPAuthHandler from '@/app/MCPAuthHandler';
+import { useTheme } from '@/app/context/ThemeContext';
 
 export default function OAuthCallbackPage() {
+  const { theme } = useTheme()
   const searchParams = useSearchParams();
   const [authStatus, setAuthStatus] = useState('Processing authorization...');
   const [error, setError] = useState('');
@@ -104,7 +106,7 @@ export default function OAuthCallbackPage() {
               }
               return prev - 1;
             });
-          }, 5000);
+          }, 1000);
         } catch (err) {
           console.error('OAuth callback error:', err);
           setError('Failed to process authorization');
@@ -131,12 +133,12 @@ export default function OAuthCallbackPage() {
   } 
   
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center p-24">
+    <div className={`flex min-h-screen flex-col items-center justify-center p-24 ${theme.textColorSecondary} ${theme.backgroundColor}`}>
       <h1 className="text-4xl font-bold mb-4">
         OAuth Authentication
       </h1>
       
-      <div className="mt-8 p-6 bg-white rounded-lg shadow-md w-full max-w-md">
+      <div className={`mt-8 p-6 ${theme.primaryColor} rounded-lg shadow-md w-full max-w-md`}>
         {error ? (
           <div className="text-red-500">
             <p className="font-bold">Error</p>

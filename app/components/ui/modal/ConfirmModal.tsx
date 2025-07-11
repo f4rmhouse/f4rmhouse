@@ -2,18 +2,18 @@
  * ConfirmModal is a yes/no confirmation shown to the user
  */
 import Modal from "./Modal"
+import { useTheme } from "@/app/context/ThemeContext"
 
 export default function ConfirmModal(
     {content,open,setIsOpen, title, action}: 
     Readonly<{content: string, open: boolean, setIsOpen: (b:boolean) => void, title:string, action: () => void}>) {
 
+  const { theme } = useTheme()
+
   return (
     <Modal open={open} title={title}>
       <div className="flex border-neutral-700">
-        <div className="text-yellow-500 bg-opacity-50 rounded-full p-2">
-        <p className="text-4xl">🤔</p>
-        </div>
-        <p className="mt-auto mb-auto ml-5 text-sm">{content}</p>
+        <p className={`mt-auto mb-auto ml-5 text-sm ${theme.textColorSecondary}`}>{content}</p>
       </div>
       <div className="flex m-2">
         <div className="flex ml-auto gap-2">
