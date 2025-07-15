@@ -14,7 +14,6 @@
     "@aws-sdk/credential-providers": "^3.693.0",
     "@aws-sdk/util-dynamodb": "^3.693.0",
     "@langchain/anthropic": "^0.3.19",
-    "@langchain/community": "^0.3.48",
     "@langchain/google-genai": "^0.2.12",
     "@langchain/groq": "^0.2.3",
     "@langchain/langgraph": "^0.2.72",

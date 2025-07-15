@@ -21,7 +21,6 @@ import {ChatGoogleGenerativeAI} from "@langchain/google-genai";
 import User from "@/app/microstore/User";
 import { MCPToolType, Prompt, Tool } from "@/app/components/types/MCPTypes";
 import { ToolPermission } from "@/app/components/types/ToolPermissionType";
-import { ChatMoonshot } from "@langchain/community/chat_models/moonshot";
 
 class ModelFactory {
   static create(config: ModelConfig): BaseChatModel {
@@ -53,13 +52,6 @@ class ModelFactory {
           maxRetries: 2,
           temperature: 0.8,
         });
-      case "moonshot":
-        return new ChatMoonshot({
-          model: id,
-          apiKey: process.env.MOONSHOT_SECRET,
-          maxRetries: 2,
-          temperature: 0.8,
-        });
       case 'local':
         return new ChatOllama({
           model: "llama3.2",
@@ -88,7 +80,7 @@ class ToolManager {
           parameters: t.inputSchema,
           authorization: tool.authorization,
           caller: caller,
-          uri: tool.uri.replace("EXA_OFFICIAL_API_KEY", process.env.EXA_OFFICIAL_API_KEY || ""),
+          uri: tool.uri,
           transport: tool.transport,
           mcp_type: "tool",
           allowList: allowList,

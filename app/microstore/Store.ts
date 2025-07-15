@@ -63,7 +63,6 @@ class Store {
   }
 
   async getProduct(uti: string): Promise<{Code: number, Message: ProductType}> {
-    console.log("Base URL: " + this.baseUrl);
     try {
       const response: AxiosResponse = await axios.get(
         `${this.baseUrl}/store/get/uti/product?uti=${uti}`,

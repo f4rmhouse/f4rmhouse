@@ -37,7 +37,7 @@ export default function Home() {
       case "small_cards":
         return (
           <div className="mt-10 mb-10 sm:ml-12">
-            <h2 className={`sm:pl-0 text-xl ${theme.textColorPrimary}`}>Servers</h2>
+            <h2 className={`sm:pl-0 text-xl ${theme.textColorPrimary}`}>Popular Servers</h2>
             <SmallAppCardGrid apps={section.content}/>
           </div>
         )
