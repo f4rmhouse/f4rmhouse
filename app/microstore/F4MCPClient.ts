@@ -28,6 +28,7 @@ class F4MCPClient {
   private caller: User | null = null
 
   private testing = false;
+  private base_url = (process.env.NEXT_PUBLIC_APP_ENV === 'production' ? 'https://api.f4rmhouse.com' : 'http://localhost:8000');
 
   /**
    * Creates a new F4MCPClient instance
@@ -294,10 +295,10 @@ class F4MCPClient {
         // Encode the serverURL to safely use it as a URL parameter
         const encodedServerURL = encodeURIComponent(serverURL);
 
-        let url = new URL(`http://localhost:3000/api/mcp/streamable?server_uri=${encodedServerURL}`)
+        let url = new URL(`${this.base_url}/api/mcp/streamable?server_uri=${encodedServerURL}`)
 
         if(transport == "sse") {
-          url = new URL(`http://localhost:3000/api/mcp/sse?server_uri=${encodedServerURL}`)
+          url = new URL(`${this.base_url}/api/mcp/sse?server_uri=${encodedServerURL}`)
         }
 
         if(this.testing) {
@@ -337,9 +338,9 @@ class F4MCPClient {
   async _connectWithMCPServerWithoutAuth(uti: string, serverURL: string, client: Client, transport: string) {
     // console.info("No auth needed for this server. Proceed to connection.")
 
-    let encodedURL = "http://localhost:3000/api/mcp/streamable?server_uri=" + encodeURIComponent(serverURL);
+    let encodedURL = `${this.base_url}/api/mcp/streamable?server_uri=${encodeURIComponent(serverURL)}`;
     if(transport == "sse") {
-      encodedURL = "http://localhost:3000/api/mcp/sse?server_uri=" + encodeURIComponent(serverURL);
+      encodedURL = `${this.base_url}/api/mcp/sse?server_uri=${encodeURIComponent(serverURL)}`;
     }
     let url = new URL(encodedURL);
 
@@ -452,9 +453,9 @@ class F4MCPClient {
     // }
     
     // Avoid CORS in issues streamable http by using proxy
-    let encodedURL = "http://localhost:3000/api/mcp/streamable?server_uri=" + encodeURIComponent(serverURL);
+    let encodedURL = `${this.base_url}/api/mcp/streamable?server_uri=${encodeURIComponent(serverURL)}`;
     if(transport == "sse") {
-      encodedURL = "http://localhost:3000/api/mcp/sse?server_uri=" + encodeURIComponent(serverURL);
+      encodedURL = `${this.base_url}/api/mcp/sse?server_uri=${encodeURIComponent(serverURL)}`;
     }
     let url = new URL(encodedURL);
 
