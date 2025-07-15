@@ -61,7 +61,7 @@ async function Dashboard() {
           </div>
         </div>
         
-        <div className="absolute bottom-0 flex right-24">
+        <div className="absolute hidden sm:flex bottom-0 flex right-24">
           <a 
             href="https://github.com/f4rmhouse/f4rmhouse" 
             target="_blank" 
