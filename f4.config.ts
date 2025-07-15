@@ -50,6 +50,9 @@ const config: Config = {
             {"id": "qwen/qwen3-32b", "name": "Qwen 3.2 32B", "provider": "groq", "logo": "https://brandlogos.net/wp-content/uploads/2025/06/qwen_icon-logo_brandlogos.net_gb71b-512x512.png"},
             {"id": "qwen-qwq-32b", "name": "Qwen QwQ 32B", "provider": "groq", "logo": "https://brandlogos.net/wp-content/uploads/2025/06/qwen_icon-logo_brandlogos.net_gb71b-512x512.png"},
         ],
+        "moonshot": [
+            {"id": "kimi-k2-0711-preview", "name": "Kimi K2 Preview", "provider": "moonshot", "logo": "https://media.licdn.com/dms/image/v2/D560BAQHwFiXHVZqcpA/company-logo_200_200/company-logo_200_200/0/1704352802668?e=2147483647&v=beta&t=pe9LRKD3jwxHyazkswfWDa9KWIyBTg2wbOYMnDwQ-nI"},
+        ],
         "openai": [
             { "id": "gpt-4o-mini", "name": "GPT-4o", "provider": "openai", "logo": "https://d-cb.jc-cdn.com/sites/crackberry.com/files/styles/large/public/article_images/2023/08/openai-logo.jpg"},
         ],

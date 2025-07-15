@@ -75,6 +75,9 @@ export default function ModelSelector({ onModelSelect, selectedModel }: { onMode
     if (config.models.google) {
       models = models.concat(config.models.google);
     }
+    if (config.models.moonshot) {
+      models = models.concat(config.models.moonshot);
+    }
     
     return models;
   };
