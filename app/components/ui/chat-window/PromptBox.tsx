@@ -392,7 +392,7 @@ export default function PromptBox(
                 <></>
               )}
         </div>
-        <div className={`mt-auto sticky transition-all ${state === "canvas" ? "w-[98%]" : "w-[99%]"} ml-1 mr-2 ${chatSession.getMessages().length > 0 ? "bottom-[10%] sm:bottom-0 pb-1" : "bottom-[calc(40vh)]"}`}>
+        <div className={`mt-auto sticky transition-all ${state === "canvas" ? "w-[98%]" : "w-[99%]"} ml-1 mr-2 ${chatSession.getMessages().length > 0 ? "bottom-0 pb-1" : "bottom-[calc(40vh)]"}`}>
           {/* Scroll buttons - only show when scrolling is available */}
           {isScrollable && chatSession.getMessages().length > 0 && (
             <div className="flex absolute bottom-10 right-0">

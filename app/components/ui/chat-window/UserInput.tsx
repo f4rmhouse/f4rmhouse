@@ -32,7 +32,7 @@ export default function UserInput({onSubmit, onChange, value, children}: {onSubm
   
   return(
     <form onSubmit={onSubmit} className={`${theme.secondaryColor ? theme.secondaryColor.replace("bg", "border") : "border neutral-700"} rounded-md flex flex-col ${theme.primaryColor ? theme.primaryColor : "bg-neutral-800"}`}>
-      <div className="flex w-full p-1">
+      <div className="flex w-full p-1 bottom-0">
         <textarea
           className={`border-none grow ${theme.textColorPrimary} ${theme.primaryColor ? theme.primaryColor : "bg-neutral-800"} border-none z-10 focus:outline-none focus:ring-0 resize-none min-h-[40px] max-h-[200px] overflow-y-auto`}
           value={value}

@@ -102,7 +102,7 @@ function Boxes({f4rmers, session}: {f4rmers:F4rmerType[],session:F4Session}) {
   };
 
   return(
-    <div className="absolute top-8 w-full h-[90%] overflow-hidden">
+    <div className="absolute top-8 w-full h-[95%] overflow-hidden">
       {/* Desktop Layout: Tabs on left, content on right */}
       <div className="hidden md:flex flex-row h-full">
         {/* Tab Bar - Left side on desktop */}
