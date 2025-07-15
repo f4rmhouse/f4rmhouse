@@ -457,14 +457,10 @@ export default function PromptBox(
         </div>
       </div>
     </div>
-    <div className="absolute bg-transparent sm:static ml-2 right-2 top-[40%]">
+    <div className="flex sm:block absolute bg-transparent bg-red-500 sm:static ml-2 right-2 left-0 top-0 sm:top-[40%]">
       <button onClick={() => state === "edit" ? setState("chat") : setState("edit")} className={`transition-all hover:rotate-[90deg] rounded-md p-2 ${theme.textColorPrimary ? theme.textColorPrimary : "text-white"}`}><Pencil size={15}/></button>
-      <div>
-        <AgentSelector />
-      </div>
-      <div>
-        <ModelSelector onModelSelect={(e:any) => {setSelectedModel(e)}} selectedModel={selectedModel}/>
-      </div>
+      <AgentSelector />
+      <ModelSelector onModelSelect={(e:any) => {setSelectedModel(e)}} selectedModel={selectedModel}/>
       <div className={`flex flex-col gap-2 ${chatSession.getMessages().length == 0 ? "opacity-0" : "opacity-100"}`}>
         <button onClick={clearChat} className={`transition-all hover:rotate-[-90deg] rounded-md p-2 ${theme.textColorPrimary ? theme.textColorPrimary : "text-white"}`}><RotateCcw size={15}/></button>
       </div> 

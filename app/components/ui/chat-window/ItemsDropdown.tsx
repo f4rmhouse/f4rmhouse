@@ -34,13 +34,13 @@ export default function ItemsDropdown({
 
   return (
     <div 
-      className={`transition-opacity duration-200 z-50 min-w-[200px] ${
+      className={`transition-opacity duration-200 z-50 min-w-0 sm:min-w-[200px] h-0 ${
         isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
       } 
       /* Desktop: absolute positioned relative to parent */
       md:absolute md:top-0 md:left-0 md:transform-none md:translate-x-0 md:translate-y-0
       /* Mobile: fixed positioned and centered on screen */
-      fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2`}
+      fixed`}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >

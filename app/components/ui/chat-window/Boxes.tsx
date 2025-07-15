@@ -92,38 +92,6 @@ function Boxes({f4rmers, session}: {f4rmers:F4rmerType[],session:F4Session}) {
     }
   };
   
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-  };
-  
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>, targetId: string) => {
-    e.preventDefault();
-    
-    if (draggedTabId && draggedTabId !== targetId) {
-      setTabs(prevTabs => {
-        // Find the indices of the dragged and target tabs
-        const draggedTabIndex = prevTabs.findIndex(tab => tab.id === draggedTabId);
-        const targetTabIndex = prevTabs.findIndex(tab => tab.id === targetId);
-        
-        if (draggedTabIndex === -1 || targetTabIndex === -1) return prevTabs;
-        
-        // Create a new array with the dragged tab moved to the target position
-        const newTabs = [...prevTabs];
-        const [draggedTab] = newTabs.splice(draggedTabIndex, 1);
-        newTabs.splice(targetTabIndex, 0, draggedTab);
-        
-        return newTabs;
-      });
-    }
-    
-    setDraggedTabId(null);
-  };
-  
-  const handleDragEnd = () => {
-    setDraggedTabId(null);
-  };
-
   // Update state for a specific tab
   const updateTabState = (id: string, newState: "canvas" | "chat" | "preview" | "edit") => {
     setTabs(prevTabs => 
@@ -134,83 +102,160 @@ function Boxes({f4rmers, session}: {f4rmers:F4rmerType[],session:F4Session}) {
   };
 
   return(
-    <div className="absolute flex flex-row top-8 w-full h-[95%] overflow-hidden">
-      {/* Tab Bar - Now on the left side */}
-      <div className={`flex flex-col items-start m-0 ${theme.backgroundColor} ${theme.secondaryColor} h-full`}>
-        <Reorder.Group 
-          axis="y" 
-          values={tabs} 
-          onReorder={setTabs} 
-          className="w-full"
-        >
-          <div>
-            {currentStep == 1 ? 
-              <img className='absolute top-[-50px] left-5 z-[-1]' height={300} width={300} src="https://f4-public.s3.eu-central-1.amazonaws.com/public/assets/session_tabs.png"/>
-            :
-            <></>}
-            {tabs.map(tab => (
-              <Reorder.Item 
-                key={tab.id} 
-                value={tab}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ 
-                  opacity: 1, 
-                  y: 0,
-                  backgroundColor: tab.isActive 
-                    ? theme.primaryColor?.replace('bg-', '') || '#1f2937' 
-                    : theme.secondaryColor?.replace('bg-', '') || 'transparent',
-                  color: tab.isActive 
-                    ? theme.textColorPrimary?.replace('text-', '') || 'text-black'
-                    : theme.textColorSecondary?.replace('text-', '') || '#9ca3af',
-                  borderLeft: tab.isActive ? '4px solid #ffde59' : '4px solid transparent',
-                  fontWeight: tab.isActive ? 600 : 400
-                }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ 
-                  type: "spring", 
-                  stiffness: 400, 
-                  damping: 30 
-                }}
-                className={`flex items-center w-full px-3 py-2 cursor-move ${theme.textColorPrimary} ${tab.isActive ? 'shadow-md' : ''}`}
-                onClick={() => activateTab(tab.id)}
-              >
-                <span className="mr-2 text-xs">{tab.title}</span>
-                <button 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    closeTab(tab.id);
+    <div className="absolute top-8 w-full h-[95%] overflow-hidden">
+      {/* Desktop Layout: Tabs on left, content on right */}
+      <div className="hidden md:flex flex-row h-full">
+        {/* Tab Bar - Left side on desktop */}
+        <div className={`flex flex-col items-start m-0 ${theme.backgroundColor} ${theme.secondaryColor} h-full`}>
+          <Reorder.Group 
+            axis="y" 
+            values={tabs} 
+            onReorder={setTabs} 
+            className="w-full"
+          >
+            <div>
+              {currentStep == 1 ? 
+                <img className='absolute top-[-50px] left-5 z-[-1]' height={300} width={300} src="https://f4-public.s3.eu-central-1.amazonaws.com/public/assets/session_tabs.png"/>
+              :
+              <></>}
+              {tabs.map(tab => (
+                <Reorder.Item 
+                  key={tab.id} 
+                  value={tab}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ 
+                    opacity: 1, 
+                    y: 0,
+                    backgroundColor: tab.isActive 
+                      ? theme.primaryColor?.replace('bg-', '') || '#1f2937' 
+                      : theme.secondaryColor?.replace('bg-', '') || 'transparent',
+                    color: tab.isActive 
+                      ? theme.textColorPrimary?.replace('text-', '') || 'text-black'
+                      : theme.textColorSecondary?.replace('text-', '') || '#9ca3af',
+                    borderLeft: tab.isActive ? '4px solid #ffde59' : '4px solid transparent',
+                    fontWeight: tab.isActive ? 600 : 400
                   }}
-                  className="hover:text-red-500 ml-auto"
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ 
+                    type: "spring", 
+                    stiffness: 400, 
+                    damping: 30 
+                  }}
+                  className={`flex items-center w-full px-3 py-2 cursor-move ${theme.textColorPrimary} ${tab.isActive ? 'shadow-md' : ''}`}
+                  onClick={() => activateTab(tab.id)}
                 >
-                  <X size={14} />
-                </button>
-              </Reorder.Item>
-            ))}
-          </div>
-        </Reorder.Group>
-        <button 
-          onClick={addTab}
-          className={`p-2 w-full flex justify-center ${theme.textColorPrimary|| 'text-gray-400'}`}
-        >
-          <div>
-            <Plus size={18} />
-          </div>
-        </button>
+                  <span className="mr-2 text-xs">{tab.title}</span>
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      closeTab(tab.id);
+                    }}
+                    className="hover:text-red-500 ml-auto"
+                  >
+                    <X size={14} />
+                  </button>
+                </Reorder.Item>
+              ))}
+            </div>
+          </Reorder.Group>
+          <button 
+            onClick={addTab}
+            className={`p-2 w-full flex justify-center ${theme.textColorPrimary|| 'text-gray-400'}`}
+          >
+            <div>
+              <Plus size={18} />
+            </div>
+          </button>
+        </div>
+        
+        {/* Tab Content - Desktop */}
+        <div className="flex-1 overflow-hidden">
+          {tabs.map(tab => (
+            <div key={tab.id} className={`flex h-full ${tab.isActive ? 'block' : 'hidden'}`}>
+              <PromptBox 
+                f4rmers={f4rmers} 
+                state={tab.state} 
+                setState={(newState) => updateTabState(tab.id, newState)} 
+                session={session}
+                addTab={() => addTab()}
+              />
+            </div>
+          ))}
+        </div>
       </div>
-      
-      {/* Tab Content */}
-      <div className="flex-1 overflow-hidden">
-        {tabs.map(tab => (
-          <div key={tab.id} className={`flex h-full ${tab.isActive ? 'block' : 'hidden'}`}>
-            <PromptBox 
-              f4rmers={f4rmers} 
-              state={tab.state} 
-              setState={(newState) => updateTabState(tab.id, newState)} 
-              session={session}
-              addTab={() => addTab()}
-            />
-          </div>
-        ))}
+
+      {/* Mobile Layout: Content on top, tabs on bottom */}
+      <div className="md:hidden flex flex-col h-full">
+        {/* Tab Content - Mobile */}
+        <div className="flex-1 overflow-hidden">
+          {tabs.map(tab => (
+            <div key={tab.id} className={`flex h-full ${tab.isActive ? 'block' : 'hidden'}`}>
+              <PromptBox 
+                f4rmers={f4rmers} 
+                state={tab.state} 
+                setState={(newState) => updateTabState(tab.id, newState)} 
+                session={session}
+                addTab={() => addTab()}
+              />
+            </div>
+          ))}
+        </div>
+
+        <div className={`flex flex-row items-center ${theme.backgroundColor} ${theme.secondaryColor} w-full`}>
+          <Reorder.Group 
+            axis="x" 
+            values={tabs} 
+            onReorder={setTabs} 
+            className="flex flex-row flex-1 overflow-x-auto"
+          >
+            <div className="flex flex-row">
+              {tabs.map(tab => (
+                <Reorder.Item 
+                  key={tab.id} 
+                  value={tab}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ 
+                    opacity: 1, 
+                    x: 0,
+                    backgroundColor: tab.isActive 
+                      ? theme.primaryColor?.replace('bg-', '') || '#1f2937' 
+                      : theme.secondaryColor?.replace('bg-', '') || 'transparent',
+                    color: tab.isActive 
+                      ? theme.textColorPrimary?.replace('text-', '') || 'text-black'
+                      : theme.textColorSecondary?.replace('text-', '') || '#9ca3af',
+                    borderTop: tab.isActive ? '4px solid #ffde59' : '4px solid transparent',
+                    fontWeight: tab.isActive ? 600 : 400
+                  }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ 
+                    type: "spring", 
+                    stiffness: 400, 
+                    damping: 30 
+                  }}
+                  className={`flex items-center px-3 py-2 cursor-move whitespace-nowrap ${theme.textColorPrimary} ${tab.isActive ? 'shadow-md' : ''}`}
+                  onClick={() => activateTab(tab.id)}
+                >
+                  <span className="mr-2 text-xs">{tab.title}</span>
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      closeTab(tab.id);
+                    }}
+                    className="hover:text-red-500"
+                  >
+                    <X size={14} />
+                  </button>
+                </Reorder.Item>
+              ))}
+            </div>
+          </Reorder.Group>
+          <button 
+            onClick={addTab}
+            className={`p-2 flex justify-center ${theme.textColorPrimary|| 'text-gray-400'} ${theme.accentColor} rounded-full shadow`}
+          >
+            <Plus size={18} />
+          </button>
+        </div>
       </div>
     </div>
   )
