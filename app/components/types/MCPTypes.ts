@@ -62,5 +62,6 @@ export type MCPToolType = {
   uri: string,
   uti:string,
   authorization: MCPOAuthType
+  auth_provider: string
   transport: string
 }

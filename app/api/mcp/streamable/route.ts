@@ -55,9 +55,6 @@ export async function POST(request: Request) {
         duplex: 'half',
       } as RequestInit & { duplex: 'half' });
 
-      const id = response.headers.get('mcp-session-id');
-      console.log('mcp session id: ', id);
-
       // Proxy the response stream with proper headers
       return response 
 

@@ -11,7 +11,6 @@ import { ToolNode } from "@langchain/langgraph/prebuilt";
 import { StateGraph, MessagesAnnotation } from "@langchain/langgraph";
 import { AIMessage, BaseMessage } from "@langchain/core/messages";
 import { BaseChatModel } from "@langchain/core/language_models/chat_models";
-import createF4Tool from "./f4-tool";
 import createMCPTool from "./mcp_sse_tool";
 import { ModelConfig, Endpoint, RequestBody } from "./agent.interfaces";
 import { LLMServiceError } from "./agent.errors";
@@ -70,6 +69,10 @@ class ToolManager {
     let f4tools: any[] = []
     if (!toolbox) return f4tools;
     for (const tool of toolbox) {
+      console.log("Tool: ", tool)
+      if(tool.auth_provider == "api_key") {
+        tool.uri = tool.uri.replace(`${tool.uti.toUpperCase()}_API_KEY`, process.env[`${tool.uti.toUpperCase()}_API_KEY`]!)
+      }
       tool.tools.map((t: Tool) => {
         f4tools.push(createMCPTool({
           uti: tool.uti,

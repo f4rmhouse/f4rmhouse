@@ -247,6 +247,7 @@ class F4MCPClient {
             uri: res.uri,
             uti: uti,
             authorization: this.metadata.get(uti)?.server.authorization,
+            auth_provider: this.metadata.get(uti)?.server.auth_provider,
             transport: this.metadata.get(uti)?.server.transport
           })
         }

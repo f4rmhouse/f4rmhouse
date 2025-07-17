@@ -72,7 +72,7 @@ function createMCPTool({ uti, endpoint, title, tool_description, parameters, aut
                     console.log("Notification: ", notification)
                 }
             });
-            const baseUrl = process.env.NEXT_PUBLIC_APP_ENV === 'production' ? 'http://localhost:8000' : 'http://localhost:8000';
+            // const baseUrl = process.env.NEXT_PUBLIC_APP_ENV === 'production' ? 'http://localhost:8000' : 'http://localhost:8000';
             // Check if auth needed
             // TODO: Add auth check
             let askUserForConfirmation = false 
@@ -116,6 +116,7 @@ function createMCPTool({ uti, endpoint, title, tool_description, parameters, aut
 
             let mcpStreamableHTTPtransport: StreamableHTTPClientTransport;
             let mcpSSEtransport: SSEClientTransport;
+            console.log("URI: ", uri)
             if(transport == "sse") {
                 const url = new URL(uri)
                 mcpSSEtransport = new SSEClientTransport(url, {
@@ -161,10 +162,14 @@ function createMCPTool({ uti, endpoint, title, tool_description, parameters, aut
                 let result : any;
                 let content: any;
                 if(mcp_type == "tool") {
+                    console.log("Calling tool: ", endpoint)
+                    console.log("Arguments: ", filteredArgs)
+                    console.log("tools: ", client.listTools)
                     result = await client.callTool({
                         name: endpoint,
                         arguments: filteredArgs,
                     }); 
+                    console.log("Result: ", result)
                     if (!result || !result.content) {
                         throw new Error('Empty response');
                     }
