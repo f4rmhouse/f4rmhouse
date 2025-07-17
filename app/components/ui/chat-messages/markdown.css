@@ -100,12 +100,53 @@
   border-collapse: collapse;
   width: 100%;
   margin-bottom: 1rem;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.markdown-content th,
+.markdown-content th {
+  background-color: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  padding: 0.75rem 0.5rem;
+  font-weight: 600;
+  text-align: left;
+  font-size: 0.9rem;
+}
+
 .markdown-content td {
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  padding: 0.5rem;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 0.75rem 0.5rem;
+  vertical-align: top;
+}
+
+.markdown-content tbody tr:nth-child(even) {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.markdown-content tbody tr:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+/* Responsive table wrapper */
+.markdown-content {
+  overflow-x: auto;
+}
+
+.markdown-content table {
+  min-width: 100%;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .markdown-content table {
+    font-size: 0.85rem;
+  }
+  
+  .markdown-content th,
+  .markdown-content td {
+    padding: 0.5rem 0.375rem;
+  }
 }
 
 .dark .markdown-content blockquote {
@@ -116,7 +157,23 @@
   color: #63b3ed;
 }
 
-.dark .markdown-content th,
+.dark .markdown-content th {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
 .dark .markdown-content td {
-  border-color: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark .markdown-content tbody tr:nth-child(even) {
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+.dark .markdown-content tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
+.dark .markdown-content table {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }

@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { Timer } from "lucide-react";
 import { useTheme } from "../../../context/ThemeContext"
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import './markdown.css';
 
 export default function NewAIMessage({id, message, latency}:{id: string, message:string| undefined, latency: number}) {
@@ -16,7 +17,7 @@ export default function NewAIMessage({id, message, latency}:{id: string, message
           <div>
             <div className={`${theme.textColorPrimary} ${theme.aiMessageStyle ? theme.aiMessageStyle : "bg-transparent"} rounded-lg`}>
               <div className="markdown-content m-0" style={{backgroundColor: 'inherit', padding:0}}>
-                <ReactMarkdown>{message}</ReactMarkdown>
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>{message}</ReactMarkdown>
               </div>
             </div>
           </div>

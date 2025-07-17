@@ -41,6 +41,7 @@
     "react-markdown": "^10.1.0",
     "recharts": "^2.13.0-alpha.5",
     "remark": "^15.0.1",
+    "remark-gfm": "^4.0.1",
     "remark-html": "^16.0.1",
     "sharp": "^0.34.1",
     "sonner": "^2.0.6",

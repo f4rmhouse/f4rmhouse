@@ -73,7 +73,6 @@ export default function RightSidebar() {
             >
               <HardDrive size={20}/> Add custom server
             </button>
-            <button className={`hover:${theme.textColorPrimary} p-2 rounded-md transition-all hover:${theme.hoverColor} cursor-pointer flex ${theme.textColorSecondary} w-full text-base gap-3 my-auto`}><BrainCircuit size={20}/> Add local model</button>
           </div>
         </div>
       </div>
