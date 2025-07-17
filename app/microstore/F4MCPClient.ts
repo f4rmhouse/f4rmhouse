@@ -28,7 +28,7 @@ class F4MCPClient {
   private caller: User | null = null
 
   private testing = false;
-  private base_url = (process.env.NEXT_PUBLIC_APP_ENV === 'production' ? 'https://f4rmhouse.com' : 'http://localhost:3000');
+  private base_url = (process.env.NEXT_PUBLIC_APP_ENV === 'production' ? 'https://app.f4rmhouse.com' : 'http://localhost:3000');
 
   /**
    * Creates a new F4MCPClient instance
