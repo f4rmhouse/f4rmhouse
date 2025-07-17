@@ -21,6 +21,7 @@ export const MCP_PROXY_CONFIG: ProxySecurityConfig = {
     // Local development
     'localhost',
     '127.0.0.1',
+    'app.f4rmhouse.com',
     
     // Trusted MCP servers - ADD YOUR SERVERS HERE
     'mcp.deepwiki.com',
@@ -30,7 +31,6 @@ export const MCP_PROXY_CONFIG: ProxySecurityConfig = {
     'mcp.exa.ai',
     'mcp.context7.com',
     'mcp.icons8.com',
-    'f4rmhouse.com',
     
     // Example: Add your own MCP servers
     // 'your-mcp-server.com',
@@ -81,9 +81,9 @@ export function getProxyConfig(): ProxySecurityConfig {
   // In production, ensure we're more restrictive
   if (process.env.NODE_ENV === 'production') {
     // Remove localhost in production if not needed
-    baseConfig.allowedHosts = baseConfig.allowedHosts.filter(
-      host => host !== 'localhost' && host !== '127.0.0.1' && host !== "f4rmhouse.com"
-    );
+    // baseConfig.allowedHosts = baseConfig.allowedHosts.filter(
+    //   host => host !== 'localhost' && host !== '127.0.0.1' && host !== "app.f4rmhouse.com"
+    // );
     
     // Reduce timeout in production
     baseConfig.timeoutMs = 20000;

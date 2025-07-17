@@ -46,6 +46,7 @@ const config: Config = {
     "loadingMessages": ["Generating slop...", "Analyzing Memes...", "Pretending to Like Matcha...", "Taking a coffee break...", "Summoning the Council of Elrond...", "Asking the Jedi Council...", "Generating slop..."],
     "models": {
         "groq": [
+            {"id": "moonshotai/kimi-k2-instruct", "name": "Kimi K2", "provider": "groq", "logo": "https://media.licdn.com/dms/image/v2/D560BAQHwFiXHVZqcpA/company-logo_200_200/company-logo_200_200/0/1704352802668?e=2147483647&v=beta&t=pe9LRKD3jwxHyazkswfWDa9KWIyBTg2wbOYMnDwQ-nI"},
             {"id": "meta-llama/llama-4-maverick-17b-128e-instruct", "name": "Llama 4 Maverick", "provider": "groq", "logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFM23hF3C0Gcai4Vk6TZHh5dsGwLpvpK28bA&s"},
             {"id": "qwen/qwen3-32b", "name": "Qwen 3.2 32B", "provider": "groq", "logo": "https://brandlogos.net/wp-content/uploads/2025/06/qwen_icon-logo_brandlogos.net_gb71b-512x512.png"},
             {"id": "qwen-qwq-32b", "name": "Qwen QwQ 32B", "provider": "groq", "logo": "https://brandlogos.net/wp-content/uploads/2025/06/qwen_icon-logo_brandlogos.net_gb71b-512x512.png"},

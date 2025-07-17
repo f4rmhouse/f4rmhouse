@@ -1,34 +1,5 @@
 import { extractAndValidateServerUri, secureFetch } from '@/app/lib/security/url-validator';
 import { getProxyConfig } from '@/app/lib/security/proxy-config';
-import { headers } from 'next/headers';
-
-/**
- * Parses Server-Sent Events (SSE) format to extract JSON-RPC data
- * @param sseText - The SSE formatted text containing event and data fields
- * @returns Parsed JSON-RPC object or null if parsing fails
- */
-function parseSSEToJsonRpc(sseText: string): any | null {
-  try {
-    // Split by lines and find the data line
-    const lines = sseText.split('\n');
-    
-    for (const line of lines) {
-      // Look for lines that start with "data: "
-      if (line.startsWith('data: ')) {
-        // Extract the JSON part after "data: "
-        const jsonString = line.substring(6); // Remove "data: " prefix
-        
-        // Parse the JSON string
-        return JSON.parse(jsonString);
-      }
-    }
-    
-    return null;
-  } catch (error) {
-    console.error('Error parsing SSE to JSON-RPC:', error);
-    return null;
-  }
-}
 
 export async function POST(request: Request) {
     // Extract and validate the server URI with SSRF protection
@@ -141,7 +112,6 @@ export async function GET(request: Request) {
 
       const responseText = await response.text();
       const id = response.headers.get('Mcp-Session-Id');
-      console.log('mcp sse id: ', id);
 
       // Proxy the response stream with proper SSE headers
       return new Response(response.body, {

@@ -27,7 +27,7 @@ const DEFAULT_CONFIG: SecurityConfig = {
     'mcp.exa.ai',
     'mcp.context7.com',
     'mcp.icons8.com',
-    'f4rmhouse.com',
+    'app.f4rmhouse.com',
     // Add your trusted MCP servers here
   ],
   // Only allow standard HTTP/HTTPS ports and common development ports
@@ -73,7 +73,7 @@ function isIpInCidr(ip: string, cidr: string): boolean {
  */
 async function isHostnameBlocked(hostname: string, config: SecurityConfig): Promise<boolean> {
   // Skip IP resolution for localhost and 127.0.0.1 as they're explicitly allowed
-  if (hostname=="f4rmhouse.com" || hostname === 'localhost' || hostname === '127.0.0.1') {
+  if (hostname=="app.f4rmhouse.com" || hostname === 'localhost' || hostname === '127.0.0.1') {
     return false;
   }
   
