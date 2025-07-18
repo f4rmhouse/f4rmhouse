@@ -20,10 +20,9 @@ import { toast } from 'sonner';
 export default function RightSidebar() {
   const { theme } = useTheme()
   const { completeStep, isStepCompleted } = useOnboarding();
-  const { selectedAgent } = useAgent();
+  const { selectedAgent, trustedServers, setTrustedServers } = useAgent();
 
   // Track trusted servers
-  const [trustedServers, setTrustedServers] = useState<{[key: string]: boolean}>({})
   const [showAddServerModal, setShowAddServerModal] = useState(false);
   const [visible, setVisible] = useState<boolean>(false)
 

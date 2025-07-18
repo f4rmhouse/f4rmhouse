@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { createContext, useContext, useState, useEffect, ReactNode, Dispatch, SetStateAction } from 'react'
 import F4rmerType from '../components/types/F4rmerType'
 import F4MCPClient from '../microstore/F4MCPClient'
 
@@ -10,6 +10,8 @@ type AgentContextType = {
   availableAgents: F4rmerType[]
   setAvailableAgents: (agents: F4rmerType[]) => void
   client: F4MCPClient
+  trustedServers: { [key: string]: boolean }
+  setTrustedServers: Dispatch<SetStateAction<{ [key: string]: boolean }>>
 }
 
 const AgentContext = createContext<AgentContextType | undefined>(undefined)
@@ -29,6 +31,7 @@ export function AgentProvider({ children }: { children: ReactNode }) {
   const [selectedAgent, setSelectedAgentState] = useState<F4rmerType | undefined>(undefined)
   const [availableAgents, setAvailableAgentsState] = useState<F4rmerType[]>([defaultAgent])
   const [client, setClient] = useState<F4MCPClient>(new F4MCPClient("default f4rmer", []))
+  const [trustedServers, setTrustedServers] = useState<{[key: string]: boolean}>({})
 
   // Wrapper for setSelectedAgent that also saves to localStorage
   const setSelectedAgent = (agent: F4rmerType) => {
@@ -81,7 +84,9 @@ export function AgentProvider({ children }: { children: ReactNode }) {
       setSelectedAgent, 
       availableAgents, 
       setAvailableAgents,
-      client
+      client,
+      trustedServers,
+      setTrustedServers
     }}>
       {children}
     </AgentContext.Provider>

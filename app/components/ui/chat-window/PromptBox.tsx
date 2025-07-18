@@ -33,6 +33,7 @@ import { useLoadingState } from "./hooks/useLoadingState";
 import { MessageHandlers } from "./utils/messageHandlers";
 import { helpContent } from '../../../docs/commands/help';
 import Timer from "../misc/Timer";
+import { ToolPermission } from "../../types/ToolPermissionType";
 
 /**
  * PromptBox is the text input box at the bottom of the screen on /f4rmers/details page
@@ -63,7 +64,7 @@ export default function PromptBox(
   }
 ){
   const { theme } = useTheme();
-  const { selectedAgent, setSelectedAgent, setAvailableAgents, client } = useAgent();
+  const { selectedAgent, setSelectedAgent, setAvailableAgents, client, trustedServers } = useAgent();
   
   // Custom hooks for state management
   const {
@@ -333,6 +334,19 @@ export default function PromptBox(
 
     let tools = await client.preparePrompt()
 
+    let permissions: ToolPermission[] = []
+
+    tools.map((tool) => {
+      if(trustedServers[tool.uti]) {
+        tool.tools.map((t) => {
+          permissions.push({
+            name: t.name,
+            arguments: "*"
+          })
+        })
+      }
+    })
+
     let postData: PostDataType = {
       messages: chatSession.getNextJSMessages(), 
       description: selectedAgent.jobDescription,
@@ -341,7 +355,7 @@ export default function PromptBox(
       f4rmer: selectedAgent.title,
       model: selectedModel,
       tools: tools,
-      allowList: []
+      allowList: permissions
     }
 
     // Send message

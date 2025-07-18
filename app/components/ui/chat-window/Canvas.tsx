@@ -11,7 +11,7 @@ export default function Canvas() {
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const [artifact, setArtifact] = useState<string>("")
   const { currentArtifact, artifacts, setCurrentArtifact } = useArtifact()
-  const [artifactType, setArtifactType] = useState<"image"|"html"|"video"|null>(null)
+  const [artifactType, setArtifactType] = useState<"image"|"html"|"video"|"url"|null>(null)
 
   // Function to get file name from URL
   const getFileName = (url: string) => {
@@ -19,9 +19,15 @@ export default function Canvas() {
     return parts[parts.length - 1];
   }
   
-  // Function to determine artifact type based on file extension
-  const getArtifactType = (url: string) => {
-    const format = url.split(".").pop()?.toLowerCase();
+  // Function to determine artifact type based on content or file extension
+  const getArtifactType = (content: string) => {
+    // Check if content is HTML by looking for DOCTYPE and html tags
+    if (content.includes("<!DOCTYPE html") && content.includes("</html>")) {
+      return "html";
+    }
+    
+    // Check file extension for URLs
+    const format = content.split(".").pop()?.toLowerCase();
     switch (format) {
       case "html":
         return "html";
@@ -32,6 +38,10 @@ export default function Canvas() {
       case "svg":
         return "image";
       default:
+        // If it starts with http/https, treat as URL
+        if (content.startsWith("http://") || content.startsWith("https://")) {
+          return "url";
+        }
         return "image";
     }
   }
@@ -43,6 +53,16 @@ export default function Canvas() {
       setArtifactType(artifactType)
       
       if (artifactType === "html" && iframeRef.current) {
+        // For HTML content, create a blob URL
+        const blob = new Blob([artifacts[artifacts.length-1]], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        iframeRef.current.src = url;
+        
+        // Cleanup function to revoke blob URL
+        return () => {
+          URL.revokeObjectURL(url);
+        };
+      } else if (artifactType === "url" && iframeRef.current) {
         iframeRef.current.src = artifacts[artifacts.length-1]
       }
     }
@@ -103,6 +123,12 @@ export default function Canvas() {
       {/* Content area */}
       <div className="flex-grow overflow-auto">
         {artifactType === "html" ? (
+          <div>
+            <div dangerouslySetInnerHTML={{__html: currentArtifact || ""}}>
+            </div>
+          </div>
+          
+        ) : artifactType === "url" ? (
           <iframe
             ref={iframeRef}
             src={currentArtifact || ""}

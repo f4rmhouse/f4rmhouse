@@ -75,7 +75,7 @@ function createMCPTool({ uti, endpoint, title, tool_description, parameters, aut
             // const baseUrl = process.env.NEXT_PUBLIC_APP_ENV === 'production' ? 'http://localhost:8000' : 'http://localhost:8000';
             // Check if auth needed
             // TODO: Add auth check
-            let askUserForConfirmation = false 
+            let askUserForConfirmation = true 
 
             allowList.map(e => {
                 if(e.name == endpoint) {
@@ -86,7 +86,7 @@ function createMCPTool({ uti, endpoint, title, tool_description, parameters, aut
             let accessToken = {Code: 0, Token: ""}
             if(askUserForConfirmation) {
                 return {
-                    message: "Confirmation needed. Inform user to confirm or cancel the request so that personal or confidential data isn't sent to the server.", 
+                    message: "Confirmation needed to continue. Please inform user to confirm or cancel the request so that personal or confidential data isn't sent to the server. DO NOT WRITE ANY 'SYNTHETIC RESPONSE' or HALLUCINATIONS", 
                     tool_identifier: endpoint, 
                     code: 401, 
                     data: {

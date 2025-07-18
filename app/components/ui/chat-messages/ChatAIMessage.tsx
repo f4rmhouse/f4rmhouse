@@ -1,12 +1,39 @@
 import { useEffect, useState, useRef } from "react";
 import { Timer } from "lucide-react";
 import { useTheme } from "../../../context/ThemeContext"
+import { useArtifact } from "../../../context/ArtifactContext";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import './markdown.css';
 
 export default function NewAIMessage({id, message, latency}:{id: string, message:string| undefined, latency: number}) {
   const { theme } = useTheme();
+  const { addArtifact } = useArtifact();
+  const [hasCreatedArtifact, setHasCreatedArtifact] = useState(false);
+
+  // Function to extract HTML content between DOCTYPE and closing html tags
+  const extractHTMLContent = (text: string): string | null => {
+    if (!text) return null;
+    
+    // Regular expression to match from <!DOCTYPE html> to </html>
+    // The 's' flag makes . match newlines as well
+    const htmlRegex = /<!DOCTYPE\s+html[^>]*>[\s\S]*?<\/html>/gi;
+    const match = text.match(htmlRegex);
+    
+    return match ? match[0] : null;
+  };
+
+  // Create artifact when HTML content is detected
+  useEffect(() => {
+    if (message?.includes("!DOCTYPE html") && message?.includes("</html>") && !hasCreatedArtifact) {
+      const htmlContent = extractHTMLContent(message);
+      if (htmlContent) {
+        console.log("Extracted HTML Artifact: ", htmlContent);
+        addArtifact(htmlContent);
+        setHasCreatedArtifact(true);
+      }
+    }
+  }, [message, addArtifact, hasCreatedArtifact]);
 
   return (
     <>
