@@ -376,7 +376,7 @@ export default function PromptBox(
         <div className={`relative m-auto mt-1 md:pt-0 w-[100vw] h-[100vh] sm:h-[93vh] ${state === "chat" || state === "edit" ? "sm:w-[16cm]" : "sm:w-[10cm]"} rounded-md ${theme.chatWindowStyle ? theme.chatWindowStyle : ""}`}>
           <div className="flex flex-col w-full transition-all duration-500 flex-grow h-full">
             <div
-              className={`overflow-auto scrollbar-hide p-2 flex flex-col w-full gap-5 transition-all duration-500 ${currentSession.length > 0 ? 'opacity-100' : 'opacity-0 h-0'}`}
+              className={`mb-20 sm:mb-0 overflow-auto scrollbar-hide p-2 flex flex-col w-full gap-5 transition-all duration-500 ${currentSession.length > 0 ? 'opacity-100' : 'opacity-0 h-0'}`}
               ref={messageContainerRef}
             >
               {chatSession.messagesTypes.length > 0 ? (
@@ -406,7 +406,7 @@ export default function PromptBox(
                 <></>
               )}
         </div>
-        <div className={`mt-auto sticky transition-all ${state === "canvas" ? "w-[98%]" : "w-[99%]"} ml-1 mr-2 ${chatSession.getMessages().length > 0 ? "bottom-0 pb-1" : "bottom-[calc(40vh)]"}`}>
+        <div className={`mt-auto sticky transition-all ${state === "canvas" ? "w-[98%]" : "w-[99%]"} ml-1 mr-2 ${chatSession.getMessages().length > 0 ? "bottom-0 pb-1" : "bottom-[calc(0vh)] sm:bottom-[calc(40vh)]"}`}>
           {/* Scroll buttons - only show when scrolling is available */}
           {isScrollable && chatSession.getMessages().length > 0 && (
             <div className="flex absolute bottom-10 right-0">
@@ -437,7 +437,7 @@ export default function PromptBox(
             </div>
           )}
           <div className={`${chatSession.getMessages().length === 0 ? "block" : "hidden"} pb-1`}>
-            <h1 className={`flex text-base m-auto sm:text-2xl ${theme.textColorPrimary ? theme.textColorPrimary : "text-white"}`}>{welcomeMessage} <img className="my-auto w-10" src={"https://media.tenor.com/R7JF4cuIjogAAAAj/spongebob-spongebob-meme.gif"} /></h1>
+            <h1 className={`hidden sm:flex text-base m-auto sm:text-2xl ${theme.textColorPrimary ? theme.textColorPrimary : "text-white"}`}>{welcomeMessage} <img className="my-auto w-10" src={"https://media.tenor.com/R7JF4cuIjogAAAAj/spongebob-spongebob-meme.gif"} /></h1>
           </div>
           <UserInput onSubmit={sendMessage} onChange={handleInputChange} value={input}>
             <div className="flex p-0">
