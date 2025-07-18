@@ -376,7 +376,7 @@ export default function PromptBox(
         <div className={`relative m-auto mt-1 md:pt-0 w-[100vw] h-[100vh] sm:h-[93vh] ${state === "chat" || state === "edit" ? "sm:w-[16cm]" : "sm:w-[10cm]"} rounded-md ${theme.chatWindowStyle ? theme.chatWindowStyle : ""}`}>
           <div className="flex flex-col w-full transition-all duration-500 flex-grow h-full">
             <div
-              className={`mb-20 sm:mb-0 overflow-auto scrollbar-hide p-2 flex flex-col w-full gap-5 transition-all duration-500 ${currentSession.length > 0 ? 'opacity-100' : 'opacity-0 h-0'}`}
+              className={`pb-40 sm:mb-0 overflow-auto scrollbar-hide p-2 flex flex-col w-full gap-5 transition-all duration-500 ${currentSession.length > 0 ? 'opacity-100' : 'opacity-0 h-0'}`}
               ref={messageContainerRef}
             >
               {chatSession.messagesTypes.length > 0 ? (
@@ -472,10 +472,10 @@ export default function PromptBox(
       </div>
     </div>
     <div className="flex sm:block absolute bg-transparent bg-red-500 sm:static ml-2 right-2 left-0 top-0 sm:top-[40%]">
-      <button onClick={() => state === "edit" ? setState("chat") : setState("edit")} className={`transition-all hover:rotate-[90deg] rounded-md p-2 ${theme.textColorPrimary ? theme.textColorPrimary : "text-white"}`}><Pencil size={15}/></button>
+      <button onClick={() => state === "edit" ? setState("chat") : setState("edit")} className={`transition-all hover:rotate-[90deg] rounded-md p-2 ${theme.textColorPrimary ? theme.textColorPrimary : "text-white"} hidden sm:block`}><Pencil size={15}/></button>
       <AgentSelector />
       <ModelSelector onModelSelect={(e:any) => {setSelectedModel(e)}} selectedModel={selectedModel}/>
-      <div className={`flex flex-col gap-2 ${chatSession.getMessages().length == 0 ? "opacity-0" : "opacity-100"}`}>
+      <div className={`hidden sm:flex flex-col gap-2 ${chatSession.getMessages().length == 0 ? "opacity-0" : "opacity-100"}`}>
         <button onClick={clearChat} className={`transition-all hover:rotate-[-90deg] rounded-md p-2 ${theme.textColorPrimary ? theme.textColorPrimary : "text-white"}`}><RotateCcw size={15}/></button>
       </div> 
     </div>

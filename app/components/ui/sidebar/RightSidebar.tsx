@@ -42,7 +42,7 @@ export default function RightSidebar() {
   }, []);
 
   return (
-    <div>
+    <div className="hidden sm:block">
       <div onMouseEnter={() => setVisible(true)} onMouseLeave={() => setVisible(false)} className={`p-2 fixed right-0 w-[50%] sm:w-[25%] mt-9 h-[92vh] z-10 top-0 border-${theme.secondaryColor?.replace("bg-", "")} ${theme.chatWindowStyle} transition-transform duration-300 ease-in-out rounded-md transform p-3 ${visible ? 'translate-x-0' : 'translate-x-full'}`}>
         <div className='h-[95%] flex flex-col'>
           <p className={`pl-2 pb-2 flex text-base flex mb-2 ${theme.textColorPrimary}`}><span className='my-auto'>{selectedAgent?.title}</span></p>

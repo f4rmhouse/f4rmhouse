@@ -18,7 +18,6 @@ export default async function NavButtonGroup() {
     <div className="w-full md:block md:w-auto flex m-auto">
       {session ? 
         <div className="flex">
-          <IconButton name="Create f4rmer" href="/dashboard/f4rmers/create"><SmilePlus className="m-auto hover:rotate-[45deg] transition-all" size={15}/></IconButton>
           <IconButton name="Store" href="/store"><Store className="m-auto" size={15}/></IconButton>
           <IconButton name="Home" href="/"><MessageSquareText className="m-auto" size={15}/></IconButton>
           <LogoutButton session={session}/>
@@ -26,7 +25,6 @@ export default async function NavButtonGroup() {
         </div>
         :
         <div className="flex gap">
-          <IconButton name="New f4rmer" href="/dashboard/f4rmers/create"><Plus className="m-auto" size={15}/></IconButton>
           <IconButton name="Store" href="/store"><Store className="m-auto" size={15}/></IconButton>
           <IconButton name="Home" href="/"><House className="m-auto" size={15}/></IconButton>
           <Link aria-label="Login" className="group transition-all text-sm rounded-md p-1 m-auto hover:bg-neutral-700 flex sm:p-2 text-xs sm:text-sm p-1" href="/login"><LogIn className="m-auto sm:mr-0" size={15}/></Link>
