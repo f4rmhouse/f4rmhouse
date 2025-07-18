@@ -73,7 +73,7 @@ async function Dashboard() {
             </div>
           </div>
         </div>
-        <div className="absolute bottom-2 flex right-24">
+        <div className="absolute hidden sm:flex bottom-0 flex right-24">
           <a 
             href="https://github.com/f4rmhouse/f4rmhouse" 
             target="_blank" 
@@ -88,10 +88,9 @@ async function Dashboard() {
           <p className="text-neutral-500 text-xs">v{config.version}</p>
         </div>
         {error && (
-            <div className="bg-black p-4 rounded absolute bottom-10 right-24">
-              <p className="text-neutral-100 text-xs">👩🏾‍💻 Running in local mode</p>
-              <p className="text-neutral-100 text-xs">Only local MCP tool calling available</p>
-            </div>
+          <div className="p-4 rounded absolute bottom-10 right-24">
+            <p className="text-xs">Running in local mode</p>
+          </div>
           )}
         </div>
       </div>
