@@ -19,6 +19,26 @@ export default function Canvas() {
     return parts[parts.length - 1];
   }
   
+  // Function to get display name for tab
+  const getTabName = (content: string, index: number) => {
+    const type = getArtifactType(content);
+    
+    if (type === "html") {
+      // Try to extract title from HTML content
+      const titleMatch = content.match(/<title[^>]*>([^<]+)<\/title>/i);
+      if (titleMatch && titleMatch[1]) {
+        return titleMatch[1].trim();
+      }
+      return `HTML Document ${index + 1}`;
+    }
+    
+    if (type === "url") {
+      return getFileName(content) || `Link ${index + 1}`;
+    }
+    
+    return getFileName(content) || `Artifact ${index + 1}`;
+  }
+  
   // Function to determine artifact type based on content or file extension
   const getArtifactType = (content: string) => {
     // Check if content is HTML by looking for DOCTYPE and html tags
@@ -96,7 +116,7 @@ export default function Canvas() {
                 : `${theme.textColorSecondary}`
             }`}
           >
-            <span className="max-w-[100px] truncate">{getFileName(artifactUrl)}</span>
+            <span className="max-w-[100px] truncate">{getTabName(artifactUrl, index)}</span>
           </button>
         ))}
       </div>
@@ -123,11 +143,11 @@ export default function Canvas() {
       {/* Content area */}
       <div className="flex-grow overflow-auto">
         {artifactType === "html" ? (
-          <div>
-            <div dangerouslySetInnerHTML={{__html: currentArtifact || ""}}>
-            </div>
-          </div>
-          
+          <iframe
+            src={`data:text/html;charset=utf-8,${encodeURIComponent(currentArtifact || "")}`}
+            className="h-full w-full border-none rounded-b-md"
+            sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+          />
         ) : artifactType === "url" ? (
           <iframe
             ref={iframeRef}

@@ -34,6 +34,7 @@ import { MessageHandlers } from "./utils/messageHandlers";
 import { helpContent } from '../../../docs/commands/help';
 import Timer from "../misc/Timer";
 import { ToolPermission } from "../../types/ToolPermissionType";
+import { useArtifact } from "@/app/context/ArtifactContext";
 
 /**
  * PromptBox is the text input box at the bottom of the screen on /f4rmers/details page
@@ -85,6 +86,7 @@ export default function PromptBox(
   } = useChatSession();
   
   const { loading, setLoading, currentLoadingMessage } = useLoadingState();
+  const {artifacts } = useArtifact();
   
   // Component state
   const messageContainerRef = useRef<HTMLDivElement | null>(null);
@@ -197,6 +199,12 @@ export default function PromptBox(
     chatSession.streaming = false
     setChatSession(chatSession)
   }, [loading])
+
+  useEffect(() => {
+    if(artifacts.length > 0){
+      setState("canvas")
+    }
+  }, [artifacts])
 
   // Scroll to top function
   const scrollToTop = () => {

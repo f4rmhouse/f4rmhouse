@@ -17,13 +17,13 @@ export function ArtifactProvider({ children }: { children: ReactNode }) {
 
   const addArtifact = (url: string) => {
     if (!artifacts.includes(url)) {
-      let _tmp = artifacts
-      _tmp.push(url)
-      setArtifacts(_tmp)
+      const newArtifacts = [...artifacts, url]
+      setArtifacts(newArtifacts)
       console.log("added artifact: ", url)
       setCurrentArtifact(url)
     } else {
       console.log("artifact already exists: ", url)
+      setCurrentArtifact(url) // Still set as current even if it exists
     }
   }
 
