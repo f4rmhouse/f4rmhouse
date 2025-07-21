@@ -176,7 +176,7 @@ export default function DetailPage({ params }: { params: Params }) {
             <span>{product.title}</span>
           </div>
           <div className="sm:grid sm:grid-cols-12 gap-6 mb-8">
-            <div className="sm:col-span-5 lg:col-span-7 rounded-lg overflow-hidden sticky top-5 self-start">
+            <div className="sm:col-span-5 lg:col-span-5 rounded-lg overflow-hidden sticky top-5 self-start">
               {showcase.length > 0 ? 
                 <div className="relative">
                   <ImageBanner images={showcase} />
@@ -192,7 +192,7 @@ export default function DetailPage({ params }: { params: Params }) {
               }
             </div>
             
-            <div className="col-span-12 sm:col-span-7 lg:col-span-5 flex flex-col mt-4 sm:mt-0">
+            <div className="col-span-12 sm:col-span-7 lg:col-span-7 flex flex-col mt-4 sm:mt-0">
               <div className="mb-4">
                 <h1 className="text-2xl sm:text-3xl mt-1 mb-1">{product.title}</h1>
                 <div className="flex items-center mb-2">

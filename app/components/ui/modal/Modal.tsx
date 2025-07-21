@@ -27,14 +27,9 @@ export default function Modal({children, open, title, onClose}: Readonly<{childr
     {isOpen ?
         <div id="popup-modal" onClick={handleBackdropClick} className="flex m-auto overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-10 w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
           <div className="relative m-auto z-50 p-4 w-full max-w-xl max-h-full">
-            <div className="relative z-50 rounded-lg shadow backdrop-blur-xl p-2" style={{
-              backgroundColor: theme.backgroundColor,
-              opacity: 1
-            }}>
+            <div className={`relative z-50 rounded-lg shadow p-2 ${theme.backgroundColor} ${theme.textColorPrimary}`}>
               <div className="flex">
-                <p className="font-bold text-xs" style={{
-                  color: theme.textColorPrimary
-                }}>{title.toLocaleUpperCase()}</p>
+                <p className="font-bold text-xs">{title.toLocaleUpperCase()}</p>
                 <button onClick={() => {
                   setIsOpen(false);
                   if (onClose) onClose();
@@ -43,7 +38,7 @@ export default function Modal({children, open, title, onClose}: Readonly<{childr
                   e.currentTarget.style.backgroundColor = theme.hoverColor;
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.backgroundColor = theme.backgroundColor;
                 }}><X /></button>
               </div>
               {children}

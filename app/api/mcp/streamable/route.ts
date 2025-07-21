@@ -108,14 +108,10 @@ export async function GET(request: Request) {
       }
 
       const responseText = await response.text();
-      const id = response.headers.get('Mcp-Session-Id');
+      // const id = response.headers.get('Mcp-Session-Id');
 
       // Proxy the response stream with proper SSE headers
-      return new Response(response.body, {
-        status: response.status,
-        statusText: response.statusText,
-        headers: response.headers,
-      });
+      return response 
 
     } catch (error) {
       console.error('Secure streamable SSE proxy error:', error);
