@@ -10,7 +10,7 @@ export default function Canvas() {
   const { theme } = useTheme();
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const [artifact, setArtifact] = useState<string>("")
-  const { currentArtifact, artifacts, setCurrentArtifact } = useArtifact()
+  const { currentArtifact, artifacts, setCurrentArtifact, updateArtifact } = useArtifact()
   const [artifactType, setArtifactType] = useState<"image"|"html"|"video"|"url"|null>(null)
 
   // Function to get file name from URL
@@ -105,16 +105,12 @@ export default function Canvas() {
   return (
     <div className={`relative h-full w-full rounded-md flex flex-col overflow-auto`}>
       {/* Tabs for artifacts */}
-      <div className={`absolute w-full flex overflow-x-auto ${theme.secondaryColor} bg-opacity-0 rounded-t-md`}>
+      <div className={`absolute z-10 w-full flex overflow-x-auto ${theme.secondaryColor} bg-opacity-0 rounded-t-md`}>
         {artifacts.map((artifactUrl, index) => (
           <button
             key={index}
-            onClick={() => setCurrentArtifact(artifactUrl)}
-            className={`px-3 py-2 text-sm whitespace-nowrap flex items-center gap-1 ${
-              currentArtifact === artifactUrl 
-                ? `${theme.primaryColor} ${theme.textColorPrimary}` 
-                : `${theme.textColorSecondary}`
-            }`}
+            onClick={() => updateArtifact(index)}
+            className={`px-3 py-2 text-sm whitespace-nowrap flex items-center gap-1 bg-black`}
           >
             <span className="max-w-[100px] truncate">{getTabName(artifactUrl, index)}</span>
           </button>
@@ -122,7 +118,7 @@ export default function Canvas() {
       </div>
       
       {/* Controls */}
-      <div className={`z-10 absolute flex gap-0 w-full items-center p-1`}>
+      <div className={`z-0 absolute flex gap-0 w-full items-center p-1`}>
         <button
           onClick={reloadIframe}
           className={`ml-auto rounded-md p-2 hover:rotate-[-90deg] ${theme.textColorPrimary} transition-all`}
