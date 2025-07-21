@@ -17,8 +17,8 @@ export default function ConfirmModal(
       </div>
       <div className="flex m-2">
         <div className="flex ml-auto gap-2">
-            <button onClick={() => setIsOpen(false)} className="rounded transition-all pl-4 pr-4 p-1 ml-auto hover:bg-gray-800 bg-neutral-700">Cancel</button>
-            <button onClick={action} className="rounded transition-all pl-4 pr-4 p-1 ml-auto hover:bg-teal-700 bg-teal-600">Yes I am sure</button>
+            <button onClick={() => setIsOpen(false)} className={`rounded transition-all pl-4 pr-4 p-1 ml-auto ${theme.secondaryColor} ${theme.textColorPrimary}`}>Cancel</button>
+            <button onClick={action} className={`rounded transition-all pl-4 pr-4 p-1 ml-auto ${theme.accentColor} ${theme.textColorPrimary}`}>Yes I am sure</button>
         </div>
       </div>
     </Modal>

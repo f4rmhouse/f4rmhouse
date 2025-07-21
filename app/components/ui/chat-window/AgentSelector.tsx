@@ -4,13 +4,21 @@ import { useTheme } from '@/app/context/ThemeContext';
 import { useAgent } from '@/app/context/AgentContext';
 import F4rmerType from '@/app/components/types/F4rmerType';
 import ItemsDropdown from './ItemsDropdown';
+import { useSession } from '@/app/context/SessionContext';
+import User from '@/app/microstore/User';
+import ConfirmModal from '../modal/ConfirmModal';
 
 export default function AgentSelector() {
   const { theme } = useTheme();
   const { selectedAgent, setSelectedAgent, availableAgents } = useAgent();
+
+  const session = useSession();
+
   const selectRef = useRef<HTMLSelectElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isHovering, setIsHovering] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [profileToDelete, setProfileToDelete] = useState<any>(null);
   const [isClicked, setIsClicked] = useState(false);
   
   const isDropdownVisible = isHovering || isClicked;
@@ -105,6 +113,27 @@ export default function AgentSelector() {
   const handleIconClick = () => {
     setIsClicked(!isClicked);
   };
+
+  const handleDeleteClick = (item: any) => {
+    const profile = availableAgents.filter(e => e.title === item.value)[0];
+    setProfileToDelete(profile);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDeleteProfile = () => {
+    if (profileToDelete && session?.user) {
+      const user = new User(session.user.email, session.provider, session.access_token);
+      user.deleteF4rmer(session.user.email, profileToDelete.uid).then(() => {
+        setShowDeleteModal(false);
+        setProfileToDelete(null);
+        // Refresh the available agents list
+        window.location.reload(); // You might want to implement a more elegant refresh
+      }).catch((error) => {
+        console.error('Failed to delete profile:', error);
+        alert('Failed to delete profile. Please try again.');
+      });
+    }
+  };
   
   return (
     <div className="relative" ref={containerRef}>
@@ -132,6 +161,7 @@ export default function AgentSelector() {
         isVisible={isDropdownVisible}
         title="Select Profile"
         onItemSelect={handleAgentSelect}
+        onDelete={(item:any) => handleDeleteClick(item)}
         onClose={() => {
           setIsClicked(false);
           setIsHovering(false);
@@ -154,6 +184,15 @@ export default function AgentSelector() {
           </option>
         ))}
       </select>
+      
+      {/* Delete confirmation modal */}
+      <ConfirmModal
+        open={showDeleteModal}
+        setIsOpen={setShowDeleteModal}
+        title="Delete Profile"
+        content={`Are you sure you want to delete the profile "${profileToDelete?.title}"? This action cannot be undone.`}
+        action={confirmDeleteProfile}
+      />
     </div>
   );
 }

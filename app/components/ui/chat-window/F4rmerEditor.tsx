@@ -41,7 +41,7 @@ export default function F4rmerEditor({ f4rmer, isVisible, onClose, onSave }: F4r
   
   return (
     <div className={`absolute right-[2%] w-[25%] mr-auto ${theme.secondaryColor || "bg-neutral-700"} p-4 transition-all duration-300 ease-in-out ${theme.textColorPrimary || "text-white"} rounded-md shadow-lg ${!isVisible ? "opacity-0 -translate-y-full invisible" : "opacity-100 translate-y-0 visible"}`}>
-      <p className={`text-xl font-medium mb-3 ${theme.textColorPrimary || "text-white"}`}>Edit f4rmer</p>
+      <p className={`text-xl font-medium mb-3 ${theme.textColorPrimary || "text-white"}`}>Edit profile</p>
       <div className="space-y-3">
         <div>
           <label className={`text-sm font-medium ${theme.textColorSecondary || "text-neutral-400"} block mb-1`}>F4rmer name</label>
@@ -66,7 +66,7 @@ export default function F4rmerEditor({ f4rmer, isVisible, onClose, onSave }: F4r
         <div className="flex justify-between mt-4">
           <button 
             onClick={onClose}
-            className={`cursor-pointer transition-all hover:opacity-80 rounded-md font-medium text-sm bg-neutral-800 py-2 px-6`}
+            className={`cursor-pointer ${theme.textColorPrimary|| "bg-neutral-800"} transition-all hover:opacity-80 rounded-md font-medium text-sm py-2 px-6`}
           >
             Cancel
           </button>

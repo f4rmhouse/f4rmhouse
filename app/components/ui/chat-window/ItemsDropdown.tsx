@@ -18,6 +18,7 @@ interface ItemsDropdownProps {
   onClose: () => void;
   onMouseEnter: () => void;
   onMouseLeave: () => void;
+  onDelete?: (item: any) => void;
 }
 
 export default function ItemsDropdown({
@@ -28,7 +29,8 @@ export default function ItemsDropdown({
   onItemSelect,
   onClose,
   onMouseEnter,
-  onMouseLeave
+  onMouseLeave,
+  onDelete
 }: ItemsDropdownProps) {
   const { theme } = useTheme();
 
@@ -62,6 +64,7 @@ export default function ItemsDropdown({
         {/* Items list */}
         <div className="py-1">
           {items.map((item: Item, i:number) => (
+            <div className='flex'>
             <button
               key={i}
               onClick={() => onItemSelect(item.value)}
@@ -78,6 +81,10 @@ export default function ItemsDropdown({
               }
               {item.value}
             </button>
+            {onDelete &&
+            <button onClick={() => onDelete(item)}><X size={16} /></button>
+            }
+            </div>
           ))}
         </div>
       </div>
