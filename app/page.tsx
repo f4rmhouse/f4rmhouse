@@ -3,6 +3,7 @@
  * an easy way to navigate different f4rmers for experiences users.
  */
 import { ReactElement, JSXElementConstructor, ReactNode, ReactPortal, AwaitedReactNode } from "react";
+import { redirect } from "next/navigation";
 import DashboardLayout from "./layout";
 import F4rmerType from "@/app/components/types/F4rmerType";
 import RightSidebar from "@/app/components/ui/sidebar/RightSidebar";
@@ -32,6 +33,12 @@ async function Dashboard() {
     creator: "f4rmhouse", 
     created: '2025-04-11 15:54:31'
   }]
+
+  console.log("session: ", session.user)
+
+  if(session.user && session.user.name !== "undefined") {
+    redirect("/dashboard")
+  }
 
   const store = new Store()
   try {
