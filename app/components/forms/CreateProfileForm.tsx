@@ -40,11 +40,11 @@ AI: "Absolutely! To get started, how many guests are you thinking of inviting? D
 Use this prompt to guide your responses effectively, ensuring that each interaction is productive and tailored to the user’s specific needs.`
 
 /**
- * CreateF4rmerForm is a form that allows a user to create a new f4rmer. User inputs name, description and
- * toolbox of f4rmer
+ * CreateProfileForm is a form that allows a user to create a new profile. User inputs name, description and
+ * toolbox of profile
  * @returns 
  */
-export default function CreateF4rmerForm() {
+export default function CreateProfileForm() {
   const router = useRouter()
   const { data: session } = useSession();
 
@@ -113,7 +113,7 @@ export default function CreateF4rmerForm() {
       body: JSON.stringify({
         description: SYS_PROMPT,
         messages: ['Generate a system prompt to a useful AI agent called ' + name + ' with short description: "' + shortDescription + '" (ignore it if it is empty)'],
-        model: { "id": "claude-sonnet-4-20250514", "name": "Claude 4 Sonnet", "provider": "anthropic"},
+        model: { "id": "moonshotai/kimi-k2-instruct", "name": "Kimi K2", "provider": "groq", "logo": "https://media.licdn.com/dms/image/v2/D560BAQHwFiXHVZqcpA/company-logo_200_200/company-logo_200_200/0/1704352802668?e=2147483647&v=beta&t=pe9LRKD3jwxHyazkswfWDa9KWIyBTg2wbOYMnDwQ-nI"},
       })
     });
 
@@ -194,31 +194,31 @@ export default function CreateF4rmerForm() {
   }
 
   return(
-    <div className="w-full ml-10">
+    <div className="">
       {isMobile ?
-      <div className="flex w-full h-[100vh]">
+      <div className="flex h-[100vh]">
         <div className="text-center p-4 m-auto">
-          <h2 className="text-xl font-semibold text-neutral-100 mb-2">Not Available on Mobile</h2>
-          <p className="text-neutral-400">Agent creation is only available on larger screens</p>
+          <h2 className="text-xl font-semibold mb-2">Not Available on Mobile</h2>
+          <p>Agent creation is only available on larger screens</p>
         </div>
       </div>
       :
-      <div className={`flex w-[90vw] m-auto lg:w-[90vw] p-3`}>
+      <div className={`flex m-auto`}>
       <div className="w-full">
-      <div className="flex items-center gap-2 mt-10">
+      <div className="flex items-center gap-2">
         <Link href="/" className="hover:opacity-80 transition-all">
         </Link>
-        <h1 className="text-2xl font-semibold text-neutral-100">Add Agent</h1>
+        <h1 className="text-2xl font-semibold">Add profile</h1>
       </div>
-      <div className="w-full bg-neutral-900/50 rounded-lg p-6">
+      <div className="w-full rounded-lg">
         <form onSubmit={(e) => submit(e)} className="flex flex-col gap-5">
           <div className="space-y-2">
             <label className="text-sm font-medium text-neutral-400">Name</label>
             <input 
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className={`w-full px-4 py-2 ${config.theme.primaryColor ?? "bg-neutral-800/50"} border ${config.theme.secondaryColor.replace("bg-", "border-") ?? "border-neutral-800"} rounded-md transition-all`}
-              placeholder="Enter agent name" 
+              className={`w-full border rounded-md transition-all`}
+              placeholder="Enter profile name" 
               name="name" 
               type="text"
             />
@@ -228,7 +228,7 @@ export default function CreateF4rmerForm() {
             <input 
               value={shortDescription}
               onChange={(e) => setShortDescription(e.target.value)}
-              className={`w-full px-4 py-2 ${config.theme.primaryColor ?? "bg-neutral-800/50"} border ${config.theme.secondaryColor.replace("bg-", "border-") ?? "border-neutral-800"} rounded-md transition-all`}
+              className={`w-full border rounded-md transition-all`}
               placeholder="Enter short description (optional)" 
               name="short description" 
               type="text"
@@ -237,7 +237,7 @@ export default function CreateF4rmerForm() {
           <div className="space-y-2">
             <label className="text-sm font-medium text-neutral-400">System prompt</label>
             <LineNumberedTextarea
-              className={`px-4 py-2 ${config.theme.primaryColor ?? "bg-neutral-800/50"} border ${config.theme.secondaryColor.replace("bg-", "border-") ?? "border-neutral-800"} rounded-md transition-all min-h-[120px]`}
+              className={`px-4 py-2 border rounded-md transition-all min-h-[120px]`}
               name="job_description" 
               placeholder="Describe the agent's primary task and responsibilities..."
               value={systemPrompt}
@@ -252,7 +252,7 @@ export default function CreateF4rmerForm() {
           </div>
           <div className="flex gap-2">
             <button 
-              className={`cursor-pointer transition-all ${config.theme.accentColor ?? "bg-neutral-500"} hover:${config.theme.hoverColor ?? "bg-neutral-600"} py-2 px-6 rounded-md ml-auto font-medium text-sm`}
+              className={`cursor-pointer transition-all ${config.theme.accentColor} py-2 px-6 rounded-md ml-auto font-medium text-sm`}
               onClick={(e) => {createAgent()}}
             >
               Create Profile 

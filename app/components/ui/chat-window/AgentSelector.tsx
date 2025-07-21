@@ -7,6 +7,8 @@ import ItemsDropdown from './ItemsDropdown';
 import { useSession } from '@/app/context/SessionContext';
 import User from '@/app/microstore/User';
 import ConfirmModal from '../modal/ConfirmModal';
+import Modal from '../modal/Modal';
+import CreateProfileForm from '../../forms/CreateProfileForm';
 
 export default function AgentSelector() {
   const { theme } = useTheme();
@@ -19,6 +21,7 @@ export default function AgentSelector() {
   const [isHovering, setIsHovering] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [profileToDelete, setProfileToDelete] = useState<any>(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
   const [isClicked, setIsClicked] = useState(false);
   
   const isDropdownVisible = isHovering || isClicked;
@@ -134,6 +137,10 @@ export default function AgentSelector() {
       });
     }
   };
+
+  const onAdd = () => {
+    setShowCreateModal(true);
+  }
   
   return (
     <div className="relative" ref={containerRef}>
@@ -168,6 +175,7 @@ export default function AgentSelector() {
         }}
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}
+        onAdd={onAdd}
       />
       
       {/* Hidden select for keyboard shortcuts compatibility */}
@@ -193,6 +201,11 @@ export default function AgentSelector() {
         content={`Are you sure you want to delete the profile "${profileToDelete?.title}"? This action cannot be undone.`}
         action={confirmDeleteProfile}
       />
+      
+      {/* Create profile modal */}
+      <Modal open={showCreateModal} title="Create New Profile" onClose={() => setShowCreateModal(false)}>
+        <CreateProfileForm />
+      </Modal>
     </div>
   );
 }

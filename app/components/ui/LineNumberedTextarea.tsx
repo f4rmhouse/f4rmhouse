@@ -46,7 +46,6 @@ export const LineNumberedTextarea: React.FC<LineNumberedTextareaProps> = ({ clas
     <div className="flex flex-col gap-1">
       <div className="text-right text-sm text-neutral-500">
         {wordCount} word{wordCount !== 1 ? 's ' : ''}
-        (~{wordCount*0.75} tokens)
       </div>
       <div className="relative flex">
         <div className="select-none pt-2 pr-2 text-right bg-neutral-800/30 rounded-l-md border-l border-t border-b border-neutral-700/50">

@@ -7,14 +7,12 @@ import { ChatOpenAI } from "@langchain/openai";
 import { ChatAnthropic } from "@langchain/anthropic";
 import { PromptTemplate } from "@langchain/core/prompts";
 import { Annotation } from "@langchain/langgraph";
-import { AIMessage, BaseMessage } from "@langchain/core/messages";
+import { BaseMessage } from "@langchain/core/messages";
 import { BaseChatModel } from "@langchain/core/language_models/chat_models";
-import { F4SessionStorage } from "@/app/microstore/Session";
-import { NextApiResponse } from "next";
 import { LLMServiceError } from "../agent.errors";
 import { ChatOllama } from "@langchain/ollama";
 import { ModelConfig, RequestBody } from "../agent.interfaces";
-import { StreamingTextResponse } from "ai";
+import {ChatGroq} from "@langchain/groq";
 
 class ModelFactory {
   static create(config: ModelConfig): BaseChatModel {
@@ -37,6 +35,12 @@ class ModelFactory {
         return new ChatOllama({
           model: "llama3.2",
           temperature: 0.8,
+          maxRetries: 2,
+        });
+      case 'groq':
+        return new ChatGroq({
+          model: id,
+          apiKey: process.env.GROQ_SECRET,
           maxRetries: 2,
         });
       default:

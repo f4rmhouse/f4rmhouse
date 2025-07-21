@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { X } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
 import { useTheme } from '@/app/context/ThemeContext';
 
 type Item = {
@@ -19,6 +19,7 @@ interface ItemsDropdownProps {
   onMouseEnter: () => void;
   onMouseLeave: () => void;
   onDelete?: (item: any) => void;
+  onAdd?: () => void;
 }
 
 export default function ItemsDropdown({
@@ -30,7 +31,8 @@ export default function ItemsDropdown({
   onClose,
   onMouseEnter,
   onMouseLeave,
-  onDelete
+  onDelete,
+  onAdd
 }: ItemsDropdownProps) {
   const { theme } = useTheme();
 
@@ -86,6 +88,9 @@ export default function ItemsDropdown({
             }
             </div>
           ))}
+          {onAdd &&
+            <button onClick={() => onAdd()} className={`flex w-full justify-center items-center px-4 py-2 text-xs hover:${theme.primaryColor} transition-colors ${theme.textColorSecondary}`}><Plus size={16} /></button>
+          }
         </div>
       </div>
     </div>
