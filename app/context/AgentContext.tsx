@@ -31,7 +31,7 @@ export function AgentProvider({ children }: { children: ReactNode }) {
   const [selectedAgent, setSelectedAgentState] = useState<F4rmerType | undefined>(undefined)
   const [availableAgents, setAvailableAgentsState] = useState<F4rmerType[]>([defaultAgent])
   const [client, setClient] = useState<F4MCPClient>(new F4MCPClient("default f4rmer", []))
-  const [trustedServers, setTrustedServers] = useState<{[key: string]: boolean}>({})
+  const [trustedServers, setTrustedServersState] = useState<{[key: string]: boolean}>({})
 
   // Wrapper for setSelectedAgent that also saves to localStorage
   const setSelectedAgent = (agent: F4rmerType) => {
@@ -55,7 +55,25 @@ export function AgentProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  // Load saved agent from localStorage on initial render
+  // Wrapper for setTrustedServers that also saves to localStorage
+  const setTrustedServers = (servers: {[key: string]: boolean} | ((prev: {[key: string]: boolean}) => {[key: string]: boolean})) => {
+    if (typeof servers === 'function') {
+      setTrustedServersState(prev => {
+        const newServers = servers(prev)
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('f4rmhouse-trusted-servers', JSON.stringify(newServers))
+        }
+        return newServers
+      })
+    } else {
+      setTrustedServersState(servers)
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('f4rmhouse-trusted-servers', JSON.stringify(servers))
+      }
+    }
+  }
+
+  // Load saved data from localStorage on initial render
   useEffect(() => {
     if (typeof window !== 'undefined') {
       // Try to load selected agent from localStorage
@@ -66,14 +84,24 @@ export function AgentProvider({ children }: { children: ReactNode }) {
           setSelectedAgentState(parsedAgent)
           setClient(new F4MCPClient(parsedAgent.title, parsedAgent.toolbox))
         } catch (error) {
-          console.error('Failed to parse saved agent:', error)
           setSelectedAgentState(defaultAgent)
           setClient(new F4MCPClient(defaultAgent.title, defaultAgent.toolbox))
         }
       } else {
-        // If no saved agent, use the default
         setSelectedAgentState(defaultAgent)
         setClient(new F4MCPClient(defaultAgent.title, defaultAgent.toolbox))
+      }
+
+      // Try to load trusted servers from localStorage
+      const savedTrustedServers = localStorage.getItem('f4rmhouse-trusted-servers')
+      if (savedTrustedServers) {
+        try {
+          const parsedServers = JSON.parse(savedTrustedServers) as {[key: string]: boolean}
+          setTrustedServersState(parsedServers)
+        } catch (error) {
+          console.error('Failed to parse saved trusted servers:', error)
+          setTrustedServersState({})
+        }
       }
     }
   }, [])
