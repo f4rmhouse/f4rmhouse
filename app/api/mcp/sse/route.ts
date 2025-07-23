@@ -51,10 +51,7 @@ export async function GET(request: Request) {
 
       // If we have a response body, proxy it
       if (response.body) {
-        return new Response(response.body, {
-          headers,
-          status: response.status,
-        });
+        return response 
       }
 
       // If no body, return empty SSE stream

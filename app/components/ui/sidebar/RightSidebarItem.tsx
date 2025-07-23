@@ -212,7 +212,7 @@ export default function RightSidebarItem(
   return (
     <div key={id} className="pl-1 pb-2">
       <div onClick={() => toggleToolSummary(id)} className={`flex w-full rounded-md}`}>
-        <img alt="action-thumbnail" className="ml-2 h-6 my-auto rounded-full aspect-square object-cover" height={15} src={"https://f4-public.s3.eu-central-1.amazonaws.com/showcases/" + tool.uti + "/thumbnail.jpg"}/>
+        <img alt="?" className="ml-2 h-6 my-auto rounded-full aspect-square object-cover" height={15} src={"https://f4-public.s3.eu-central-1.amazonaws.com/showcases/" + tool.uti + "/thumbnail.jpg"}/>
         {isOnline && getStatusIndicator(isOnline.status)}
         <p className={`ml-2 text-base hover:cursor-pointer ${theme.textColorPrimary} w-[90%]`}>{tool.title}</p>
         <ChevronRight 

@@ -16,7 +16,7 @@ export async function POST(request: Request) {
       duplex: 'half', // Required when forwarding a request body
     };
     
-    const response = await fetch("https://mcp.deepwiki.com/sse/message?sessionId=" + sessionId, fetchOptions);
+    const response = await fetch("https://mcp.api.coingecko.com/sse/message?sessionId=" + sessionId, fetchOptions);
 
     console.log("Response: ", response)
     

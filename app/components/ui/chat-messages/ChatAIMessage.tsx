@@ -28,12 +28,11 @@ export default function NewAIMessage({id, message, latency}:{id: string, message
     if (message?.includes("!DOCTYPE html") && message?.includes("</html>") && !hasCreatedArtifact) {
       const htmlContent = extractHTMLContent(message);
       if (htmlContent) {
-        console.log("Extracted HTML Artifact: ");
         addArtifact(htmlContent);
         setHasCreatedArtifact(true);
       }
     }
-  }, [message, addArtifact, hasCreatedArtifact]);
+  }, [message, hasCreatedArtifact]);
 
   return (
     <>

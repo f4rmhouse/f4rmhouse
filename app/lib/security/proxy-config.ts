@@ -31,6 +31,7 @@ export const MCP_PROXY_CONFIG: ProxySecurityConfig = {
     'mcp.exa.ai',
     'mcp.context7.com',
     'mcp.icons8.com',
+    'mcp.api.coingecko.com',
     
     // Example: Add your own MCP servers
     // 'your-mcp-server.com',

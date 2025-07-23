@@ -66,7 +66,7 @@ export default function ItemsDropdown({
         {/* Items list */}
         <div className="py-1">
           {items.map((item: Item, i:number) => (
-            <div className='flex'>
+            <div key={i} className='flex'>
             <button
               key={i}
               onClick={() => onItemSelect(item.value)}

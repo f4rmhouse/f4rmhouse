@@ -1,3 +1,4 @@
+import { useTheme } from '@/app/context/ThemeContext';
 import React, { useState, useRef, useEffect } from 'react';
 
 interface LineNumberedTextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
@@ -5,6 +6,7 @@ interface LineNumberedTextareaProps extends React.TextareaHTMLAttributes<HTMLTex
 }
 
 export const LineNumberedTextarea: React.FC<LineNumberedTextareaProps> = ({ className, ...props }) => {
+  const { theme } = useTheme();
   const [lineCount, setLineCount] = useState(1);
   const [wordCount, setWordCount] = useState(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -63,7 +65,7 @@ export const LineNumberedTextarea: React.FC<LineNumberedTextareaProps> = ({ clas
             {...props}
             ref={textareaRef}
             onChange={handleTextChange}
-            className={`w-full font-mono text-sm rounded-l-none whitespace-nowrap overflow-y-hidden ${className}`}
+            className={`w-full font-mono text-sm rounded-l-none whitespace-nowrap overflow-y-hidden ${className} ${theme.backgroundColor} ${theme.textColorPrimary}`}
             style={{
               scrollbarWidth: 'thin',
               scrollbarColor: 'var(--scrollbar-color) var(--scrollbar-bg)',

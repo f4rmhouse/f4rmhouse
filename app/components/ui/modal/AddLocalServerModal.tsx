@@ -90,11 +90,11 @@ export default function AddLocalServerModal({ open, onClose }: AddLocalServerMod
     let tmp = selectedAgent
     if(tmp && session) {
       tmp?.toolbox.push(product)
+      console.log("f4rmer: ", tmp)
       // @ts-expect-error
       let user = new User(session.user.email, session.provider, session.access_token)
       user.updateF4rmer(tmp).then(e => alert("Tool added successfully"))
     }
-    //setSelectedAgent(tmp)
   }
 
   return (

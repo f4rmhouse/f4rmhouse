@@ -103,14 +103,14 @@ export default function Canvas() {
   }
 
   return (
-    <div className={`relative h-full w-full rounded-md flex flex-col overflow-auto`}>
+    <div className={`relative h-full w-full flex flex-col overflow-auto`}>
       {/* Tabs for artifacts */}
-      <div className={`absolute z-10 w-full flex overflow-x-auto ${theme.secondaryColor} bg-opacity-0 rounded-t-md`}>
+      <div className={`absolute z-10 w-full flex overflow-x-auto ${theme.secondaryColor} bg-opacity-0 `}>
         {artifacts.map((artifactUrl, index) => (
           <button
             key={index}
             onClick={() => updateArtifact(index)}
-            className={`px-3 py-2 text-sm whitespace-nowrap flex items-center gap-1 bg-black`}
+            className={`text-xs whitespace-nowrap flex items-center gap-1 bg-black`}
           >
             <span className="max-w-[100px] truncate">{getTabName(artifactUrl, index)}</span>
           </button>
@@ -121,7 +121,7 @@ export default function Canvas() {
       <div className={`z-0 absolute flex gap-0 w-full items-center p-1`}>
         <button
           onClick={reloadIframe}
-          className={`ml-auto rounded-md p-2 hover:rotate-[-90deg] ${theme.textColorPrimary} transition-all`}
+          className={`ml-auto p-2 hover:rotate-[-90deg] ${theme.textColorPrimary} transition-all`}
           title="Reload content"
         >
           <RefreshCcw size={15} />

@@ -12,6 +12,7 @@ import ModelSelector from "@/app/components/ui/chat-window/ModelSelector";
 import { Sparkles } from "lucide-react";
 import PromptBoxSimple from "@/app/components/ui/chat-window/PromptBoxSimple";
 import ErrorModal from "@/app/components/ui/modal/ErrorModal";
+import { useTheme } from "@/app/context/ThemeContext";
 
 const SYS_PROMPT = `**System Prompt for AI Agent**
 
@@ -47,6 +48,7 @@ Use this prompt to guide your responses effectively, ensuring that each interact
 export default function CreateProfileForm() {
   const router = useRouter()
   const { data: session } = useSession();
+  const { theme } = useTheme();
 
   const [selectedModel, setSelectedModel] = useState<any>(config.models[Object.keys(config.models)[0]][0]);
   const [showPreview, setShowPreview] = useState<boolean>(false)
@@ -217,7 +219,7 @@ export default function CreateProfileForm() {
             <input 
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className={`w-full border rounded-md transition-all`}
+              className={`w-full border rounded-md transition-all ${theme.backgroundColor} ${theme.textColorPrimary}`}
               placeholder="Enter profile name" 
               name="name" 
               type="text"
@@ -228,7 +230,7 @@ export default function CreateProfileForm() {
             <input 
               value={shortDescription}
               onChange={(e) => setShortDescription(e.target.value)}
-              className={`w-full border rounded-md transition-all`}
+              className={`w-full border rounded-md transition-all ${theme.backgroundColor} ${theme.textColorPrimary}`}
               placeholder="Enter short description (optional)" 
               name="short description" 
               type="text"

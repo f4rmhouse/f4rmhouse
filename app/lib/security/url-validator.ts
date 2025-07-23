@@ -28,6 +28,7 @@ const DEFAULT_CONFIG: SecurityConfig = {
     'mcp.context7.com',
     'mcp.icons8.com',
     'app.f4rmhouse.com',
+    'mcp.api.coingecko.com',
     // Add your trusted MCP servers here
   ],
   // Only allow standard HTTP/HTTPS ports and common development ports

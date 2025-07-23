@@ -86,7 +86,7 @@ export default function PromptBox(
   } = useChatSession();
   
   const { loading, setLoading, currentLoadingMessage } = useLoadingState();
-  const {artifacts } = useArtifact();
+  const {artifacts, currentArtifact } = useArtifact();
   
   // Component state
   const messageContainerRef = useRef<HTMLDivElement | null>(null);
@@ -201,10 +201,11 @@ export default function PromptBox(
   }, [loading])
 
   useEffect(() => {
+    console.log("artifacts", artifacts)
     if(artifacts.length > 0){
       setState("canvas")
     }
-  }, [artifacts])
+  }, [artifacts, currentArtifact])
 
   // Scroll to top function
   const scrollToTop = () => {
@@ -504,7 +505,7 @@ export default function PromptBox(
       <></>
     }
     </div>
-    <div className={`flex transition-all ease-in-out rounded-md bg-transparent w-[65%] ${state !== "canvas" ? "opacity-0 hidden" : "opacity-100"}`}>
+    <div className={`flex transition-all ease-in-out bg-transparent w-[75%] ${state !== "canvas" ? "opacity-0 hidden" : "opacity-100"}`}>
       <Canvas />
     </div>
     <F4rmerEditor 
