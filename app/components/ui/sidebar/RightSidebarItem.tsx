@@ -177,6 +177,8 @@ export default function RightSidebarItem(
           tool.server.auth_provider
         )
 
+        console.log(connectionStatus)
+
         _isOnline = connectionStatus
       }
     } catch (error) {

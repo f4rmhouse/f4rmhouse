@@ -8,6 +8,7 @@ import { MCPConnectionStatus } from "../components/types/MCPConnectionStatus";
 import MCPAuthHandler from "../MCPAuthHandler";
 import Store from "./Store";
 import { toast } from "sonner";
+import { ToolListChangedNotificationSchema } from "@modelcontextprotocol/sdk/types.js";
 
 /**
  * F4MCPClient is a client for interacting with Model Context Protocol (MCP) servers.
@@ -22,7 +23,7 @@ class F4MCPClient {
   private metadata: Map<string, ProductType>
   
   /** Map of UTIs to MCP client connections */
-  private connections: Map<string, Client>
+  public connections: Map<string, Client>
   
   /** User object for authentication purposes */
   private caller: User | null = null
@@ -275,6 +276,12 @@ class F4MCPClient {
       version: "1.0.0"
     })
 
+    client.setNotificationHandler(ToolListChangedNotificationSchema, async () => {
+      console.log('Received notification that tools list changed, refreshing...');
+      let tools = await client.listTools()
+      console.log("tools: ", tools)
+    });
+
     // Check if we have authentication credentials for this server
     if(this.caller) {
       let token = await this.caller.getToken(uti)
@@ -369,7 +376,7 @@ class F4MCPClient {
         remoteAuthServerMetaDataEndpoint = serverURL.replace("sse", "") + ".well-known/oauth-authorization-server"
       }
       else {
-        remoteAuthServerMetaDataEndpoint = serverURL.replace("/mcp", "") + ".well-known/oauth-authorization-server"
+        remoteAuthServerMetaDataEndpoint = serverURL + "/.well-known/oauth-authorization-server"
       }
       let authMetadata: MCPConnectionStatus = {status: "error", remoteMetadata: {}, remoteAuthServerMetadata: {}}
 
@@ -444,7 +451,7 @@ class F4MCPClient {
 
     let customHeaders = {
       headers: {
-        "Authorization": authToken
+        "Authorization": authToken,
       }
     };
     // if(transport == "sse") {
@@ -465,6 +472,7 @@ class F4MCPClient {
 
   async _handleConnection(transport: string, url: URL, customHeaders: any, client: Client, uti: string, fetchWithAuth: any) {
     if (transport == "streamable_http") {
+      console.log("URL: ", url)
       let t = new StreamableHTTPClientTransport(url, {requestInit: customHeaders});
       try {
         await client.connect(t);

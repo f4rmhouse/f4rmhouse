@@ -30,6 +30,7 @@ export async function POST(request: Request) {
     // Extract authorization header from incoming request
     const authHeader = request.headers.get('Authorization');
     const mcpSessionId = request.headers.get('mcp-session-id');
+    console.log("MCP Session ID: ", mcpSessionId)
 
     // Build headers for the proxied request
     const proxyHeaders: Record<string, string> = {
@@ -71,7 +72,9 @@ export async function GET(request: Request) {
         'http://localhost:8081/mcp',
         getProxyConfig()
     );
-    
+
+    const mcpSessionId = request.headers.get('mcp-session-id');
+
     if (!validation.isValid) {
         console.error('SSRF Protection - Invalid URL:', validation.error);
         return new Response(`Invalid server URI: ${validation.error}`, { status: 400 });
@@ -93,10 +96,17 @@ export async function GET(request: Request) {
       proxyHeaders.Authorization = authHeader;
     }
 
+    if (mcpSessionId) {
+      proxyHeaders['mcp-session-id'] = mcpSessionId;
+    }
+
     try {
-      // Use secure fetch with SSRF protection
+      // Use secure fetch with SSRF protection but no timeout for streaming
       const response = await secureFetch(targetUrl, {
+        method: 'GET',
         headers: proxyHeaders,
+      }, {
+        timeoutMs: 0 // Disable timeout for streaming responses
       });
 
       if (response.status === 401) {
@@ -106,9 +116,6 @@ export async function GET(request: Request) {
       if (!response.body) {
         return new Response('No upstream stream', { status: 502 });
       }
-
-      const responseText = await response.text();
-      // const id = response.headers.get('Mcp-Session-Id');
 
       // Proxy the response stream with proper SSE headers
       return response 

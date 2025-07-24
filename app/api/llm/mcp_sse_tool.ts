@@ -4,6 +4,7 @@ import { SSEClientTransport } from "@modelcontextprotocol/sdk/client/sse.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 import { DynamicStructuredTool } from "@langchain/core/tools";
 import { z } from "zod";
+import { ToolListChangedNotificationSchema } from "@modelcontextprotocol/sdk/types.js";
 
 function createMCPTool({ uti, endpoint, title, tool_description, parameters, authorization, caller, uri, transport, mcp_type, allowList, generatedContent, onContentGenerated}: F4ToolParams) {
 
@@ -68,9 +69,6 @@ function createMCPTool({ uti, endpoint, title, tool_description, parameters, aut
             const client = new Client({
                 name: "f4rmhouse-client",
                 version: "1.0.0",
-                notificationHandler: (notification:any) => {
-                    console.log("Notification: ", notification)
-                }
             });
             // const baseUrl = process.env.NEXT_PUBLIC_APP_ENV === 'production' ? 'http://localhost:8000' : 'http://localhost:8000';
             // Check if auth needed
@@ -103,20 +101,23 @@ function createMCPTool({ uti, endpoint, title, tool_description, parameters, aut
 
             const authToken = "Bearer " + accessToken
 
+            console.log("Auth token: ", authToken)
+
             const fetchWithAuth = (url: string | URL, init?: RequestInit) => {
               const headers = new Headers(init?.headers);
-              headers.set("Authorization", authToken);
+              // headers.set("Authorization", authToken);
+              // headers.set("Mcp-Session-Id", "64c8cbf6-1012-4450-a981-35670b637a4a");
               return fetch(url.toString(), { ...init, headers });
             };
 
             const customHeaders = {
                 Authorization: authToken,
+                //"Mcp-Session-Id": "64c8cbf6-1012-4450-a981-35670b637a4a",
+                //"Last-Event-ID": "64c8cbf6-1012-4450-a981-35670b637a4a"
             };
-
 
             let mcpStreamableHTTPtransport: StreamableHTTPClientTransport;
             let mcpSSEtransport: SSEClientTransport;
-            console.log("URI: ", uri)
             if(transport == "sse") {
                 const url = new URL(uri)
                 mcpSSEtransport = new SSEClientTransport(url, {
@@ -130,7 +131,7 @@ function createMCPTool({ uti, endpoint, title, tool_description, parameters, aut
                 await client.connect(mcpSSEtransport);
             }
             else {
-                const url = new URL(uri)
+                const url = new URL("http://localhost:3000/api/mcp/streamable?server_uri=https%3A%2F%2Fmcp.apify.com")
                 mcpStreamableHTTPtransport = new StreamableHTTPClientTransport(url, {
                     requestInit: {
                         headers: customHeaders,
@@ -164,7 +165,6 @@ function createMCPTool({ uti, endpoint, title, tool_description, parameters, aut
                 if(mcp_type == "tool") {
                     console.log("Calling tool: ", endpoint)
                     console.log("Arguments: ", filteredArgs)
-                    console.log("tools: ", client.listTools)
                     result = await client.callTool({
                         name: endpoint,
                         arguments: filteredArgs,
@@ -191,14 +191,14 @@ function createMCPTool({ uti, endpoint, title, tool_description, parameters, aut
                 if(content.length > 2) {
                     // Call the callback to store the large content
                     onContentGenerated(content);
-                    client.close()
+                    // await client.close()
                     return ["The result does not fit into the context window."];
                 }
 
-                client.close()
+                // await client.close()
                 return content;
             } finally {
-                client.close();
+                // await client.close();
             }
         } catch (error) {
             console.error("Tool execution error:", error);

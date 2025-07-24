@@ -5,6 +5,68 @@ import { useArtifact } from "../../../context/ArtifactContext";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import './markdown.css';
+import { MermaidDiagram } from '@lightenna/react-mermaid-diagram';
+
+// Function to extract Mermaid charts from message content
+const extractMermaidCharts = (text: string) => {
+  const mermaidRegex = /```mermaid\s*\n([\s\S]*?)\n```/g;
+  const charts: { chart: string; index: number }[] = [];
+  let match;
+  
+  while ((match = mermaidRegex.exec(text)) !== null) {
+    charts.push({
+      chart: match[1].trim(),
+      index: match.index
+    });
+  }
+  
+  return charts;
+};
+
+// Function to split message content around Mermaid charts
+const splitMessageWithCharts = (text: string) => {
+  const mermaidRegex = /```mermaid\s*\n[\s\S]*?\n```/g;
+  const parts = [];
+  let lastIndex = 0;
+  let match;
+  
+  while ((match = mermaidRegex.exec(text)) !== null) {
+    // Add text before the chart
+    if (match.index > lastIndex) {
+      parts.push({
+        type: 'text',
+        content: text.slice(lastIndex, match.index)
+      });
+    }
+    
+    // Add the chart
+    const chartContent = match[0].replace(/```mermaid\s*\n/, '').replace(/\n```$/, '').trim();
+    parts.push({
+      type: 'mermaid',
+      content: chartContent
+    });
+    
+    lastIndex = match.index + match[0].length;
+  }
+  
+  // Add remaining text after the last chart
+  if (lastIndex < text.length) {
+    parts.push({
+      type: 'text',
+      content: text.slice(lastIndex)
+    });
+  }
+  
+  // If no charts found, return the original text
+  if (parts.length === 0) {
+    parts.push({
+      type: 'text',
+      content: text
+    });
+  }
+  
+  return parts;
+};
 
 export default function NewAIMessage({id, message, latency}:{id: string, message:string| undefined, latency: number}) {
   const { theme } = useTheme();
@@ -43,7 +105,22 @@ export default function NewAIMessage({id, message, latency}:{id: string, message
           <div>
             <div className={`${theme.textColorPrimary} ${theme.aiMessageStyle ? theme.aiMessageStyle : "bg-transparent"} rounded-lg`}>
               <div className="markdown-content m-0" style={{backgroundColor: 'inherit', padding:0}}>
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>{message}</ReactMarkdown>
+                {message && splitMessageWithCharts(message).map((part, index) => {
+                  if (part.type === 'mermaid') {
+                    return (
+                      <div key={index} className="my-4 p-4 border rounded-lg" style={{backgroundColor: theme.hoverColor || 'transparent'}}>
+                        <MermaidDiagram>{part.content}</MermaidDiagram>
+                      </div>
+                    );
+                  } else if (part.content.trim()) {
+                    return (
+                      <div key={index}>
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>{part.content}</ReactMarkdown>
+                      </div>
+                    );
+                  }
+                  return null;
+                })}
               </div>
             </div>
           </div>

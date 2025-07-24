@@ -234,7 +234,6 @@ export async function POST(req: NextRequest) {
           if (done) {
             // Include any generated content from tools before closing
             if (ToolManager.generatedContent.length > 0) {
-              console.log("generated content length: ", ToolManager.generatedContent.length)
               // Send each element as a separate chunk to handle large content
               for (let i = 0; i < ToolManager.generatedContent.length; i++) {
                 let content = ToolManager.generatedContent[i];

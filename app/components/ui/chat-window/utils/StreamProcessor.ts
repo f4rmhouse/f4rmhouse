@@ -28,24 +28,21 @@ export default class StreamProcessor {
     }
 
     static async processTokenChunk(chunk: string, chatSession: ChatSession, startTime: number, setLatestMessage: (message: string | ((prevMessage: string) => string)) => void, loading: boolean) {
-      // let vals = chunk.split("\n")
       if(chunk) {
         try {
           let jsonResponse = JSON.parse(chunk)
           if(jsonResponse[0].id[2] == "ToolMessage") {
             // Check if tool is asking for auth
-            let content = JSON.parse(jsonResponse[0].kwargs.content)
-            console.log("Content: ", content)
-            console.log("Code: ", content.code)
-            if(content.code == 401) {
-              chatSession.push("auth", "system", content.tool_identifier, startTime, content.data)
-              chatSession.push("system", "system", "", startTime)
-            }
+            //let content = JSON.parse(jsonResponse[0].kwargs.content)
+            //if(content.code == 401) {
+            //  chatSession.push("auth", "system", content.tool_identifier, startTime, content.data)
+            //  chatSession.push("system", "system", "", startTime)
+            //}
               // Otherwise output tool response
-              else {
-                chatSession.push("tool_response", "system", content, startTime, JSON.parse(chunk)[0]);
+              // else {
+                chatSession.push("tool_response", "system", jsonResponse[0].kwargs.content, startTime, JSON.parse(chunk)[0]);
                 chatSession.push("system", "system", "", startTime)
-              }
+              // }
             }
             else if (JSON.parse(chunk)[0].id[2] == "GeneratedContent") {
               chatSession.pushToken(JSON.parse(chunk)[0].content.text)

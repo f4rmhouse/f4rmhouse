@@ -29,6 +29,8 @@ const DEFAULT_CONFIG: SecurityConfig = {
     'mcp.icons8.com',
     'app.f4rmhouse.com',
     'mcp.api.coingecko.com',
+    'remote.mcpservers.org',
+    'mcp.apify.com'
     // Add your trusted MCP servers here
   ],
   // Only allow standard HTTP/HTTPS ports and common development ports
@@ -194,12 +196,16 @@ export async function secureFetch(
   const secureOptions: RequestInit = {
     ...options,
     redirect: 'manual', // Prevent automatic redirects
-    signal: AbortSignal.timeout(config.timeoutMs),
     headers: {
       ...options.headers,
       // Remove potentially dangerous headers by setting them to undefined and filtering
     }
   };
+
+  // Only add timeout signal if timeoutMs > 0 (allows streaming without timeout)
+  if (config.timeoutMs > 0) {
+    secureOptions.signal = AbortSignal.timeout(config.timeoutMs);
+  }
   
   // Filter out undefined headers
   if (secureOptions.headers) {
