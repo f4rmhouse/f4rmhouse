@@ -356,8 +356,6 @@ export default function PromptBox(
       }
     })
 
-    console.log(client)
-
     let postData: PostDataType = {
       messages: chatSession.getNextJSMessages(), 
       description: selectedAgent.jobDescription,
@@ -366,8 +364,7 @@ export default function PromptBox(
       f4rmer: selectedAgent.title,
       model: selectedModel,
       tools: tools,
-      allowList: permissions,
-      client: client
+      allowList: permissions
     }
 
     // Send message
