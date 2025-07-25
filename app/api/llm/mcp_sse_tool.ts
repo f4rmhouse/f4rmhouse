@@ -105,15 +105,12 @@ function createMCPTool({ uti, endpoint, title, tool_description, parameters, aut
 
             const fetchWithAuth = (url: string | URL, init?: RequestInit) => {
               const headers = new Headers(init?.headers);
-              // headers.set("Authorization", authToken);
-              // headers.set("Mcp-Session-Id", "64c8cbf6-1012-4450-a981-35670b637a4a");
+              headers.set("Authorization", authToken);
               return fetch(url.toString(), { ...init, headers });
             };
 
             const customHeaders = {
                 Authorization: authToken,
-                //"Mcp-Session-Id": "64c8cbf6-1012-4450-a981-35670b637a4a",
-                //"Last-Event-ID": "64c8cbf6-1012-4450-a981-35670b637a4a"
             };
 
             let mcpStreamableHTTPtransport: StreamableHTTPClientTransport;
@@ -131,7 +128,7 @@ function createMCPTool({ uti, endpoint, title, tool_description, parameters, aut
                 await client.connect(mcpSSEtransport);
             }
             else {
-                const url = new URL("http://localhost:3000/api/mcp/streamable?server_uri=https%3A%2F%2Fmcp.apify.com")
+                const url = new URL(uri)
                 mcpStreamableHTTPtransport = new StreamableHTTPClientTransport(url, {
                     requestInit: {
                         headers: customHeaders,

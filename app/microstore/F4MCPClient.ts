@@ -315,7 +315,7 @@ class F4MCPClient {
 
         let res = await fetch(url)
 
-        if(res.status == 200 || res.status == 404 || res.status == 500) {
+        if(res.status == 200 || res.status == 404 || res.status == 500 || res.status == 400 || res.status == 405) {
           // Server allows unauthenticated access
           await this._connectWithMCPServerWithoutAuth(uti, serverURL, client, transport)
           return {status: "success"}

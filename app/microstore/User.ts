@@ -387,7 +387,7 @@ class User {
       );
 
       // Decrypt the response data if it's encrypted
-      return await this.decryptTokenData(response.data.Token);
+      return await this.decryptTokenData(response.data.Token, server);
     } catch (error) {
       console.error('Error fetching or decrypting token:', error);
       throw error;
@@ -446,7 +446,7 @@ class User {
    * @param responseData - The response data that may contain encrypted tokens
    * @returns Decrypted token data or original data if not encrypted
    */
-  private async decryptTokenData(responseData: any): Promise<any> {
+  private async decryptTokenData(responseData: any, server: string): Promise<any> {
     try {
       // Check if the response contains encrypted data
       if (responseData && responseData.encryptedData) {
@@ -468,6 +468,7 @@ class User {
       return responseData;
     } catch (error) {
       console.error('Failed to decrypt token data:', error);
+      this.deleteToken(server)
       throw new Error('Token decryption failed');
     }
   }
