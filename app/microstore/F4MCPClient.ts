@@ -376,7 +376,6 @@ class F4MCPClient {
         remoteAuthServerMetaDataEndpoint = serverURL.replace("sse", "") + ".well-known/oauth-authorization-server"
       }
       else {
-        console.log("parse url: ", this._parseServerURL(serverURL))
         remoteAuthServerMetaDataEndpoint = this._parseServerURL(serverURL) + ".well-known/oauth-authorization-server"
       }
       let authMetadata: MCPConnectionStatus = {status: "error", remoteMetadata: {}, remoteAuthServerMetadata: {}}
