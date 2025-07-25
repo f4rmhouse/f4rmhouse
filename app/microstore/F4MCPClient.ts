@@ -376,7 +376,8 @@ class F4MCPClient {
         remoteAuthServerMetaDataEndpoint = serverURL.replace("sse", "") + ".well-known/oauth-authorization-server"
       }
       else {
-        remoteAuthServerMetaDataEndpoint = serverURL + "/.well-known/oauth-authorization-server"
+        console.log("parse url: ", this._parseServerURL(serverURL))
+        remoteAuthServerMetaDataEndpoint = this._parseServerURL(serverURL) + ".well-known/oauth-authorization-server"
       }
       let authMetadata: MCPConnectionStatus = {status: "error", remoteMetadata: {}, remoteAuthServerMetadata: {}}
 
@@ -659,6 +660,28 @@ class F4MCPClient {
    */
   getConnections() {
     return this.connections
+  }
+
+  private _parseServerURL(serverURL: string) {
+    try {
+      let url = new URL(serverURL)
+      // Remove /mcp from the end of the pathname if it exists
+      if (url.pathname.endsWith('/mcp')) {
+        url.pathname = url.pathname.slice(0, -4); // Remove the last 4 characters ('/mcp')
+      }
+      // Also handle case where /mcp is followed by other path segments
+      else if (url.pathname.includes('/mcp/')) {
+        url.pathname = url.pathname.replace('/mcp/', '/');
+      }
+      return url.toString()
+    }
+
+    catch(err) {
+      console.error(err)
+      toast.info("Could not parse MCP server URL " + serverURL + " make sure it's a valid URL")
+      return serverURL
+    }
+
   }
 }
 

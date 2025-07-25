@@ -33,7 +33,8 @@ export const MCP_PROXY_CONFIG: ProxySecurityConfig = {
     'mcp.icons8.com',
     'mcp.api.coingecko.com',
     'remote.mcpservers.org',
-    'mcp.apify.com'
+    'mcp.apify.com',
+    'mcp.canva.com',
     
     // Example: Add your own MCP servers
     // 'your-mcp-server.com',

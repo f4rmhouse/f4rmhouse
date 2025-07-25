@@ -30,7 +30,8 @@ const DEFAULT_CONFIG: SecurityConfig = {
     'app.f4rmhouse.com',
     'mcp.api.coingecko.com',
     'remote.mcpservers.org',
-    'mcp.apify.com'
+    'mcp.apify.com',
+    'mcp.canva.com',
     // Add your trusted MCP servers here
   ],
   // Only allow standard HTTP/HTTPS ports and common development ports
