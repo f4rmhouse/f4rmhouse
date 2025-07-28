@@ -3,13 +3,14 @@ import MCPAuthHandler from '@/app/MCPAuthHandler';
 
 export async function POST(request: NextRequest) {
   try {
+    const base_url = (process.env.NEXT_PUBLIC_APP_ENV === 'production' ? 'https://app.f4rmhouse.com' : 'http://localhost:3000');
     const { code, provider, code_verifier, client_id, token_url } = await request.json();
 
     // Prepare token exchange request
     const body: any = {
       code: code,
       client_id: client_id,
-      redirect_uri: "http://localhost:3000/callback/mcp/oauth",
+      redirect_uri: base_url + "/callback/mcp/oauth",
       grant_type: "authorization_code"
     };
 
