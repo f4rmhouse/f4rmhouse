@@ -80,7 +80,7 @@ export default function RightSidebarItem(
     registerEndpoint: string, 
     serverMetadata?: any) => 
   {
-    let redirect_uri = "http://localhost:3000/callback/mcp/oauth"
+    let redirect_uri = window.location.origin + "/callback/mcp/oauth"
     
     const codeVerifier = MCPAuthHandler.generateCodeVerifier();
     const codeChallenge = await MCPAuthHandler.generateCodeChallenge(codeVerifier);
@@ -113,7 +113,7 @@ export default function RightSidebarItem(
     let oauthClientParams: OauthClientType = {
       id: tool.uti,
       client_name: "MCP Client Application",
-      redirect_uris: ["http://localhost:3000/callback/mcp/oauth"],
+      redirect_uris: [window.location.origin + "/callback/mcp/oauth"],
       grant_types: ["authorization_code"],
       response_types: ["code"],
       scope: "email",
