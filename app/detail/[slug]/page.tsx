@@ -274,7 +274,7 @@ export default function DetailPage({ params }: { params: Params }) {
                       <Star key={i} size={16} className={i < Math.round(rating) ? "text-yellow-400 fill-yellow-400" : "text-neutral-600"} />
                     ))}
                   </div>
-                  <p className="text-sm">{reviews.length} global ratings</p>
+                  <p className="text-sm">{reviews.length} ratings</p>
                 </div>
                 
                 <div className="space-y-2">
@@ -297,14 +297,6 @@ export default function DetailPage({ params }: { params: Params }) {
               <div className="col-span-8 lg:col-span-9 mt-6 sm:mt-0">
                 <div className="flex items-center justify-between mb-4 pb-2">
                   <p className="text-lg font-medium">{reviews.length} Customer Reviews</p>
-                  <div className="flex items-center">
-                    <span className="text-sm text-neutral-400 mr-2">Sort by:</span>
-                    <select className="bg-zinc-800 border border-neutral-700 text-sm rounded-md py-1 px-2 text-neutral-300 focus:outline-none focus:ring-1 focus:ring-blue-500">
-                      <option>Most recent</option>
-                      <option>Highest rated</option>
-                      <option>Lowest rated</option>
-                    </select>
-                  </div>
                 </div>
                 
                 {serverError || reviews.length == 0 ?

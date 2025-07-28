@@ -473,6 +473,22 @@ class User {
     }
   }
 
+  async registerRun(uid: string): Promise<any> {
+    console.log("tool server: ", uid)
+    try {
+      const response: AxiosResponse = await axios.post(
+        `${this.baseUrl}/user/tool/run?tid=${uid}`, {},
+        {
+          headers: { "Authorization": this.token, "X-Username": this.username, "X-Provider": this.provider}
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching services:', error);
+      throw error;
+    }
+  }
+
   async deleteToken(server: string): Promise<any> {
     try {
       const response: AxiosResponse = await axios.delete(
