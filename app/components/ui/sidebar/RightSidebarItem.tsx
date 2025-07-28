@@ -100,6 +100,8 @@ export default function RightSidebarItem(
       application_type: "native"
     };
 
+    console.log("oauthClientParams", oauthClientParams)
+
     // Adapt based on server metadata if available
     const authHandler = new OAuthClient(oauthClientParams, serverMetadata);
     const encodedURL = registerEndpoint;
@@ -120,6 +122,8 @@ export default function RightSidebarItem(
       token_endpoint_auth_method: "none",
       application_type: "native"
     }; 
+
+    console.log("oauthClientParams", oauthClientParams)
 
     const authHandler = new OAuthClient(oauthClientParams, serverMetadata);
     const authUrl = authHandler.getAuthorizationURL(

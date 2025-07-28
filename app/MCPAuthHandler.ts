@@ -255,6 +255,7 @@ export class OAuthClient {
   getAuthorizationURL(uti: string, provider: string, redirectUri: string, scope: string) {
     let url = MCPAuthHandler.oauth2(provider).authorization_server
     let client_id = MCPAuthHandler.oauth2(provider).client_id
+    console.log("client_id", client_id)
     return url + "?client_id=" + client_id + "&response_type=code&redirect_uri=" + encodeURIComponent(redirectUri) + "&scope=" + encodeURIComponent(scope) + "&state=" + uti;
   }
 }
