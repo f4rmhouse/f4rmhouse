@@ -113,7 +113,7 @@ export default function RightSidebarItem(
     let oauthClientParams: OauthClientType = {
       id: tool.uti,
       client_name: "MCP Client Application",
-      redirect_uris: [window.location.origin + "/callback/mcp/oauth"],
+      redirect_uris: ["https://app.f4rmhouse.com/callback/mcp/oauth", "http://localhost:3000/callback/mcp/oauth"],
       grant_types: ["authorization_code"],
       response_types: ["code"],
       scope: "email",
