@@ -291,8 +291,6 @@ class F4MCPClient {
       }
     }
 
-    console.log("accessToken", accessToken)
-
     try {
       if (accessToken) {
         await this._connectToClientWithAuthToken(uti, serverURL, accessToken, client, transport)
