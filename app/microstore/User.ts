@@ -379,9 +379,6 @@ class User {
 
   async getToken(server: string): Promise<any> {
     try {
-      console.log("token: ", this.token)
-      console.log("username: ", this.username)
-      console.log("provider: ", this.provider)
       const response: AxiosResponse = await axios.get(
         `${this.baseUrl}/user/get/token?server=${server}`,
         {
