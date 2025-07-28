@@ -29,32 +29,33 @@ export default function CreateReviewForm({ product_id, username }: { product_id:
 
   const publishReview = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if(session){
+      // A user will create the review
+      const user = new User(session.user.email, session.provider, session.access_token)
 
-    // A user will create the review
-    const user = new User(session.user.email, session.provider, session.access_token)
+      const today = new Date();
+      const formattedDate = today.toISOString().split('T')[0];
 
-    const today = new Date();
-    const formattedDate = today.toISOString().split('T')[0];
-
-    const data: ReviewType = {
-      pid: product_id, 
-      uid: "",
-      title: title, 
-      value: String(stars+1),  // stars are 0-indexed
-      content: content, 
-      creator: username.split(" ")[0], 
-      creator_uid: session.user.email, 
-      date: formattedDate,
-      rating: 0,
-      rated: false
-    }
-
-    user.createReview(data).then((e) => {
-      if (e.Code == 201) {
-        alert("You need to use an action to give it a review!")
+      const data: ReviewType = {
+        pid: product_id, 
+        uid: "",
+        title: title, 
+        value: String(stars+1),  // stars are 0-indexed
+        content: content, 
+        creator: username.split(" ")[0], 
+        creator_uid: session.user.email, 
+        date: formattedDate,
+        rating: 0,
+        rated: false
       }
-      router.push(`/detail/${product_id}`)
-    })
+
+      user.createReview(data).then((e) => {
+        if (e.Code == 201) {
+          alert("You need to use an action to give it a review!")
+        }
+        router.push(`/detail/${product_id}`)
+      })
+    }
   }
 
   return (
@@ -90,7 +91,20 @@ export default function CreateReviewForm({ product_id, username }: { product_id:
             showPreview ?
             <div className="mr-10">
               <h1 className={`${theme.textColorPrimary || 'text-white'}`}>Remember to follow our community guidelines</h1>
-              <Review review={{pid: product_id, uid: "unused", title: title, value: String(stars+1), content: content, creator: username.split(" ")[0], creator_uid: session.user.email, date: "2024-09-26", rating: 0, rated:false}}/>
+              <Review review={
+                {
+                  pid: product_id, 
+                  uid: "unused", 
+                  title: title, 
+                  value: String(stars+1), 
+                  content: content, 
+                  creator: username.split(" ")[0], 
+                  creator_uid: session?.user.email ?? "", 
+                  date: "2024-09-26", 
+                  rating: 0, 
+                  rated:false
+                }
+              }/>
               <div className="flex w-full justify-end">
                 <button className={`font-bold rounded-full mt-2 text-sm pl-4 pr-4 p-1 transition-colors ${theme.primaryColor || 'bg-yellow-500'} text-black hover:opacity-80`}>Publish review</button>
               </div>
