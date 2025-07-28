@@ -201,7 +201,6 @@ export default function PromptBox(
   }, [loading])
 
   useEffect(() => {
-    console.log("artifacts", artifacts)
     if(artifacts.length > 0){
       setState("canvas")
     }

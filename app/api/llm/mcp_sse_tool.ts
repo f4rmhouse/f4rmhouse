@@ -192,8 +192,7 @@ function createMCPTool({ uti, endpoint, title, tool_description, parameters, aut
                     return ["The result does not fit into the context window."];
                 }
 
-                let callerRunResult = await caller.registerRun(uti)
-                console.log("Caller run result: ", callerRunResult)
+                await caller.registerRun(uti)
 
                 // await client.close()
                 return content;

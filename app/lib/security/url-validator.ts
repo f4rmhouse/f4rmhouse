@@ -32,6 +32,7 @@ const DEFAULT_CONFIG: SecurityConfig = {
     'remote.mcpservers.org',
     'mcp.apify.com',
     'mcp.canva.com',
+    'mcp.linear.app',
     // Add your trusted MCP servers here
   ],
   // Only allow standard HTTP/HTTPS ports and common development ports

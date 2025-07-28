@@ -35,6 +35,7 @@ export const MCP_PROXY_CONFIG: ProxySecurityConfig = {
     'remote.mcpservers.org',
     'mcp.apify.com',
     'mcp.canva.com',
+    'mcp.linear.app',
     
     // Example: Add your own MCP servers
     // 'your-mcp-server.com',

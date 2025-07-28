@@ -39,11 +39,11 @@ export default function RightSidebarItem(
   const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false)
 
   useEffect(() => {
-    if (tool && session) {
+    if (tool) {
       setIsExpanded(false)
       connectToTool(tool.uti)
     }
-  }, [tool, session])
+  }, [tool, session, selectedAgent])
 
   const getStatusIndicator = (status: string) => {
     switch(status) {
@@ -132,6 +132,10 @@ export default function RightSidebarItem(
   }
 
   const login = async () => {
+    if(!session) {
+      alert("You need to login or sing up to use tools that require authentication.")
+      return;
+    }
     if (tool) {
 
       let clientRegistrationURL = isOnline
@@ -159,6 +163,7 @@ export default function RightSidebarItem(
 
     let _isOnline = { status: "connecting" } as MCPConnectionStatus
     let connectionStatus: MCPConnectionStatus
+    setIsOnline(_isOnline)
 
     try {
 
@@ -166,8 +171,11 @@ export default function RightSidebarItem(
 
       // Only connect with remote servers (no stdio)
       if(startsWithHTTP){
-        // @ts-expect-error
-        let user = new User(session?.user.email, session?.provider, session?.access_token) 
+        let user = new User("undefined", "undefined", "undefined") 
+        if(session) {
+          // @ts-expect-error
+          user = new User(session?.user.email, session?.provider, session?.access_token) 
+        }
         client.setUser(user)
 
         connectionStatus = await client.connect(
@@ -176,8 +184,6 @@ export default function RightSidebarItem(
           tool.server.transport, 
           tool.server.auth_provider
         )
-
-        console.log(connectionStatus)
 
         _isOnline = connectionStatus
       }
@@ -231,6 +237,7 @@ export default function RightSidebarItem(
                 <p>Connection error: Unable to connect to server</p>
                 <button 
                   className="text-xs bg-neutral-700 hover:bg-neutral-600 text-white px-2 py-1 rounded mt-1"
+                  onClick={() => connectToTool(tool.uti)}
                 >
                   Retry connection
                 </button>

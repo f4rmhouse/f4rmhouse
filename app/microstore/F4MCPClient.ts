@@ -277,13 +277,11 @@ class F4MCPClient {
     })
 
     client.setNotificationHandler(ToolListChangedNotificationSchema, async () => {
-      console.log('Received notification that tools list changed, refreshing...');
-      let tools = await client.listTools()
-      console.log("tools: ", tools)
+      await client.listTools()
     });
 
     // Check if we have authentication credentials for this server
-    if(this.caller) {
+    if(this.caller && this.caller.isLoggedIn()) {
       let token = await this.caller.getToken(uti)
       if(token.encryptedData == "") {
         accessToken = ""
@@ -292,6 +290,8 @@ class F4MCPClient {
         accessToken = token.token.token
       }
     }
+
+    console.log("accessToken", accessToken)
 
     try {
       if (accessToken) {
@@ -436,7 +436,6 @@ class F4MCPClient {
    */
   async _connectToClientWithAuthToken(uti: string, serverURL: string, accessToken: string, client: Client, transport: string) {
     const authToken = "Bearer " + accessToken
-    console.log("server url: ", serverURL)
     /**
      * Helper function to add authorization headers to fetch requests
      * @param url - URL to fetch
@@ -472,7 +471,6 @@ class F4MCPClient {
 
   async _handleConnection(transport: string, url: URL, customHeaders: any, client: Client, uti: string, fetchWithAuth: any) {
     if (transport == "streamable_http") {
-      console.log("URL: ", url)
       let t = new StreamableHTTPClientTransport(url, {requestInit: customHeaders});
       try {
         await client.connect(t);
@@ -483,8 +481,6 @@ class F4MCPClient {
       }
     }
     else {
-      console.log("url", url)
-      console.log("transport", transport)
       let t = new SSEClientTransport(new URL(url), {
           eventSourceInit: {
               fetch: fetchWithAuth,
@@ -554,8 +550,6 @@ class F4MCPClient {
    * @returns Promise resolving to the fetch response
    */
   async _fetchRFC9728MetaData(remoteMetaDataEndpoint:string): Promise<any> {
-    // console.log("Fetching RFC 9728 metadata from: ", remoteMetaDataEndpoint)
-    // const encodedURL = "http://localhost:3000/api/mcp/automatic/discovery?server_uri=" +encodeURIComponent(remoteMetaDataEndpoint);
     try {
       return await fetch(remoteMetaDataEndpoint)
     }
@@ -571,7 +565,6 @@ class F4MCPClient {
    * @returns Promise resolving to the fetch response
    */
   async _fetchRFC8414AuthServerMetaData(remoteAuthServerMetaDataEndpoint:string): Promise<any> {
-    // console.log("Fetching RFC 8414 metadata from: ", remoteAuthServerMetaDataEndpoint)
     try {
       return await fetch(remoteAuthServerMetaDataEndpoint)
     }
