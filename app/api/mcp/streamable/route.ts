@@ -109,13 +109,13 @@ export async function GET(request: Request) {
       })
       console.log("response: ", response)
 
-      if (response.status === 401) {
-        return new Response('Unauthorized', { status: 401, statusText: "Unauthorized", headers: response.headers });
-      }
-
       if (!response.body) {
         return new Response('No upstream stream', { status: 502, statusText: "No upstream stream" });
       }
+
+      // if (response.status === 401) {
+      //   return new Response(response.body, { status: 401, statusText: "Unauthorized", headers: response.headers });
+      // }
 
       // Proxy the response stream with proper SSE headers
       return response 
