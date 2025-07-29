@@ -222,7 +222,7 @@ export async function secureFetch(
       const connectionController = new AbortController();
       const connectionTimeout = setTimeout(() => {
         connectionController.abort();
-      }, Math.min(config.timeoutMs, 15000)); // Max 15s for connection
+      }, Math.min(config.timeoutMs, 1000)); // Max 1s for connection
       
       secureOptions.signal = connectionController.signal;
       
