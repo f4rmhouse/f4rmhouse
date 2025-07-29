@@ -311,6 +311,7 @@ class F4MCPClient {
           url = new URL("http://localhost:8080/sse");
         }
 
+        console.log("connecting to: ", url)
         let res = await fetch(url)
         console.log("res: ", res)
 

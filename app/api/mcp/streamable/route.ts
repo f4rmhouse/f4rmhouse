@@ -119,11 +119,7 @@ export async function GET(request: Request) {
       }
 
       // Proxy the response stream with proper SSE headers
-      return new Response(response.body, {
-        status: response.status,
-        statusText: response.statusText,
-        headers: response.headers,
-      }) 
+      return response 
 
     } catch (error) {
       console.error('Secure streamable SSE proxy error:', error);
