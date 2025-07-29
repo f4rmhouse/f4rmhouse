@@ -67,6 +67,7 @@ export async function POST(request: Request) {
 
 export async function GET(request: Request) {
     // Extract and validate the server URI with SSRF protection
+
     const validation = await extractAndValidateServerUri(
         request, 
         'http://localhost:8081/mcp',
@@ -118,7 +119,11 @@ export async function GET(request: Request) {
       }
 
       // Proxy the response stream with proper SSE headers
-      return response 
+      return new Response(response.body, {
+        status: response.status,
+        statusText: response.statusText,
+        headers: response.headers,
+      }) 
 
     } catch (error) {
       console.error('Secure streamable SSE proxy error:', error);

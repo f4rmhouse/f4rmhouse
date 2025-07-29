@@ -177,6 +177,7 @@ export async function validateUrl(urlString: string, customConfig?: Partial<Secu
 
 /**
  * Create a secure fetch wrapper with SSRF protection
+ * Supports both regular requests and streaming (SSE) with separate timeout handling
  */
 export async function secureFetch(
   urlString: string, 
@@ -194,6 +195,15 @@ export async function secureFetch(
   // Use sanitized URL
   const url = validation.sanitizedUrl!;
   
+  // Determine if this is likely a streaming request
+  const isStreamingRequest = 
+    options.headers && 
+    (Object.entries(options.headers).some(([key, value]) => 
+      key.toLowerCase() === 'accept' && 
+      typeof value === 'string' && 
+      value.includes('text/event-stream')
+    ));
+  
   // Add security headers and timeouts
   const secureOptions: RequestInit = {
     ...options,
@@ -204,12 +214,54 @@ export async function secureFetch(
     }
   };
 
-  // Only add timeout signal if timeoutMs > 0 (allows streaming without timeout)
+  // Handle timeout based on request type
   if (config.timeoutMs > 0) {
-    secureOptions.signal = AbortSignal.timeout(config.timeoutMs);
+    if (isStreamingRequest) {
+      // For streaming requests, use a connection timeout only
+      // Create a separate controller for connection establishment
+      const connectionController = new AbortController();
+      const connectionTimeout = setTimeout(() => {
+        connectionController.abort();
+      }, Math.min(config.timeoutMs, 15000)); // Max 15s for connection
+      
+      secureOptions.signal = connectionController.signal;
+      
+      // Filter out undefined headers for streaming requests
+      if (secureOptions.headers) {
+        const filteredHeaders: Record<string, string> = {};
+        Object.entries(secureOptions.headers).forEach(([key, value]) => {
+          if (value !== undefined && key !== 'Host' && key !== 'X-Forwarded-For' && key !== 'X-Real-IP') {
+            filteredHeaders[key] = value as string;
+          }
+        });
+        secureOptions.headers = filteredHeaders;
+      }
+      
+      // Handle streaming request with connection timeout
+      try {
+        const response = await fetch(url, secureOptions);
+        clearTimeout(connectionTimeout); // Clear timeout once response is established
+        
+        // Check for redirects and block them
+        if (response.status >= 300 && response.status < 400) {
+          throw new Error('SSRF Protection: Redirects are not allowed');
+        }
+        
+        return response;
+      } catch (error) {
+        clearTimeout(connectionTimeout);
+        if (error instanceof Error && error.name === 'AbortError') {
+          throw new Error(`SSRF Protection: Connection timeout after ${Math.min(config.timeoutMs, 15000)}ms`);
+        }
+        throw error;
+      }
+    } else {
+      // For regular requests, use full timeout
+      secureOptions.signal = AbortSignal.timeout(config.timeoutMs);
+    }
   }
   
-  // Filter out undefined headers
+  // Filter out undefined headers for non-streaming requests
   if (secureOptions.headers) {
     const filteredHeaders: Record<string, string> = {};
     Object.entries(secureOptions.headers).forEach(([key, value]) => {
