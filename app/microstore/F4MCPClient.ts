@@ -311,7 +311,9 @@ class F4MCPClient {
           url = new URL("http://localhost:8080/sse");
         }
 
-        let res = await fetch(url)
+        let res = await fetch(url, {
+          signal: AbortSignal.timeout(1000) // 5 second timeout
+        })
 
         if(res.status == 200 || res.status == 404 || res.status == 500 || res.status == 400 || res.status == 405) {
           // Server allows unauthenticated access
