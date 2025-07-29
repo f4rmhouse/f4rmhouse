@@ -106,9 +106,8 @@ export async function GET(request: Request) {
       const response = await secureFetch(targetUrl, {
         method: 'GET',
         headers: proxyHeaders,
-      }, {
-        timeoutMs: 0 // Disable timeout for streaming responses
-      });
+      })
+      console.log("response: ", response)
 
       if (response.status === 401) {
         return new Response('Unauthorized', { status: 401, headers: response.headers });
