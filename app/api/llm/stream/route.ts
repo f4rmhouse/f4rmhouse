@@ -72,8 +72,6 @@ export async function POST(req: NextRequest) {
     const { description, messages = [], model: selectedModel, toolbox: initialToolbox, f4rmer } = body;
     const prompt = PromptTemplate.fromTemplate(TEMPLATE);
 
-    console.log("MODEL: ", selectedModel)
-    
     // Handle toolbox initialization
 
     // Initialize model
@@ -89,6 +87,7 @@ export async function POST(req: NextRequest) {
     const textStream = new ReadableStream({
       async start(controller) {
         for await (const chunk of response) {
+          console.log("chunk: ", chunk.content)
           controller.enqueue(chunk.content);
         }
         controller.close();
