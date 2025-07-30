@@ -1,7 +1,7 @@
 // This code was taken from https://github.com/langchain-ai/langchain-nextjs-template/blob/main/app/api/chat/route.ts
 // this boilerplace example is from the official langhcain github repo. We use it here because it's a fast way to implement
 // llms into the app not because it's going to be the approach used in prod
-export const runtime = "edge";
+// export const runtime = "edge";
 import { NextRequest, NextResponse } from "next/server";
 import { ChatOpenAI } from "@langchain/openai";
 import { ChatAnthropic } from "@langchain/anthropic";
