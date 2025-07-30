@@ -81,7 +81,6 @@ export async function POST(req: NextRequest) {
     const model = ModelFactory.create(selectedModel);
 
     let modelWithPrompt = prompt.pipe(model)
-    console.log("modelWithPrompt: ", modelWithPrompt)
     const response = await modelWithPrompt.stream({description: description, input: messages[0]})
 
     // Convert AIMessageChunk stream to text stream
