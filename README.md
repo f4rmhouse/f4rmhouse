@@ -10,7 +10,7 @@
 F4rmhouse is an open source and browser-native MCP client. It provides every tool you need to create a modern agent with all its bells and MCP whistles. 
 
 - [x] [local/custom deployments](https://app.f4rmhouse.com): Many teams need full control over their data and infrastructure. By self hosting your MCP client you will: avoid vendor lock-in, ensure data never leaves your environment, and simplify compliance with HIPAA, GDPR, SOC 2, etc.
-- [] [shareable profiles](https://app.f4rmhouse.com): share your MCP profile with collegues and friends using a simple URL. (coming soon) 
+- [ ] [shareable profiles](https://app.f4rmhouse.com): share your MCP profile with collegues and friends using a simple URL. (coming soon) 
 - [x] [MCP plug-and-play](https://app.f4rmhouse.com): Users often complain about the complexity associated with attaching MCPs to a chat. f4rmhouse makes this a breeze, using the "action store" you can add MCPs to your chat with one single click. 
 - [x] [Model selection](https://app.f4rmhouse.com): Different models have different capabilities. The model selector lets you choose the model you want to use to accomplish a specific task, use a public model through an API key or use a local one with ollama.
 - [x] [Extensible artifacts](https://app.f4rmhouse.com): LLMs are mostly used to generate text. But give them the right tools and they can generate far more than that, artifacts allow your agents to render web pages, csv files, 3D scenes and much more. You can add artifacts that suit your specific needs.
