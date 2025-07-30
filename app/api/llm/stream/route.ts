@@ -71,6 +71,8 @@ export async function POST(req: NextRequest) {
     const body = await req.json() as RequestBody;
     const { description, messages = [], model: selectedModel, toolbox: initialToolbox, f4rmer } = body;
     const prompt = PromptTemplate.fromTemplate(TEMPLATE);
+
+    console.log("MODEL: ", selectedModel)
     
     // Handle toolbox initialization
 
