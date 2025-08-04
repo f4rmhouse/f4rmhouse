@@ -39,7 +39,7 @@ export default function RightSidebarItem(
   const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false)
 
   useEffect(() => {
-    if (tool) {
+    if (tool && session && selectedAgent) {
       setIsExpanded(false)
       connectToTool(tool.uti)
     }
@@ -181,6 +181,8 @@ export default function RightSidebarItem(
           user = new User(session?.user.email, session?.provider, session?.access_token) 
         }
         client.setUser(user)
+
+        console.log("Connect to MCP: ", uti)
 
         connectionStatus = await client.connect(
           uti, 

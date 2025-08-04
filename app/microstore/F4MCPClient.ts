@@ -31,6 +31,8 @@ class F4MCPClient {
   private testing = false;
   private base_url = (process.env.NEXT_PUBLIC_APP_ENV === 'production' ? 'https://app.f4rmhouse.com' : 'http://localhost:3000');
 
+  private pending = new Map<string, boolean>();
+
   /**
    * Creates a new F4MCPClient instance
    * @param name - Name identifier for this client
@@ -311,9 +313,7 @@ class F4MCPClient {
           url = new URL("http://localhost:8080/sse");
         }
 
-        console.log("connecting to: ", url)
         let res = await fetch(url)
-        console.log("res: ", res)
 
         if(res.status == 200 || res.status == 404 || res.status == 500 || res.status == 400 || res.status == 405) {
           // Server allows unauthenticated access
@@ -451,12 +451,15 @@ class F4MCPClient {
     let customHeaders = {
       headers: {
         "Authorization": authToken,
+        "server-id": uti
       }
     };
     // if(transport == "sse") {
     //   customHeaders = {
-    //     Authorization: authToken,
-    //   };
+    //     headers: {
+    //       "Authorization": authToken,
+    //     }
+    //   }
     // }
     
     // Avoid CORS in issues streamable http by using proxy
@@ -470,31 +473,45 @@ class F4MCPClient {
   }
 
   async _handleConnection(transport: string, url: URL, customHeaders: any, client: Client, uti: string, fetchWithAuth: any) {
+
+    if(this.pending.has(uti)) {
+      return;
+    }
+    this.pending.set(uti, true);
+
     if (transport == "streamable_http") {
-      let t = new StreamableHTTPClientTransport(url, {requestInit: customHeaders});
-      try {
-        await client.connect(t);
-        this.connections.set(uti, client);
-      }
-      catch(err) {
-        console.error(err)
-      }
+        let t = new StreamableHTTPClientTransport(url, {requestInit: customHeaders});
+        try {
+          await client.connect(t);
+          this.connections.set(uti, client);
+        }
+        catch(err) {
+          console.error(err)
+        }
     }
     else {
       let t = new SSEClientTransport(new URL(url), {
-          eventSourceInit: {
-              fetch: fetchWithAuth,
-          },
-          requestInit: customHeaders
+        eventSourceInit:{ 
+          fetch: (url: string | URL, init?: RequestInit) => {
+            return fetch(url.toString(), { ...init});
+          }
+        },
+        requestInit: customHeaders,
+        fetch: (url: string | URL, init?: RequestInit) => {
+          console.log("init: ", init)
+          let sessionId = ""
+          if(url instanceof URL) {
+            sessionId = url.searchParams.get("sessionId") || ""
+          }
+          return fetch("http://localhost:3000/api/mcp/sse?sessionId=" + sessionId, init)
+        }
       });
-      try {
-        await client.connect(t);
-        this.connections.set(uti, client);
-      }
-      catch(err) {
-        console.error(err)
-      }
+
+      await client.connect(t, {timeout: 10000});
+      this.connections.set(uti, client);
     } 
+
+    this.pending.delete(uti);
   }
 
   /**

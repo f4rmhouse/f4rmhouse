@@ -61,6 +61,7 @@ export async function GET(request: Request) {
       });
 
     } catch (error) {
+      console.log("Error proxying SSE request: ", error)
       return new Response(`Proxy error: ${error instanceof Error ? error.message : 'Unknown error'}`, { 
         status: 500,
         headers: {
@@ -68,4 +69,29 @@ export async function GET(request: Request) {
         }
       });
     }
+}
+
+export async function POST(request: Request) {
+  // Proxy the response stream
+  
+  // Get session_id from URL parameters
+  const url = new URL(request.url);
+  const sessionId = url.searchParams.get("sessionId");
+
+  // Create fetch options with the required duplex property
+  const fetchOptions: any = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'text/event-stream'
+    },
+    body: request.body,
+    duplex: 'half', // Required when forwarding a request body
+  };
+  
+  const response = await fetch("https://mcp.api.coingecko.com/sse/message?sessionId=" + sessionId, fetchOptions);
+
+  console.log("Response: ", response)
+  
+  return response; 
 }
