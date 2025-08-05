@@ -84,7 +84,7 @@ function createMCPTool({ uti, endpoint, title, tool_description, parameters, aut
             let accessToken = {Code: 0, Token: ""}
             if(askUserForConfirmation) {
                 return {
-                    message: "Confirmation needed to continue. Please inform user to confirm or cancel the request so that personal or confidential data isn't sent to the server. DO NOT WRITE ANY 'SYNTHETIC RESPONSE' or HALLUCINATIONS", 
+                    message: "Wait until user confirmation until you continue. Please inform user to confirm or cancel the request so that personal or confidential data isn't sent to the server. DO NOT WRITE ANY 'SYNTHETIC RESPONSE' or 'HALLUCINATIONS' or anything other than informing the user that they need to confirm a dialog.", 
                     tool_identifier: endpoint, 
                     code: 401, 
                     data: {
