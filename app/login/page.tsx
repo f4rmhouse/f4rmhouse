@@ -9,9 +9,9 @@ import OAuthLoginButton from "../components/ui/button/OAuthLoginButton";
  */
 export default function Login() {
   return (
-    <div className="absolute z-0 w-[100vw] h-[100vh]">
+    <div className="absolute z-0 w-[100vw] h-[100vh] bg-zinc-900">
       <div className='relative flex h-full'>
-        <div className='m-auto rounded-md w-[100%] md:w-[75%] lg:w-[25%] p-2'>
+        <div className='m-auto rounded-md w-[100%] md:w-[75%] lg:w-[25%] p-2 rounded p-5'>
           <div className="flex relative mb-10">
             <Link href="/" className="absolute mt-auto mb-auto m-2"><ArrowLeft size={30} className="transition-all hover:bg-zinc-600 bg-zinc-700 p-2 rounded-full" /></Link>
             <h1 className='text-center text-xl m-auto'>Login</h1>

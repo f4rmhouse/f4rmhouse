@@ -77,6 +77,7 @@ export async function POST(request: Request) {
   // Get session_id from URL parameters
   const url = new URL(request.url);
   const sessionId = url.searchParams.get("sessionId");
+  const serverId = request.headers.get("server-id")
 
   // Create fetch options with the required duplex property
   const fetchOptions: any = {
@@ -88,8 +89,8 @@ export async function POST(request: Request) {
     body: request.body,
     duplex: 'half', // Required when forwarding a request body
   };
-  
-  const response = await fetch("https://mcp.api.coingecko.com/sse/message?sessionId=" + sessionId, fetchOptions);
+
+  const response = await fetch(`${serverId}/message?sessionId=${sessionId}`, fetchOptions);
 
   console.log("Response: ", response)
   

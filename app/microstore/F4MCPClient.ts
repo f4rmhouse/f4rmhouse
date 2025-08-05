@@ -352,7 +352,13 @@ class F4MCPClient {
     }
     let url = new URL(encodedURL);
 
-    await this._handleConnection(transport, url, {}, client, uti, null)
+    let customHeaders = {
+      headers: {
+        "server-id": serverURL 
+      }
+    };
+
+    await this._handleConnection(transport, url, customHeaders, client, uti, null)
   }
 
   /**
@@ -451,17 +457,10 @@ class F4MCPClient {
     let customHeaders = {
       headers: {
         "Authorization": authToken,
-        "server-id": uti
+        "server-id": serverURL 
       }
     };
-    // if(transport == "sse") {
-    //   customHeaders = {
-    //     headers: {
-    //       "Authorization": authToken,
-    //     }
-    //   }
-    // }
-    
+
     // Avoid CORS in issues streamable http by using proxy
     let encodedURL = `${this.base_url}/api/mcp/streamable?server_uri=${encodeURIComponent(serverURL)}`;
     if(transport == "sse") {
@@ -498,7 +497,6 @@ class F4MCPClient {
         },
         requestInit: customHeaders,
         fetch: (url: string | URL, init?: RequestInit) => {
-          console.log("init: ", init)
           let sessionId = ""
           if(url instanceof URL) {
             sessionId = url.searchParams.get("sessionId") || ""
