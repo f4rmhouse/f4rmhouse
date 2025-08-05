@@ -503,7 +503,7 @@ class F4MCPClient {
           if(url instanceof URL) {
             sessionId = url.searchParams.get("sessionId") || ""
           }
-          return fetch("http://localhost:3000/api/mcp/sse?sessionId=" + sessionId, init)
+          return fetch(`${this.base_url}/api/mcp/sse?sessionId=${sessionId}`, init)
         }
       });
 
