@@ -272,8 +272,6 @@ class F4MCPClient {
   async connect(uti: string, serverURL: string, transport: string, auth_provider: string): Promise<MCPConnectionStatus> {
     let accessToken = ""
 
-    console.log("starting connect: ", uti)
-
     // Create a new MCP client instance for this connection
     const client = new Client({
       name: "f4rmhouse-client",
@@ -316,7 +314,6 @@ class F4MCPClient {
         if(res.status == 200 || res.status == 404 || res.status == 500 || res.status == 400 || res.status == 405) {
           // Server allows unauthenticated access
           await this._connectWithMCPServerWithoutAuth(uti, serverURL, client, transport)
-          console.log("connect done but might not be... " + uti)
           return {status: "success"}
         }
         else if(res.status == 401) {

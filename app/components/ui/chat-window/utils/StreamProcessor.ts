@@ -33,10 +33,14 @@ export default class StreamProcessor {
           let jsonResponse = JSON.parse(chunk)
           if(jsonResponse[0].id[2] == "ToolMessage") {
             // Check if tool is asking for auth
-            let content = JSON.parse(jsonResponse[0].kwargs.content)
-            if(content.code == 401) {
-              chatSession.push("auth", "system", content.tool_identifier, startTime, content.data)
-              chatSession.push("system", "system", "", startTime)
+            console.log("tool message: ", jsonResponse[0].kwargs.content[0].text)
+            if(jsonResponse[0].kwargs.content[0].text.includes("code")){
+              let content = JSON.parse(jsonResponse[0].kwargs.content)
+              console.log("content: ", content)
+              if(content.code == 401) {
+                chatSession.push("auth", "system", content.tool_identifier, startTime, content.data)
+                chatSession.push("system", "system", "", startTime)
+              }
             }
             // Otherwise output tool response
             else {
