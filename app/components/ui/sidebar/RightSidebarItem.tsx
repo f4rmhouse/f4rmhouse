@@ -39,11 +39,22 @@ export default function RightSidebarItem(
   const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false)
 
   useEffect(() => {
-    if (tool && session && selectedAgent) {
-      setIsExpanded(false)
-      connectToTool(tool.uti)
-    }
-  }, [tool, session, selectedAgent])
+    const connectAsync = async () => {
+      if (tool && session && selectedAgent) {
+        setIsExpanded(false)
+        
+        // In development, stagger connections to prevent server overload
+        if (process.env.NODE_ENV === 'development') {
+          const delay = id * 10000; // 1 second delay per tool index
+          await new Promise(resolve => setTimeout(resolve, delay));
+        }
+        
+        await connectToTool(tool.uti)
+      }
+    };
+    
+    connectAsync();
+  }, [tool, session, selectedAgent, id])
 
   const getStatusIndicator = (status: string) => {
     switch(status) {
@@ -182,14 +193,14 @@ export default function RightSidebarItem(
         }
         client.setUser(user)
 
-        console.log("Connect to MCP: ", uti)
-
         connectionStatus = await client.connect(
           uti, 
           tool.server.uri, 
           tool.server.transport, 
           tool.server.auth_provider
         )
+
+        console.log("connection status: ", connectionStatus)
 
         _isOnline = connectionStatus
       }
@@ -248,7 +259,7 @@ export default function RightSidebarItem(
                   Retry connection
                 </button>
               </div>
-            ) : isOnline.status === "connecting" ? (
+            ) : client.isPending(tool.uti) ? (
               <div className="text-xs text-blue-400 mt-1 mb-2 flex items-center">
                 <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-blue-400 mr-2"></div>
                 <p>Connecting to server...</p>
@@ -286,7 +297,7 @@ export default function RightSidebarItem(
                 )}
               </div>
             )}
-            {isOnline.status === "success" && (
+            {client.isConnected(tool.uti) && (
               <label className="mt-5 mb-2 inline-flex items-center cursor-pointer">
                 <input 
                   type="checkbox" 

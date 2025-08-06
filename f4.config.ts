@@ -53,6 +53,7 @@ const config: Config = {
         ],
         "openai": [
             { "id": "gpt-4o-mini", "name": "GPT-4o", "provider": "openai", "logo": "https://d-cb.jc-cdn.com/sites/crackberry.com/files/styles/large/public/article_images/2023/08/openai-logo.jpg"},
+            { "id": "openai/gpt-oss-120b", "name": "GPT-OSS", "provider": "groq", "logo": "https://d-cb.jc-cdn.com/sites/crackberry.com/files/styles/large/public/article_images/2023/08/openai-logo.jpg"},
         ],
         "anthropic": [
             { "id": "claude-sonnet-4-20250514", "name": "Claude 4 Sonnet", "provider": "anthropic", "logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRnM91o7r1wba01xcHW15PLqbe-ONaTIjOO3g&s"},
