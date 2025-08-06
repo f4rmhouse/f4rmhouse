@@ -496,6 +496,9 @@ class F4MCPClient {
           let sessionId = ""
           if(url instanceof URL) {
             sessionId = url.searchParams.get("sessionId") || ""
+            if(sessionId == "") {
+              sessionId = url.searchParams.get("session_id") || ""
+            }
           }
           return fetch(`${this.base_url}/api/mcp/sse?sessionId=${sessionId}`, init)
         }

@@ -79,6 +79,9 @@ export async function POST(request: Request) {
   const sessionId = url.searchParams.get("sessionId");
   const serverId = request.headers.get("server-id")
 
+  // Read the request body once to avoid "disturbed or locked" error
+  const requestBody = await request.text();
+  
   // Create fetch options with the required duplex property
   const fetchOptions: any = {
     method: 'POST',
@@ -86,13 +89,21 @@ export async function POST(request: Request) {
       'Content-Type': 'application/json',
       'Accept': 'text/event-stream'
     },
-    body: request.body,
+    body: requestBody,
     duplex: 'half', // Required when forwarding a request body
   };
 
-  const response = await fetch(`${serverId}/message?sessionId=${sessionId}`, fetchOptions);
-
-  console.log("Response: ", response)
-  
-  return response; 
+  let response = await fetch(`${serverId}/message?sessionId=${sessionId}`, fetchOptions);
+  if(response.status !== 404) {
+    return response; 
+  }
+  else {
+    // Create new fetch options with the same body for fallback
+    const fallbackOptions = {
+      ...fetchOptions,
+      body: requestBody // Reuse the already-read body
+    };
+    let res = await fetch(`${serverId?.replace("/sse", "")}/messages/?session_id=${sessionId}`, fallbackOptions);
+    return res; 
+  }
 }
