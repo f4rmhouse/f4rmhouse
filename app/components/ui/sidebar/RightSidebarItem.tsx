@@ -259,7 +259,7 @@ export default function RightSidebarItem(
                   Retry connection
                 </button>
               </div>
-            ) : client.isPending(tool.uti) ? (
+            ) : isOnline.status === "connecting" ? (
               <div className="text-xs text-blue-400 mt-1 mb-2 flex items-center">
                 <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-blue-400 mr-2"></div>
                 <p>Connecting to server...</p>
@@ -297,7 +297,7 @@ export default function RightSidebarItem(
                 )}
               </div>
             )}
-            {client.isConnected(tool.uti) && (
+            {isOnline.status === "success" && (
               <label className="mt-5 mb-2 inline-flex items-center cursor-pointer">
                 <input 
                   type="checkbox" 
