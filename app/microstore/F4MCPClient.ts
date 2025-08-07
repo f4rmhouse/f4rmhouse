@@ -311,6 +311,8 @@ class F4MCPClient {
 
         let res = await fetch(url)
 
+        console.log("init res: ", res)
+
         if(res.status == 200 || res.status == 404 || res.status == 500 || res.status == 400 || res.status == 405) {
           // Server allows unauthenticated access
           await this._connectWithMCPServerWithoutAuth(uti, serverURL, client, transport)
@@ -444,6 +446,7 @@ class F4MCPClient {
      * @param init - Request initialization options
      * @returns Promise from fetch with authorization headers added
      */
+
     const fetchWithAuth = (url: string | URL, init?: RequestInit) => {
       const headers = new Headers(init?.headers);
       headers.set("Authorization", authToken);
@@ -487,9 +490,7 @@ class F4MCPClient {
     else {
       let t = new SSEClientTransport(new URL(url), {
         eventSourceInit:{ 
-          fetch: (url: string | URL, init?: RequestInit) => {
-            return fetch(url.toString(), { ...init});
-          }
+          fetch: fetchWithAuth
         },
         requestInit: customHeaders,
         fetch: (url: string | URL, init?: RequestInit) => {
@@ -500,6 +501,7 @@ class F4MCPClient {
               sessionId = url.searchParams.get("session_id") || ""
             }
           }
+          const headers = new Headers(init?.headers);
           return fetch(`${this.base_url}/api/mcp/sse?sessionId=${sessionId}`, init)
         }
       });

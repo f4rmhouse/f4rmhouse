@@ -28,7 +28,7 @@ export async function GET(request: Request) {
     const proxyHeaders: Record<string, string> = {
       Accept: 'text/event-stream, application/json',
     };
-    
+
     // Add authorization header if present
     if (authHeader) {
       proxyHeaders.Authorization = authHeader;
@@ -81,14 +81,25 @@ export async function POST(request: Request) {
 
   // Read the request body once to avoid "disturbed or locked" error
   const requestBody = await request.text();
+
+  // Extract authorization header from incoming request
+  const authHeader = request.headers.get('Authorization');
+    
+  // Build headers for the proxied request
+  const proxyHeaders: Record<string, string> = {
+    'Content-Type': 'application/json',
+    'Accept': 'text/event-stream, application/json',
+  };
+
+  // Add authorization header if present
+  if (authHeader) {
+    proxyHeaders.Authorization = authHeader;
+  }
   
   // Create fetch options with the required duplex property
   const fetchOptions: any = {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'text/event-stream'
-    },
+    headers: proxyHeaders,
     body: requestBody,
     duplex: 'half', // Required when forwarding a request body
   };
