@@ -682,7 +682,7 @@ class F4MCPClient {
 
     catch(err) {
       console.error(err)
-      toast.info("Could not parse MCP server URL " + serverURL + " make sure it's a valid URL")
+      toast.error("Could not parse MCP server URL " + serverURL + " make sure it's a valid URL")
       return serverURL
     }
 

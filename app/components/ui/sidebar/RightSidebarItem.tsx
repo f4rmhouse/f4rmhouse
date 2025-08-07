@@ -204,7 +204,12 @@ export default function RightSidebarItem(
       }
     } catch (error) {
       _isOnline = { status: "error" } as MCPConnectionStatus
-      toast.error('Failed to connect MCP server: ' + tool.uti)
+      if((tool.server.uri.includes("localhost") || tool.server.uri.includes("127.0.0.1"))){
+        toast.error(tool.server.uri + ' not available in cloud version of f4rmhouse. Use a local deployment to use local MCP servers.')
+      }
+      else {
+        toast.error('Failed to connect MCP server: ' + tool.uti)
+      }
     }
     setIsOnline(_isOnline)
   }
