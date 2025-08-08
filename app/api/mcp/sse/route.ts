@@ -35,7 +35,6 @@ export async function GET(request: Request) {
     }
 
     try {
-      // Create a new fetch with no timeout and proper SSE headers
       const response = await fetch(targetUrl, {
         headers: proxyHeaders,
         signal: request.signal, // Use request signal for proper cancellation

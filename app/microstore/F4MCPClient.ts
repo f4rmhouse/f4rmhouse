@@ -311,8 +311,6 @@ class F4MCPClient {
 
         let res = await fetch(url)
 
-        console.log("init res: ", res)
-
         if(res.status == 200 || res.status == 404 || res.status == 500 || res.status == 400 || res.status == 405) {
           // Server allows unauthenticated access
           await this._connectWithMCPServerWithoutAuth(uti, serverURL, client, transport)
@@ -356,7 +354,11 @@ class F4MCPClient {
       }
     };
 
-    await this._handleConnection(transport, url, customHeaders, client, uti, null)
+    const fetchWithNoAuthHeader= (url: string | URL, init?: RequestInit) => {
+      return fetch(url.toString(), { ...init});
+    };
+
+    await this._handleConnection(transport, url, customHeaders, client, uti, fetchWithNoAuthHeader)
   }
 
   /**
