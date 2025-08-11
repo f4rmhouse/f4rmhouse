@@ -47,7 +47,7 @@ export default function SmallAppCardGrid({apps}: {apps: AppCardType[]|string}) {
 
   return (
     <div className="sm:grid sm:grid-cols-3 mt-5 gap-2 w-[95%] m-auto">
-        {values.slice(0,9).map((app,i) => {
+        {values.map((app,i) => {
           return <SmallAppCard key={i} app={app}/>
         })} 
         {error ? 

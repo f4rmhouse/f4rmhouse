@@ -152,12 +152,12 @@ export default function RightSidebarItem(
       return;
     }
     if (tool) {
-
       let clientRegistrationURL = isOnline
         .remoteAuthServerMetadata
         ?.registration_endpoint
 
       if(clientRegistrationURL) {
+        console.log("clientRegistrationURL", clientRegistrationURL)
         registerClient(
           tool.uti, 
           clientRegistrationURL, 

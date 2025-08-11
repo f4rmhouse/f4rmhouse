@@ -112,7 +112,9 @@ export const MCP_PROXY_CONFIG: ProxySecurityConfig = {
     'mcp.himalayas.app',
     'mcp-keywordspeopleuse.com',
     'mcp.pearl.com',
-    'aimcp.info'
+    'aimcp.info',
+    'www.audioscrape.com',
+    'app.scorecard.io'
     
     // Example: Add your own MCP servers
     // 'your-mcp-server.com',

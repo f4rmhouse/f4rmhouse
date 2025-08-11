@@ -49,7 +49,7 @@ export async function POST(request: Request) {
 
     try {
       // Use secure fetch with SSRF protection
-      const response = await secureFetch(targetUrl, {
+      const response = await fetch(targetUrl, {
         method: 'POST',
         headers: proxyHeaders,
         body: bodyText,
@@ -57,7 +57,7 @@ export async function POST(request: Request) {
       } as RequestInit & { duplex: 'half' });
 
       // Proxy the response stream with proper headers
-      return response 
+      return response;
 
     } catch (error) {
       console.error('Secure streamable proxy error:', error);

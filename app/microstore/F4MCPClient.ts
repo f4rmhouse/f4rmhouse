@@ -309,7 +309,9 @@ class F4MCPClient {
           url = new URL("http://localhost:8080/sse");
         }
 
+        // console.log("init")
         let res = await fetch(url)
+        console.log("init res: ", res)
 
         if(res.status == 200 || res.status == 404 || res.status == 500 || res.status == 400 || res.status == 405) {
           // Server allows unauthenticated access
@@ -317,14 +319,14 @@ class F4MCPClient {
           return {status: "success"}
         }
         else if(res.status == 401) {
-          // Server requires authentication - initiate OAuth flow
           toast.info(uti + ' needs you to authenticate to use the MCP server.')
+          let res = await fetch(url)
           let result = await this._initiateMCPAuthentication(uti, serverURL, res)
           return result
         }
         else {
-          console.error("Unexpected status code:", res.status)
-          return {status: "error"}
+           console.error("Unexpected status code:", res.status)
+           return {status: "error"}
         }
       }
     } catch (error) {
@@ -478,15 +480,19 @@ class F4MCPClient {
       return;
     }
     this.pending.set(uti, true);
+    console.log("transport: ", transport)
 
     if (transport == "streamable_http") {
-        let t = new StreamableHTTPClientTransport(url, {requestInit: customHeaders});
+        console.log("customHeaders: ", customHeaders)
+        let t = new StreamableHTTPClientTransport(url, {
+          requestInit: customHeaders,
+        });
         try {
           await client.connect(t);
           this.connections.set(uti, client);
         }
         catch(err) {
-          console.error(err)
+          console.error("Error: ", err)
         }
     }
     else {
@@ -503,7 +509,6 @@ class F4MCPClient {
               sessionId = url.searchParams.get("session_id") || ""
             }
           }
-          const headers = new Headers(init?.headers);
           return fetch(`${this.base_url}/api/mcp/sse?sessionId=${sessionId}`, init)
         }
       });

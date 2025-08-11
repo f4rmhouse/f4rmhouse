@@ -108,7 +108,9 @@ const DEFAULT_CONFIG: SecurityConfig = {
     'mcp.himalayas.app',
     'mcp-keywordspeopleuse.com',
     'mcp.pearl.com',
-    'aimcp.info'
+    'aimcp.info',
+    'www.audioscrape.com',
+    'app.scorecard.io'
     
     // Add your trusted MCP servers here
   ],
