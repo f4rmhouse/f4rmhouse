@@ -165,7 +165,7 @@ export default function DetailPage({ params }: { params: Params }) {
 
     return (
       <div className={`m-auto ${theme.backgroundColor} ${theme.textColorPrimary}`}>
-        <div className="relative max-w-screen-2xl w-[95vw] justify-between mx-auto pt-10">
+        <div className="relative max-w-screen-2xl w-[75vw] justify-between mx-auto pt-10">
           {!noActionFound ?
           <div>
           {product?
@@ -176,23 +176,17 @@ export default function DetailPage({ params }: { params: Params }) {
             <span>{product.title}</span>
           </div>
           <div className="sm:grid sm:grid-cols-12 gap-6 mb-8">
-            <div className="sm:col-span-5 lg:col-span-5 rounded-lg overflow-hidden sticky top-5 self-start">
-              {showcase.length > 0 ? 
-                <div className="relative">
-                  <ImageBanner images={showcase} />
-                </div>
-                :
-                <div className="aspect-square flex items-center justify-center bg-zinc-900 border-neutral-800">
-                  <img 
-                    className="w-3/4 h-3/4 object-contain opacity-90" 
-                    src={"https://f4-public.s3.eu-central-1.amazonaws.com/showcases/" + product.uti + "/thumbnail.jpg"}
-                    alt={product.title}
-                  />
-                </div>
-              }
+            <div className="sm:col-span-2 lg:col-span-2 rounded-lg overflow-hidden sticky top-5 self-start">
+              <div className="aspect-square flex items-center justify-center bg-zinc-900 border-neutral-800">
+                <img 
+                  className="w-3/4 h-3/4 object-contain opacity-90" 
+                  src={"https://f4-public.s3.eu-central-1.amazonaws.com/showcases/" + product.uti + "/thumbnail.jpg"}
+                  alt={product.title}
+                />
+              </div>
             </div>
             
-            <div className="col-span-12 sm:col-span-7 lg:col-span-7 flex flex-col mt-4 sm:mt-0">
+            <div className="col-span-12 lg:col-start-5 sm:col-span-6 lg:col-span-8 flex flex-col mt-4 sm:mt-0">
               <div className="mb-4">
                 <h1 className="text-2xl sm:text-3xl mt-1 mb-1">{product.title}</h1>
                 <div className="flex items-center mb-2">
@@ -237,36 +231,13 @@ export default function DetailPage({ params }: { params: Params }) {
               </div>
             </div>
           </div>
-          <div className="p-4 mb-8">
-            <h2 className="text-lg font-bold mb-3 flex items-center">
-              <Award className="mr-2 text-green-500" size={18} />
-              Security & Compliance
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div className="flex items-start p-3 rounded-lg">
-                <Shield className="text-green-500 mr-2 mt-0.5" size={16} />
-                <div>
-                  <p className="text-sm font-medium">Data Protection</p>
-                  <p className="text-xs">Your data is encrypted and securely processed</p>
-                </div>
-              </div>
-              <div className="flex items-start p-3 rounded-lg">
-                <CheckCircle2 className="text-green-500 mr-2 mt-0.5" size={16} />
-                <div>
-                  <p className="text-sm font-medium">Compliance Certified</p>
-                  <p className="text-xs">Meets industry standards for AI safety</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div id="reviews" className="mb-12 pt-8">
+          <div id="reviews" className="mb-12">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl">Customer Reviews</h2>
             </div>
             
             <div className="sm:grid sm:grid-cols-12 gap-6">
-              <div className="col-span-4 lg:col-span-3 self-start rounded-lg p-4 sticky top-5">
+              <div className="col-span-6 lg:col-span-4 self-start rounded-lg p-4 sticky top-5">
                 <div className="text-center mb-4">
                   <h3 className="text-6xl font-bold mb-1">{rating}</h3>
                   <div className="flex justify-center mb-1">
@@ -294,7 +265,7 @@ export default function DetailPage({ params }: { params: Params }) {
                 </div>
               </div>
               
-              <div className="col-span-8 lg:col-span-9 mt-6 sm:mt-0">
+              <div className="col-span-4 lg:col-span-8 mt-6 sm:mt-0">
                 <div className="flex items-center justify-between mb-4 pb-2">
                   <p className="text-lg font-medium">{reviews.length} Customer Reviews</p>
                 </div>
@@ -321,7 +292,7 @@ export default function DetailPage({ params }: { params: Params }) {
           <div className="pb-[15vh] pt-8">
             <h2 className="text-2xl mb-6">You might also like</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {["dashboarder", "linear_official", "deepwiki", "mediagen"].map((i:string) => (
+              {["asana", "linear_official", "deepwiki", "exa_official"].map((i:string) => (
                 <ProductPreviewCard key={i} name={i} />
               ))}
             </div>
