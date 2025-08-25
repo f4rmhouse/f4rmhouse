@@ -13,7 +13,7 @@ import KeyboardHandlerWrapper from "./components/ui/KeyboardHandlerWrapper";
 
 export const metadata: Metadata = {
   title: "f4rmhouse",
-  description: "The MCP tool hub.",
+  description: "the browser-native MCP client",
 };
 
 export default function RootLayout({children,}: Readonly<{children: React.ReactNode}>) {

@@ -7,22 +7,6 @@ import remarkGfm from 'remark-gfm';
 import './markdown.css';
 import { MermaidDiagram } from '@lightenna/react-mermaid-diagram';
 
-// Function to extract Mermaid charts from message content
-const extractMermaidCharts = (text: string) => {
-  const mermaidRegex = /```mermaid\s*\n([\s\S]*?)\n```/g;
-  const charts: { chart: string; index: number }[] = [];
-  let match;
-  
-  while ((match = mermaidRegex.exec(text)) !== null) {
-    charts.push({
-      chart: match[1].trim(),
-      index: match.index
-    });
-  }
-  
-  return charts;
-};
-
 // Function to split message content around Mermaid charts
 const splitMessageWithCharts = (text: string) => {
   const mermaidRegex = /```mermaid\s*\n[\s\S]*?\n```/g;
@@ -71,30 +55,118 @@ const splitMessageWithCharts = (text: string) => {
 export default function NewAIMessage({id, message, latency}:{id: string, message:string| undefined, latency: number}) {
   const { theme } = useTheme();
   const { addArtifact } = useArtifact();
-  const [hasCreatedArtifact, setHasCreatedArtifact] = useState(false);
+  const [hasCreatedHtmlArtifact, setHasCreatedHtmlArtifact] = useState(false);
+  const [hasCreatedHtmlUrlArtifact, setHasCreatedHtmlUrlArtifact] = useState(false);
+  const [hasCreatedImageArtifact, setHasCreatedImageArtifact] = useState(false);
 
   // Function to extract HTML content between DOCTYPE and closing html tags
   const extractHTMLContent = (text: string): string | null => {
     if (!text) return null;
     
-    // Regular expression to match from <!DOCTYPE html> to </html>
+    // Regular expression to match from <!DOCTYPE html> or <html> to </html>
     // The 's' flag makes . match newlines as well
-    const htmlRegex = /<!DOCTYPE\s+html[^>]*>[\s\S]*?<\/html>/gi;
+    const htmlRegex = /(?:<!DOCTYPE\s+html[^>]*>[\s\S]*?|<html[^>]*>[\s\S]*?)<\/html>/gi;
     const match = text.match(htmlRegex);
     
     return match ? match[0] : null;
   };
 
+  // Function to extract HTML file URLs from message content
+  const extractHtmlUrls = (text: string): string[] => {
+    if (!text) return [];
+    
+    // Regular expressions for HTML file URL patterns
+    const patterns = [
+      // Direct HTML file URLs (http/https with .html/.htm extensions)
+      /https?:\/\/[^\s<>"']+\.(?:html|htm)(?:\?[^\s<>"']*)?/gi,
+      // Markdown link syntax [text](url.html)
+      /\[[^\]]*\]\(([^)]+\.(?:html|htm)(?:\?[^)]*)?)\)/gi,
+      // HTML anchor tags with href to HTML files
+      /<a[^>]+href=["']([^"']+\.(?:html|htm)(?:\?[^"']*)?)["'][^>]*>/gi
+    ];
+    
+    const htmlUrls: string[] = [];
+    
+    patterns.forEach(pattern => {
+      let match;
+      while ((match = pattern.exec(text)) !== null) {
+        // For markdown and HTML patterns, extract the URL from capture group
+        const url = match[1] || match[0];
+        if (url && !htmlUrls.includes(url)) {
+          htmlUrls.push(url);
+        }
+      }
+    });
+    
+    return htmlUrls;
+  };
+
+  // Function to extract image URLs from message content
+  const extractImageUrls = (text: string): string[] => {
+    if (!text) return [];
+    
+    // Regular expressions for different image URL patterns
+    const patterns = [
+      // Direct image URLs (http/https with common image extensions)
+      /https?:\/\/[^\s<>"']+\.(?:jpg|jpeg|png|gif|bmp|webp|svg|ico|tiff|tif)(?:\?[^\s<>"']*)?/gi,
+      // Markdown image syntax ![alt](url)
+      /!\[[^\]]*\]\(([^)]+\.(?:jpg|jpeg|png|gif|bmp|webp|svg|ico|tiff|tif)(?:\?[^)]*)?)\)/gi,
+      // HTML img tags
+      /<img[^>]+src=["']([^"']+\.(?:jpg|jpeg|png|gif|bmp|webp|svg|ico|tiff|tif)(?:\?[^"']*)?)["'][^>]*>/gi
+    ];
+    
+    const imageUrls: string[] = [];
+    
+    patterns.forEach(pattern => {
+      let match;
+      while ((match = pattern.exec(text)) !== null) {
+        // For markdown and HTML patterns, extract the URL from capture group
+        const url = match[1] || match[0];
+        if (url && !imageUrls.includes(url)) {
+          imageUrls.push(url);
+        }
+      }
+    });
+    
+    return imageUrls;
+  };
+
   // Create artifact when HTML content is detected
   useEffect(() => {
-    if (message?.includes("!DOCTYPE html") && message?.includes("</html>") && !hasCreatedArtifact) {
+    if (message?.includes("!DOCTYPE html") && message?.includes("</html>") && !hasCreatedHtmlArtifact) {
       const htmlContent = extractHTMLContent(message);
       if (htmlContent) {
         addArtifact(htmlContent);
-        setHasCreatedArtifact(true);
+        setHasCreatedHtmlArtifact(true);
       }
     }
-  }, [message, hasCreatedArtifact]);
+  }, [message, hasCreatedHtmlArtifact, addArtifact]);
+
+  // Create artifacts for HTML file URLs
+  useEffect(() => {
+    if (message && !hasCreatedHtmlUrlArtifact) {
+      const htmlUrls = extractHtmlUrls(message);
+      if (htmlUrls.length > 0) {
+        htmlUrls.forEach(url => {
+          addArtifact(url);
+        });
+        setHasCreatedHtmlUrlArtifact(true);
+      }
+    }
+  }, [message, hasCreatedHtmlUrlArtifact, addArtifact]);
+
+  // Create artifacts for image URLs
+  useEffect(() => {
+    if (message && !hasCreatedImageArtifact) {
+      const imageUrls = extractImageUrls(message);
+      if (imageUrls.length > 0) {
+        imageUrls.forEach(url => {
+          addArtifact(url);
+        });
+        setHasCreatedImageArtifact(true);
+      }
+    }
+  }, [message, hasCreatedImageArtifact, addArtifact]);
 
   return (
     <>

@@ -1,6 +1,7 @@
 import axios, { AxiosResponse } from 'axios';
 import ProductType from '../components/types/ProductType';
 import ReviewType from '../components/types/ReviewType';
+import F4rmerType from '../components/types/F4rmerType';
 
 /**
  * Store is an abstraction for multiple datastores that contain 
@@ -90,6 +91,18 @@ class Store {
     try {
       const response: AxiosResponse = await axios.get(
         `${this.baseUrl}/store/get/default/f4rmers`,
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching services:', error);
+      throw error;
+    }
+  }
+
+  async getF4rmer(user: string, uid: string): Promise<F4rmerType> {
+    try {
+      const response: AxiosResponse = await axios.get(
+        `${this.baseUrl}/public/f4rmer/read_specific?username=${user}&uid=${uid}`
       );
       return response.data;
     } catch (error) {

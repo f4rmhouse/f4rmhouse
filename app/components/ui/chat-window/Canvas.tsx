@@ -94,6 +94,35 @@ export default function Canvas() {
     }
   }
 
+  const downloadFile = () => {
+    if (!currentArtifact) return;
+    
+    if (artifactType === "html") {
+      // Create blob from HTML string
+      const blob = new Blob([currentArtifact], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      
+      // Create temporary download link
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${getTabName(currentArtifact, artifacts.indexOf(currentArtifact))}.html`;
+      document.body.appendChild(link);
+      link.click();
+      
+      // Cleanup
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } else {
+      // For URLs and other content, use original behavior
+      const link = document.createElement('a');
+      link.href = currentArtifact;
+      link.download = getFileName(currentArtifact);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  }
+
   if (!currentArtifact) {
     return (
       <div className={`flex h-full w-full ${theme.primaryColor} items-center justify-center`}>
@@ -126,14 +155,13 @@ export default function Canvas() {
         >
           <RefreshCcw size={15} />
         </button>
-        <a
-          href={currentArtifact}
-          download={getFileName(currentArtifact || "")}
+        <button
+          onClick={downloadFile}
           className={`rounded-md p-2 transition-all ${theme.textColorPrimary}`}
           title="Download content"
         >
           <Download size={15} />
-        </a>
+        </button>
       </div>
       
       {/* Content area */}

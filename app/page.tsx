@@ -11,13 +11,11 @@ import getSession from "@/app/context/getSession";
 import Boxes from "./components/ui/chat-window/Boxes";
 import Store from "./microstore/Store";
 import { Github } from "lucide-react";
-import FPSCounter from './components/ui/FPSCounter';
 import { ThemeProvider } from "./context/ThemeContext";
 import ThemeToggleButton from "./components/ui/ThemeToggleButton";
 import HelpModal from "./components/ui/HelpModal";
 import config from "../f4.config";
 import ProductType from "./components/types/ProductType";
-import { toast, Toaster } from "sonner";
 
 async function Dashboard() {
 

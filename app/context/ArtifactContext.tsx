@@ -21,7 +21,6 @@ export function ArtifactProvider({ children }: { children: ReactNode }) {
       let _tmp = artifacts
       _tmp.push(url)
       setArtifacts(_tmp)
-      console.log("added artifact: ", url)
       setCurrentArtifact(url)
     } else {
       console.log("artifact already exists: ", url)
@@ -29,7 +28,6 @@ export function ArtifactProvider({ children }: { children: ReactNode }) {
   }
 
   const updateArtifact = (index:number) => {
-    console.log("index", index)
     setCurrentArtifact(artifacts[index])
   }
 

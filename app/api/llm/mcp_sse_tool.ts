@@ -93,7 +93,6 @@ function createMCPTool({ uti, endpoint, title, tool_description, parameters, aut
                     }
                 }
             }
-
             let token = await caller.getToken(uti) 
             if(token.encryptedData.length > 0) {
                 accessToken = token.token.token
@@ -192,7 +191,11 @@ function createMCPTool({ uti, endpoint, title, tool_description, parameters, aut
                     return ["The result does not fit into the context window."];
                 }
 
-                await caller.registerRun(uti)
+                console.log("endpoint: ", endpoint)
+                console.log("url: ", uri)
+                if(!uri.includes("localhost") && !uri.includes("127.0.0.1") && !uri.includes("0.0.0.0")) {
+                  await caller.registerRun(uti)
+                }
 
                 // await client.close()
                 return content;
