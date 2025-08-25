@@ -29,7 +29,7 @@ export default async function SharePage({ params }: SharePageProps) {
   f4rmers = [f4rmer]
 
   return (
-    <div className="text-black">
+    <div className="">
       <div className="">
         <Boxes f4rmers={f4rmers} session={session}/>
       </div>
