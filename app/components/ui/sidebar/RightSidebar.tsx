@@ -6,7 +6,7 @@
 "use client"
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { BadgeCheck, BrainCircuit, HardDrive, Store as StoreIcon} from "lucide-react";
+import { BadgeCheck, BrainCircuit, HardDrive, Share, Store as StoreIcon} from "lucide-react";
 import { PanelLeftClose } from 'lucide-react';
 import { useTheme } from "../../../context/ThemeContext";
 import { useOnboarding } from "../../../context/OnboardingContext";
@@ -71,6 +71,21 @@ export default function RightSidebar() {
               className={`hover:${theme.textColorPrimary} p-2 rounded-md transition-all hover:${theme.hoverColor} cursor-pointer flex ${theme.textColorSecondary} w-full text-base gap-3 my-auto`}
             >
               <HardDrive size={20}/> Add custom server
+            </button>
+          </div>
+          <div className=''>
+            <button 
+              onClick={() => {
+                const shareLink = `http://localhost:3000/share/${selectedAgent?.creator}/${selectedAgent?.uid}`;
+                navigator.clipboard.writeText(shareLink).then(() => {
+                  toast.success("Link copied to clipboard")
+                }).catch(err => {
+                  console.error('Failed to copy link:', err);
+                });
+              }}
+              className={`hover:${theme.textColorPrimary} p-2 rounded-md transition-all hover:${theme.hoverColor} cursor-pointer flex ${theme.textColorSecondary} w-full text-base gap-3 my-auto`}
+            >
+              <Share size={20}/> Share 
             </button>
           </div>
         </div>

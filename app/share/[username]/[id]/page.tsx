@@ -31,7 +31,6 @@ export default async function SharePage({ params }: SharePageProps) {
   return (
     <div className="text-black">
       <div className="">
-        <p>URL: /share/{username}/{id}</p>
         <Boxes f4rmers={f4rmers} session={session}/>
       </div>
       <div className="absolute hidden sm:flex bottom-0 flex right-24">
