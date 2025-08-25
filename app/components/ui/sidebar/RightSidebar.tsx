@@ -18,7 +18,7 @@ import { toast } from 'sonner';
 
 
 export default function RightSidebar() {
-  let baseURL = process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://f4rmhouse.com'
+  let baseURL = process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://app.f4rmhouse.com'
   const { theme } = useTheme()
   const { completeStep, isStepCompleted } = useOnboarding();
   const { selectedAgent, trustedServers, setTrustedServers } = useAgent();
