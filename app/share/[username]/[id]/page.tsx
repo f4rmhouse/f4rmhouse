@@ -7,10 +7,10 @@ import config from "../../../../f4.config";
 import { Github } from "lucide-react";
 
 interface SharePageProps {
-  params: {
+  params: Promise<{
     username: string;
     id: string;
-  };
+  }>;
 }
 
 export default async function SharePage({ params }: SharePageProps) {
