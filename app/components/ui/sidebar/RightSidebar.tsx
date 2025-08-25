@@ -18,6 +18,7 @@ import { toast } from 'sonner';
 
 
 export default function RightSidebar() {
+  let baseURL = process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://f4rmhouse.com'
   const { theme } = useTheme()
   const { completeStep, isStepCompleted } = useOnboarding();
   const { selectedAgent, trustedServers, setTrustedServers } = useAgent();
@@ -76,7 +77,7 @@ export default function RightSidebar() {
           <div className=''>
             <button 
               onClick={() => {
-                const shareLink = `http://localhost:3000/share/${selectedAgent?.creator}/${selectedAgent?.uid}`;
+                const shareLink = `${baseURL}/share/${selectedAgent?.creator}/${selectedAgent?.uid}`;
                 navigator.clipboard.writeText(shareLink).then(() => {
                   toast.success("Link copied to clipboard")
                 }).catch(err => {
