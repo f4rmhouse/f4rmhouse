@@ -100,8 +100,6 @@ function createMCPTool({ uti, endpoint, title, tool_description, parameters, aut
 
             const authToken = "Bearer " + accessToken
 
-            console.log("Auth token: ", authToken)
-
             const fetchWithAuth = (url: string | URL, init?: RequestInit) => {
               const headers = new Headers(init?.headers);
               headers.set("Authorization", authToken);
@@ -159,13 +157,10 @@ function createMCPTool({ uti, endpoint, title, tool_description, parameters, aut
                 let result : any;
                 let content: any;
                 if(mcp_type == "tool") {
-                    console.log("Calling tool: ", endpoint)
-                    console.log("Arguments: ", filteredArgs)
                     result = await client.callTool({
                         name: endpoint,
                         arguments: filteredArgs,
                     }); 
-                    console.log("Result: ", result)
                     if (!result || !result.content) {
                         throw new Error('Empty response');
                     }
@@ -191,8 +186,6 @@ function createMCPTool({ uti, endpoint, title, tool_description, parameters, aut
                     return ["The result does not fit into the context window."];
                 }
 
-                console.log("endpoint: ", endpoint)
-                console.log("url: ", uri)
                 if(!uri.includes("localhost") && !uri.includes("127.0.0.1") && !uri.includes("0.0.0.0")) {
                   await caller.registerRun(uti)
                 }

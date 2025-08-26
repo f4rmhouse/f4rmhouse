@@ -5,6 +5,7 @@ import getSession from "@/app/context/getSession";
 import Store from "@/app/microstore/Store";
 import config from "../../../../f4.config";
 import { Github } from "lucide-react";
+import RightSidebar from "@/app/components/ui/sidebar/RightSidebar";
 
 interface SharePageProps {
   params: Promise<{
@@ -32,6 +33,7 @@ export default async function SharePage({ params }: SharePageProps) {
     <div className="">
       <div className="">
         <Boxes f4rmers={f4rmers} session={session}/>
+        <RightSidebar />
       </div>
       <div className="absolute hidden sm:flex bottom-0 flex right-24">
           <a 
