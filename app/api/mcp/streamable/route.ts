@@ -30,7 +30,6 @@ export async function POST(request: Request) {
     // Extract authorization header from incoming request
     const authHeader = request.headers.get('Authorization');
     const mcpSessionId = request.headers.get('mcp-session-id');
-    console.log("MCP Session ID: ", mcpSessionId)
 
     // Build headers for the proxied request
     const proxyHeaders: Record<string, string> = {
@@ -107,7 +106,6 @@ export async function GET(request: Request) {
         method: 'GET',
         headers: proxyHeaders,
       })
-      console.log("response: ", response)
 
       if (!response.body) {
         return new Response('No upstream stream', { status: 502, statusText: "No upstream stream" });

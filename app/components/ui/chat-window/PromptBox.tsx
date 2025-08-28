@@ -295,8 +295,23 @@ export default function PromptBox(
       return
     }
 
+    let f4rmerDescription = selectedAgent?.jobDescription
+    let f4rmerName = selectedAgent?.title
+
+    console.log("f4rmerDescription: " + f4rmerDescription)
+    console.log("f4rmerName: " + f4rmerName)
+
+    if(input.includes("@")) {
+      const atMention = input.match(/@(\w+)/)?.[1];
+      if (atMention) {
+        let mention = f4rmers.filter(f => f.title == atMention)
+        f4rmerDescription = mention[0].jobDescription
+        f4rmerName = mention[0].title
+      }
+    }
+
     // TODO: make it so that I need to type nextjsrole and f4role
-    chatSession.push("user", "user", input, 0)
+    chatSession.push("user", "user", input.split(/\s+/).filter(word => !word.startsWith('@')).join(' '), 0)
     setInput("")
 
     // Add session to the components chat message storage
@@ -357,10 +372,10 @@ export default function PromptBox(
 
     let postData: PostDataType = {
       messages: chatSession.getNextJSMessages(), 
-      description: selectedAgent.jobDescription,
+      description: String(f4rmerDescription),
       show_intermediate_steps: false,
       session: session,
-      f4rmer: selectedAgent.title,
+      f4rmer: String(f4rmerName),
       model: selectedModel,
       tools: tools,
       allowList: permissions

@@ -42,6 +42,15 @@ export default function RightSidebar() {
     return cleanup;
   }, []);
 
+  const copyLinkToClipboard = () => {
+    const shareLink = `${baseURL}/share/${selectedAgent?.creator}/${selectedAgent?.uid}`;
+    navigator.clipboard.writeText(shareLink).then(() => {
+      toast.success("Link copied to clipboard")
+    }).catch(err => {
+      console.error('Failed to copy link:', err);
+    });  
+  }
+
   return (
     <div className="hidden sm:block">
       <div onMouseEnter={() => setVisible(true)} onMouseLeave={() => setVisible(false)} className={`p-2 fixed right-0 w-[50%] sm:w-[25%] mt-9 h-[92vh] z-10 top-0 border-${theme.secondaryColor?.replace("bg-", "")} ${theme.chatWindowStyle} transition-transform duration-300 ease-in-out rounded-md transform p-3 ${visible ? 'translate-x-0' : 'translate-x-full'}`}>
@@ -76,14 +85,7 @@ export default function RightSidebar() {
           </div>
           <div className=''>
             <button 
-              onClick={() => {
-                const shareLink = `${baseURL}/share/${selectedAgent?.creator}/${selectedAgent?.uid}`;
-                navigator.clipboard.writeText(shareLink).then(() => {
-                  toast.success("Link copied to clipboard")
-                }).catch(err => {
-                  console.error('Failed to copy link:', err);
-                });
-              }}
+              onClick={() => {copyLinkToClipboard()}}
               className={`hover:${theme.textColorPrimary} p-2 rounded-md transition-all hover:${theme.hoverColor} cursor-pointer flex ${theme.textColorSecondary} w-full text-base gap-3 my-auto`}
             >
               <Share size={20}/> Share 

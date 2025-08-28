@@ -32,11 +32,9 @@ async function Dashboard() {
     created: '2025-04-11 15:54:31'
   }]
 
-  console.log("session: ", session.user)
-
-  if(session.user && session.user.name !== "undefined") {
-    redirect("/dashboard")
-  }
+  // if(session.user && session.user.name !== "undefined") {
+  //   redirect("/dashboard")
+  // }
 
   const store = new Store()
   try {

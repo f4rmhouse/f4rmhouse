@@ -10,6 +10,7 @@ import { AgentProvider } from "./context/AgentContext";
 import { OnboardingProvider } from "./context/OnboardingContext";
 import config from "../f4.config"
 import KeyboardHandlerWrapper from "./components/ui/KeyboardHandlerWrapper";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "f4rmhouse",
@@ -45,6 +46,7 @@ export default function RootLayout({children,}: Readonly<{children: React.ReactN
                 </nav>
                 }
                 <div>
+                  <Toaster />
                   {children}
                 </div>
               </div>
