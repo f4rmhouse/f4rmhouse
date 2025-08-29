@@ -9,13 +9,6 @@ import PostHogPageView from "../PostHogPageView";
 import { useTheme } from "../context/ThemeContext";
 
 const AppMocks = {
-  "banner": {
-    "type": "banner",
-    "header": "", 
-    "content": [
-
-    ]
-  },
   "bApps": {
     "type": "small_cards",
     "header": "Apps to streamline your business",
@@ -36,8 +29,8 @@ export default function Home() {
     switch (type) {
       case "small_cards":
         return (
-          <div className="mt-10 mb-10 sm:ml-12">
-            <h2 className={`sm:pl-0 text-xl ${theme.textColorPrimary}`}>Popular Servers</h2>
+          <div className="mt-0 mb-10 sm:ml-12">
+            <h2 className={`sm:pl-0 text-xl sm:ml-10 ${theme.textColorPrimary}`}>All Servers</h2>
             <SmallAppCardGrid apps={section.content}/>
           </div>
         )
