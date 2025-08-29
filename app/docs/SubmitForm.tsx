@@ -10,7 +10,7 @@ export default function SubmitForm() {
   const [description, setDescription] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("");
   const [paymentInfo, setPaymentInfo] = useState("");
-  const [showSuccessModal, setShowSuccessModal] = useState(true);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handlePaymentMethodClick = (method: string) => {
