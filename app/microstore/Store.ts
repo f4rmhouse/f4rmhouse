@@ -111,6 +111,18 @@ class Store {
     }
   }
 
+  async createComm(data: any): Promise<F4rmerType> {
+    try {
+      const response: AxiosResponse = await axios.post(
+        `${this.baseUrl}/public/comms/create`, data
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching services:', error);
+      throw error;
+    }
+  }
+
 }
 
 export default Store;

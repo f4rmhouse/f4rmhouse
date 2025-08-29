@@ -72,7 +72,7 @@ export default function Home() {
         </div>
         <footer className="px-5 sm:pr-0 sm:pl-0">
           <div className="flex">
-            <Link href="/docs" className={`m-auto hover:${theme.textColorPrimary} p-2 rounded-md transition-all hover:${theme.hoverColor} cursor-pointer flex ${theme.textColorSecondary} text-base gap-3 my-auto`}><Hammer size={20}/> Submit a Server</Link>
+            <Link href="/docs" className={`m-auto hover:${theme.textColorPrimary} p-2 hover:underline transition-all hover:${theme.hoverColor} cursor-pointer flex ${theme.textColorSecondary} text-base gap-3 my-auto`}>Submit a Server</Link>
           </div>
           <div className="grid grid-cols-2 pt-5 pb-5">
           </div>
