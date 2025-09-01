@@ -65,6 +65,7 @@ async function Dashboard() {
         </div>
         
         <div className="absolute hidden sm:flex bottom-0 flex right-24">
+          <a href="https://discord.gg/E4jtCthE" target="_blank" rel="noopener noreferrer" className="text-neutral-500 flex hover:text-white px-1 underline text-xs">discord</a>
           <a 
             href="https://github.com/f4rmhouse/f4rmhouse" 
             target="_blank" 
