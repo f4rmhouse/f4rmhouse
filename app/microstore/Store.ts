@@ -112,6 +112,7 @@ class Store {
   }
 
   async createComm(data: any): Promise<F4rmerType> {
+    console.log("comms: ", data)
     try {
       const response: AxiosResponse = await axios.post(
         `${this.baseUrl}/public/comms/create`, data

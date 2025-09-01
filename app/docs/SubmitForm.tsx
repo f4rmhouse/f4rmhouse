@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Store from "../microstore/Store";
+import { sanitizeFormData } from "../utils/inputSanitization";
 
 export default function SubmitForm() {
   const [mcpUrl, setMcpUrl] = useState("");
@@ -43,19 +44,36 @@ export default function SubmitForm() {
       return;
     }
 
+    // Sanitize and validate all inputs
+    const formData = {
+      mcpUrl,
+      creator,
+      description,
+      email,
+      paymentMethod,
+      paymentInfo
+    };
+
+    const { sanitized, errors } = sanitizeFormData(formData);
+
+    if (errors.length > 0) {
+      alert(`Validation failed:\n${errors.join('\n')}`);
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
       let data = {
-          user: email,
+          user: sanitized.email,
           type: "mcp submission",
-          content: {
-              mcpUrl: mcpUrl,
-              creator: creator,
-              description: description,
-              paymentMethod: paymentMethod,
-              paymentInfo: paymentInfo
-          },
+          content: JSON.stringify({
+              mcpUrl: sanitized.mcpUrl,
+              creator: sanitized.creator,
+              description: sanitized.description,
+              paymentMethod: sanitized.paymentMethod,
+              paymentInfo: sanitized.paymentInfo
+          }),
           number: 0
       }
 
