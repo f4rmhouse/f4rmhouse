@@ -15,6 +15,12 @@ const nextConfig = {
             protocol: 'https',
             hostname: 'f4-public.s3.eu-central-1.amazonaws.com',
             port: '',
+            pathname: '/artifacts/0adf3243-a050-4c8f-9de6-f7d74de944f8.jpg',
+          },
+          {
+            protocol: 'https',
+            hostname: 'f4-public.s3.eu-central-1.amazonaws.com',
+            port: '',
             pathname: '/public/assets/banner_item-1.webp',
           },
           {

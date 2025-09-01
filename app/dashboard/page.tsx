@@ -17,6 +17,7 @@ import HelpModal from "../components/ui/HelpModal";
 import FPSCounter from "../components/ui/FPSCounter";
 import config from "@/f4.config";
 import { Toaster } from "sonner";
+import SendFeedback from "../components/ui/SendFeedback";
 
 const posthog = new PostHog(process.env.NEXT_PUBLIC_POSTHOG_KEY ? process.env.NEXT_PUBLIC_POSTHOG_KEY : "", {
   host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
@@ -85,6 +86,7 @@ async function Dashboard() {
           </a>
           <ThemeToggleButton />
           <HelpModal />
+          <SendFeedback />
           <p className="text-neutral-500 text-xs">v{config.version}</p>
         </div>
         {error && (
