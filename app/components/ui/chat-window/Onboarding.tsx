@@ -146,7 +146,7 @@ function BrowseStoreModal({open}: Readonly<{open: boolean}>) {
             <button 
               onClick={() => {
                 setShowModal(false);
-                router.push('/store');
+                window.open('/store', '_blank');
               }}
               className={`w-1/2 px-4 py-2 rounded ${theme.accentColor} text-white hover:opacity-90 transition-all`}
             >
