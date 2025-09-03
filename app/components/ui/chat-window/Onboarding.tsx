@@ -1,10 +1,12 @@
 import { useTheme } from "@/app/context/ThemeContext";
 import { BrainCircuit, Circle, CircleCheckBig, Paperclip, Sticker, WandSparkles } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Modal from "../modal/Modal";
 import ThemeModal from "../modal/ThemeModal";
 import { toast } from "sonner";
 import { useOnboarding } from "@/app/context/OnboardingContext";
+import CreateProfileForm from "../../forms/CreateProfileForm";
 
 function OnboardingButton({
   icon, 
@@ -39,6 +41,7 @@ function OnboardingButton({
 
 function MCPProfileModal({open}: Readonly<{open: boolean}>) {
   const [showProfileModal, setShowProfileModal] = useState<boolean>(false);
+  const [showCreateProfileModal, setShowCreateProfileModal] = useState<boolean>(false);
   const { theme } = useTheme();
 
   useEffect(() => {
@@ -46,6 +49,7 @@ function MCPProfileModal({open}: Readonly<{open: boolean}>) {
   }, [open])
 
   return(
+    <div>
     <Modal 
         open={showProfileModal} 
         title="" 
@@ -82,6 +86,7 @@ function MCPProfileModal({open}: Readonly<{open: boolean}>) {
               onClick={() => {
                 // Handle profile creation logic here
                 setShowProfileModal(false);
+                setShowCreateProfileModal(true)
               }}
               className={`w-1/2 px-4 py-2 rounded ${theme.accentColor} text-white hover:opacity-90 transition-all`}
             >
@@ -89,11 +94,17 @@ function MCPProfileModal({open}: Readonly<{open: boolean}>) {
             </button>
           </div>
         </div>
-      </Modal>)
+      </Modal>
+      <Modal open={showCreateProfileModal} title="Create New Profile" onClose={() => setShowCreateProfileModal(false)}>
+        <CreateProfileForm />
+      </Modal>
+      </div>
+    )
 }
 
 function BrowseStoreModal({open}: Readonly<{open: boolean}>) {
   const { theme } = useTheme();
+  const router = useRouter();
   const [showModal, setShowModal] = useState<boolean>(false);
 
   useEffect(() => {
@@ -134,8 +145,8 @@ function BrowseStoreModal({open}: Readonly<{open: boolean}>) {
             </button>
             <button 
               onClick={() => {
-                // Handle profile creation logic here
                 setShowModal(false);
+                router.push('/store');
               }}
               className={`w-1/2 px-4 py-2 rounded ${theme.accentColor} text-white hover:opacity-90 transition-all`}
             >
@@ -150,7 +161,7 @@ function ShareProfileModal({open}: Readonly<{open: boolean}>) {
   const { theme } = useTheme();
   const [showModal, setShowModal] = useState<boolean>(false);
 
-    let baseURL = process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://app.f4rmhouse.com'
+  let baseURL = process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://app.f4rmhouse.com'
 
   useEffect(() => {
     setShowModal(open)
@@ -195,7 +206,8 @@ function ShareProfileModal({open}: Readonly<{open: boolean}>) {
             </button>
           </div>
         </div>
-      </Modal>)
+      </Modal>
+    )
 }
 
 export default function Onboarding(
@@ -209,6 +221,7 @@ export default function Onboarding(
   const [showThemeModal, setShowThemeModal] = useState<boolean>(false);
   const [showStoreModal, setShowStoreModal] = useState<boolean>(false);
   const [showShareModal, setShowShareModal] = useState<boolean>(false);
+  const [showCreateProfileModal, setShowCreateProfileModal] = useState<boolean>(false);
 
   const [done, setDone] = useState<boolean>(false)
 
@@ -223,6 +236,11 @@ export default function Onboarding(
     setDone(true)
   }
 
+  const profileAction = () => {
+    setShowProfileModal(true);
+    completeStep(currentStep)
+  }
+
   return (
     <>
     {currentStep < 5 && !isStepCompleted(5) ?
@@ -231,7 +249,7 @@ export default function Onboarding(
           <h1 className={`text-base m-auto sm:text-4xl mb-5 ${theme.textColorPrimary}`}>Welcome to f4rmhouse!</h1>
           <p className={`${theme.textColorPrimary} mb-5`}>This is your brand new, shiny AI buzzword app. Here are some steps that will help you get started.</p>
           <div className={`flex gap-2 flex-col mb-5 ${theme.textColorPrimary}`}>
-            <OnboardingButton icon={"https://f4-public.s3.eu-central-1.amazonaws.com/public/assets/cyberpunk_character_transparent_bg.png"} text="Create an MCP profile" action={() => {setShowProfileModal(true);completeStep(currentStep)}} />
+            <OnboardingButton icon={"https://f4-public.s3.eu-central-1.amazonaws.com/public/assets/cyberpunk_character_transparent_bg.png"} text="Create an MCP profile" action={() => {profileAction()}} />
             <OnboardingButton icon={"https://f4-public.s3.eu-central-1.amazonaws.com/public/assets/paint_brush_transparent_bg.png"} text="Customize your workspace" action={() => {setShowThemeModal(true);completeStep(currentStep)}} />
             <OnboardingButton icon={"https://f4-public.s3.eu-central-1.amazonaws.com/public/assets/computer_transparent_bg.png"} text="Add your first MCP server" action={() => {setShowStoreModal(true);completeStep(currentStep)}} />
             <OnboardingButton icon={"https://f4-public.s3.eu-central-1.amazonaws.com/public/assets/paper_plane_blue_transparent_bg.png"} text="Share your MCP profile" action={() => {setShowShareModal(true);completeStep(currentStep)}} />
@@ -247,6 +265,9 @@ export default function Onboarding(
     <ThemeModal open={showThemeModal} setIsOpen={setShowThemeModal}/>
     <BrowseStoreModal open={showStoreModal}/>
     <ShareProfileModal open={showShareModal}/>
+    <Modal open={showCreateProfileModal} title="Create New Profile" onClose={() => setShowCreateProfileModal(false)}>
+      <CreateProfileForm />
+    </Modal>
     </>
   )
 }

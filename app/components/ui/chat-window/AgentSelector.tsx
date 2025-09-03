@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { AtSign, Hash } from 'lucide-react';
+import { AtSign } from 'lucide-react';
 import { useTheme } from '@/app/context/ThemeContext';
 import { useAgent } from '@/app/context/AgentContext';
 import F4rmerType from '@/app/components/types/F4rmerType';
