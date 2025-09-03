@@ -1,6 +1,6 @@
 /**
  * The dashboard should provides an easy onboarding experience for new users and
- * an easy way to navigate different f4rmers for experiences users.
+ * an easy way to navigate different f4rmers for experienced users.
  */
 import { ReactElement, JSXElementConstructor, ReactNode, ReactPortal, AwaitedReactNode } from "react";
 import DashboardLayout from "./layout";
@@ -11,12 +11,10 @@ import getSession from "@/app/context/getSession";
 import User from "@/app/microstore/User";
 import Boxes from "../components/ui/chat-window/Boxes";
 import { PostHog } from 'posthog-node'
-import { BadgeDollarSign, Github, Shield } from "lucide-react";
+import { Github } from "lucide-react";
 import ThemeToggleButton from "../components/ui/ThemeToggleButton";
 import HelpModal from "../components/ui/HelpModal";
-import FPSCounter from "../components/ui/FPSCounter";
 import config from "@/f4.config";
-import { Toaster } from "sonner";
 import SendFeedback from "../components/ui/SendFeedback";
 
 const posthog = new PostHog(process.env.NEXT_PUBLIC_POSTHOG_KEY ? process.env.NEXT_PUBLIC_POSTHOG_KEY : "", {

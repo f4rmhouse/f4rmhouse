@@ -9,6 +9,7 @@ import {
   ArrowLeft, 
   ArrowRight, 
   ArrowUp, 
+  Circle, 
   CircleStop, 
   CornerRightUp, 
   Paperclip, 
@@ -35,6 +36,8 @@ import { helpContent } from '../../../docs/commands/help';
 import Timer from "../misc/Timer";
 import { ToolPermission } from "../../types/ToolPermissionType";
 import { useArtifact } from "@/app/context/ArtifactContext";
+import Onboarding from "./Onboarding";
+import { useOnboarding } from "@/app/context/OnboardingContext";
 
 /**
  * PromptBox is the text input box at the bottom of the screen on /f4rmers/details page
@@ -95,6 +98,8 @@ export default function PromptBox(
   const [isAtBottom, setIsAtBottom] = useState<boolean>(true);
   const [isAtTop, setIsAtTop] = useState<boolean>(true);
   const [isScrollable, setIsScrollable] = useState<boolean>(false);
+  const [onBoardingDone, setOnboardingDone] = useState<boolean>(false)
+  const { completeStep, isStepCompleted, currentStep } = useOnboarding();
 
   // Message handlers
   const messageHandlers = new MessageHandlers(
@@ -460,7 +465,10 @@ export default function PromptBox(
             </div>
           )}
           <div className={`${chatSession.getMessages().length === 0 ? "block" : "hidden"} pb-1`}>
-            <h1 className={`hidden sm:flex text-base m-auto sm:text-2xl ${theme.textColorPrimary ? theme.textColorPrimary : "text-white"}`}>{welcomeMessage} <img className="my-auto w-10" src={"https://media.tenor.com/R7JF4cuIjogAAAAj/spongebob-spongebob-meme.gif"} /></h1>
+              <Onboarding
+                setOnboardingDone={() => setOnboardingDone(true)}
+              />
+              <h1 className={`hidden sm:flex text-base m-auto sm:text-2xl ${theme.textColorPrimary ? theme.textColorPrimary : "text-white"}`}>{welcomeMessage}</h1>
           </div>
           <UserInput onSubmit={sendMessage} onChange={handleInputChange} value={input}>
             <div className="flex p-0">

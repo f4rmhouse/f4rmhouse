@@ -8,6 +8,7 @@ interface OnboardingContextType {
   completeStep: (step: number) => void;
   isStepCompleted: (step: number) => boolean;
   resetOnboarding: () => void;
+  skipOnboarding: () => void;
 }
 
 const OnboardingContext = createContext<OnboardingContextType | undefined>(undefined);
@@ -37,6 +38,10 @@ export function OnboardingProvider({ children }: OnboardingProviderProps) {
     }
   };
 
+  const skipOnboarding = () => {
+    setCurrentStep(5)
+  }
+
   const completeStep = (step: number) => {
     if (step == currentStep) {
       setCurrentStep(step + 1);
@@ -61,6 +66,7 @@ export function OnboardingProvider({ children }: OnboardingProviderProps) {
     completeStep,
     isStepCompleted,
     resetOnboarding,
+    skipOnboarding
   };
 
   return (

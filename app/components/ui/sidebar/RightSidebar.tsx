@@ -20,7 +20,6 @@ import { toast } from 'sonner';
 export default function RightSidebar() {
   let baseURL = process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://app.f4rmhouse.com'
   const { theme } = useTheme()
-  const { completeStep, isStepCompleted } = useOnboarding();
   const { selectedAgent, trustedServers, setTrustedServers } = useAgent();
 
   // Track trusted servers
@@ -93,14 +92,8 @@ export default function RightSidebar() {
           </div>
         </div>
       </div>
-      {isStepCompleted(1) && !isStepCompleted(2) ? 
-        <img className='absolute top-0 right-[-65px]' height={300} width={300} src="https://f4-public.s3.eu-central-1.amazonaws.com/public/assets/mcp_servers.png"/>
-      :
-        <></>
-      }
       <div onMouseEnter={() => {
         setVisible(true); 
-        completeStep(2); // Complete step 3 (sidebar hover)
       }} className="bg-transparent absolute sm:fixed top-16 right-0 w-[50px] h-[10vh] sm:h-[100vh] z-0">
         <button onClick={() => setVisible(p => !p)} className={`z-10 ml-4 ${theme.textColorPrimary ? theme.textColorPrimary : "text-white" }`}><PanelLeftClose /></button>
       </div>

@@ -118,7 +118,7 @@ const themePresets: Record<string, Theme> = {
     "primaryColor": "bg-zinc-950 shadow-sm text-sm",
     "secondaryColor": "bg-zinc-900",
     "accentColor": "bg-emerald-500 shadow-sm font-mono text-sm",
-    "hoverColor": "bg-emerald-400",
+    "hoverColor": "bg-neutral-900",
     "backgroundColor": "bg-zinc-950 font-mono text-sm",
     "backgroundImage": "",
     "primaryHoverColor": "bg-zinc-900",
@@ -213,7 +213,6 @@ const themePresets: Record<string, Theme> = {
 
 export default function ThemeToggleButton() {
   const { theme, setTheme } = useTheme()
-  const { completeStep, isStepCompleted } = useOnboarding()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [activeThemeKey, setActiveThemeKey] = useState<string>('midnight') // Default theme key
   const [isHydrated, setIsHydrated] = useState(false)
@@ -245,16 +244,10 @@ export default function ThemeToggleButton() {
       <button 
         onClick={() => {
           setIsModalOpen(true); 
-          completeStep(0); // Complete step 1 (theme selection)
         }}
         className="flex text-neutral-500 hover:text-white px-1 underline text-xs"
       >
         <Palette className="w-4 h-4" />
-        {isStepCompleted(0) ? 
-        <></>
-        :
-        <img className="absolute bottom-[-60px] right-10" height={300} width={300} src={"https://f4-public.s3.eu-central-1.amazonaws.com/public/assets/change_theme.png"}/>
-        }
         Theme: {activeThemeKey}
       </button>
       
