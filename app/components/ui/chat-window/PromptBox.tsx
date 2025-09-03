@@ -32,7 +32,7 @@ import { useKeyboardShortcuts } from "../../../utils/keyboardShortcuts";
 import { useChatSession } from "./hooks/useChatSession";
 import { useLoadingState } from "./hooks/useLoadingState";
 import { MessageHandlers } from "./utils/messageHandlers";
-import { helpContent } from '../../../docs/commands/help';
+import { helpContent } from '../../../submit/commands/help';
 import Timer from "../misc/Timer";
 import { ToolPermission } from "../../types/ToolPermissionType";
 import { useArtifact } from "@/app/context/ArtifactContext";
