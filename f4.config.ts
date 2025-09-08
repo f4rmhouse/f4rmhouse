@@ -41,8 +41,8 @@ interface Config {
 
 const config: Config = {
     "name": "f4rmhouse",
-    "version": "1.1.3-beta",
-    "welcomeText": ["{{username}} returns!" ,"> anon joins the chat!", "ASIC speed. OMGGGGGGG", "Try out the open source models. They're super fast!", "Ask me about roko's basilisk.", "Security is always 1st but spongebob dancing is a close 2nd", "Have you said thank you once??"],
+    "version": "0.1.3-alpha",
+    "welcomeText": ["{{username}} returns!" ,"> anon joins the chat!", "ASIC speed. OMGGGGGGG", "Try out the open source models. They're super fast!", "Ask me about roko's basilisk."],
     "loadingMessages": ["Generating slop...", "Analyzing Memes...", "Pretending to Like Matcha...", "Taking a coffee break...", "Summoning the Council of Elrond...", "Asking the Jedi Council...", "Generating slop..."],
     "models": {
         "groq": [
