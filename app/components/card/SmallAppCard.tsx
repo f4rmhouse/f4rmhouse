@@ -30,13 +30,6 @@ export default function SmallAppCard({app}: {app: AppCardType}) {
             <div className="flex gap-2">
             </div>
           </div>
-          <div className="text-xs text-center p-1 ml-auto mt-auto mb-auto">
-            {app.price == "0.0" || app.price == "0"?
-              <button className="rounded-full p-1 pl-3 pr-3 ml-auto text-xs mb-auto mt-auto"></button>
-              :
-              `\$${app.price}/req`
-            }
-          </div>
         </div>
       </Link>
     </div>

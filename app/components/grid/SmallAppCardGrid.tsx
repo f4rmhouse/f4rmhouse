@@ -5,11 +5,13 @@ import SmallAppCard from "../card/SmallAppCard";
 import Store from "../../microstore/Store"
 import { useEffect, useState } from "react";
 import ProductType from "../types/ProductType";
+import { useTheme } from "@/app/context/ThemeContext";
 
 /**
  * SmallAppCardGrid shows SmallAppCards in a 3x3 grid.
  */
-export default function SmallAppCardGrid({apps}: {apps: AppCardType[]|string}) {
+export default function SmallAppCardGrid({title, apps}: {title: string, apps: AppCardType[]|string}) {
+  const { theme } = useTheme();
 
   const [values, setValues] = useState<AppCardType[]>([]);
   const [error, setError] = useState<string>("");
@@ -46,7 +48,8 @@ export default function SmallAppCardGrid({apps}: {apps: AppCardType[]|string}) {
   },[apps])
 
   return (
-    <div className="sm:grid sm:grid-cols-3 mt-5 gap-2 w-[95%] m-auto">
+    <div className="sm:grid sm:grid-cols-1 mt-5 gap-2 w-[90%] sm:w-[40%] m-auto">
+        <h2 className={`text-xl ${theme.textColorPrimary}`}>Verified Servers</h2>
         {values.map((app,i) => {
           return <SmallAppCard key={i} app={app}/>
         })} 

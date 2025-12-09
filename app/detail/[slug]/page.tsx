@@ -50,7 +50,6 @@ export default function DetailPage({ params }: { params: Params }) {
     const [product, setProduct] = useState<ProductType|null>(null)
     const [reviews, setReviews] = useState<ReviewType[]>([]);
     const [serverError, setServerError] = useState<boolean>(false)
-    const [collapsedTables, setCollapsedTables] = useState<{[key: number]: boolean}>({})
 
     const [showcase, setShowcase] = useState<string[]>([])
     const [readme, setReadme] = useState<string>("") 
@@ -134,7 +133,6 @@ export default function DetailPage({ params }: { params: Params }) {
       if(session?.user && product) {
         // @ts-expect-error
         let user = new User(session.user.email, String(session.provider), String(session.access_token));
-        console.log(product.uid)
         // @ts-expect-error
         user.addTool(session.user.email, f4rmerId, product.uid)
           .then(() => {

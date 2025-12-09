@@ -114,7 +114,14 @@ export const MCP_PROXY_CONFIG: ProxySecurityConfig = {
     'mcp.pearl.com',
     'aimcp.info',
     'www.audioscrape.com',
-    'app.scorecard.io'
+    'app.scorecard.io',
+    'mcp.timeslope.com',
+    'outlook-email.mintmcp.com',
+    'www.mcp.timeslope.com',
+    'gmail.mintmcp.com',
+    'gcal.mintmcp.com',
+    'mcp.coupler.io',
+    'proto.rostro.dev'
     
     // Example: Add your own MCP servers
     // 'your-mcp-server.com',

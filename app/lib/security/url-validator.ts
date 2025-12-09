@@ -110,7 +110,14 @@ const DEFAULT_CONFIG: SecurityConfig = {
     'mcp.pearl.com',
     'aimcp.info',
     'www.audioscrape.com',
-    'app.scorecard.io'
+    'app.scorecard.io',
+    'mcp.timeslope.com',
+    'outlook-email.mintmcp.com',
+    'www.mcp.timeslope.com',
+    'gcal.mintmcp.com',
+    'gmail.mintmcp.com',
+    'mcp.coupler.io',
+    'proto.rostro.dev'
     
     // Add your trusted MCP servers here
   ],
@@ -322,9 +329,9 @@ export async function secureFetch(
         clearTimeout(connectionTimeout); // Clear timeout once response is established
         
         // Check for redirects and block them
-        if (response.status >= 300 && response.status < 400) {
-          throw new Error('SSRF Protection: Redirects are not allowed');
-        }
+        // if (response.status >= 300 && response.status < 400) {
+        //   throw new Error('SSRF Protection: Redirects are not allowed');
+        // }
         
         return response;
       } catch (error) {

@@ -490,6 +490,8 @@ class F4MCPClient {
         try {
           await client.connect(t);
           this.connections.set(uti, client);
+          let ts = await client.listTools()
+          console.log("tools: ", ts)
         }
         catch(err) {
           console.error("Error: ", err)
